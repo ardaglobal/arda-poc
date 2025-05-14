@@ -16,7 +16,7 @@ import (
 
 // ERES key for dubai region from .arda_data/config/priv_validator_key.json
 var regionPubKeys = map[string]string{
-    "dubai": "uzHG3r56+TWyPCsnO4q9V4VEqV2IDjIAkloboUTOAsM=",
+	"dubai": "uzHG3r56+TWyPCsnO4q9V4VEqV2IDjIAkloboUTOAsM=",
 }
 
 type (
@@ -117,6 +117,13 @@ func (k Keeper) GetSubmission(ctx sdk.Context, id uint64) (types.Submission, boo
 
 	b, err := kvStore.Get(submissionKey)
 	if err != nil {
+		if errors.Is(err, sdkerrors.ErrKeyNotFound) {
+			return types.Submission{}, false
+		}
+		panic(fmt.Errorf("failed to get submission with id %d: %w", id, err))
+	}
+
+	if b == nil {
 		return types.Submission{}, false
 	}
 
@@ -124,4 +131,3 @@ func (k Keeper) GetSubmission(ctx sdk.Context, id uint64) (types.Submission, boo
 	k.cdc.MustUnmarshal(b, &submission)
 	return submission, true
 }
-
