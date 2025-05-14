@@ -9,6 +9,18 @@ make dev
 
 This runs `ignite chain serve` with the `config.yml` file.
 
+You can use https://github.com/ardaglobal/dexplorer to view the blockchain on the arda branch.
+
+### Functionality
+
+Currently the blockchain is setup to submit a hash and a signature. This hash can represent any off chain data.
+
+By running the tests in ./scripts you can generate the command to submit a hash to the blockchain and run the mock global node to track the valid hashes being submitted.
+
+The chain name is arda and the token is uarda.
+
+It is set up to be a single validator chain with the name of the validator being ERES.
+
 ### Configure
 
 Your blockchain in development can be configured with `config.yml`. To learn more, see the [Ignite CLI docs](https://docs.ignite.com).
