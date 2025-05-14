@@ -78,6 +78,7 @@ import (
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	"arda/docs"
+	"arda/pkg/consts"
 )
 
 const (
@@ -157,6 +158,9 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
+	
+	// Set the default bond denomination to uarda
+	sdk.DefaultBondDenom = consts.BondDenom
 }
 
 // getGovProposalHandlers return the chain proposal handlers.
