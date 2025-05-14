@@ -2,15 +2,14 @@ package keeper
 
 import (
 	"context"
-	"crypto/ecdsa"
+	"crypto/ed25519"
+	"encoding/base64"
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"math/big"
 
 	"arda/x/arda/types"
 
-	"github.com/btcsuite/btcd/btcec/v2"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -18,40 +17,28 @@ func (k Keeper) SubmitHash(goCtx context.Context, msg *types.MsgSubmitHash) (*ty
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// 1. Get the pubkey for the region
-	pubKeyHex, ok := regionPubKeys[msg.Region]
+	pubKeyBase64, ok := regionPubKeys[msg.Region]
 	if !ok {
 		return nil, errors.New("region not recognized")
 	}
-	pubKeyBytes, err := hex.DecodeString(pubKeyHex)
+	pubKeyBytes, err := base64.StdEncoding.DecodeString(pubKeyBase64)
 	if err != nil {
 		return nil, errors.New("error decoding pubkey")
+	}
+	if len(pubKeyBytes) != ed25519.PublicKeySize {
+		return nil, errors.New("invalid pubkey length")
 	}
 	
 	// 2. Decode the signature from hex/base64 string to bytes
 	sigBytes, err := hex.DecodeString(msg.Signature)
-	// If the CLI provided signature in base64, use base64 decoding instead.
 	if err != nil {
-		// handle error decoding signature
 		return nil, errors.New("error decoding signature")
 	}
-	
-	// 3. Parse signature bytes into r and s values (assuming 64-byte R||S format)
-	if len(sigBytes) != 64 {
-		// signature length mismatch, mark as invalid
-		return nil, errors.New("signature length mismatch")
+	if len(sigBytes) != ed25519.SignatureSize {
+		return nil, errors.New("invalid signature length")
 	}
-	r := new(big.Int).SetBytes(sigBytes[:32])
-	s := new(big.Int).SetBytes(sigBytes[32:])
 	
-	// 4. Parse the public key bytes (33-byte compressed) into an ECDSA public key
-	pubKey, err := btcec.ParsePubKey(pubKeyBytes)
-	if err != nil {
-		// handle error (invalid pubkey bytes)
-		return nil, errors.New("invalid pubkey bytes")
-	}
-	ecdsaPubKey := pubKey.ToECDSA()
-	
-	// 5. Decode the hash string into bytes
+	// 3. Decode the hash string into bytes
 	hashBytes, err := hex.DecodeString(msg.Hash)
 	if err != nil {
 		return nil, errors.New("error decoding hash")
@@ -60,21 +47,20 @@ func (k Keeper) SubmitHash(goCtx context.Context, msg *types.MsgSubmitHash) (*ty
 	if len(hashBytes) != 32 {
 		return nil, errors.New("hash length mismatch")
 	}
-	// 6. Verify the signature using ECDSA
-	// TODO: see how the UX differs if we reject vs just mark as invalid
-	valid := ecdsa.Verify(ecdsaPubKey, hashBytes, r, s)
+	// 4. Verify the signature using Ed25519
+	valid := ed25519.Verify(pubKeyBytes, hashBytes, sigBytes)
 	
-	// 7. Create the Submission object with valid/invalid flag
+	// 5. Create the Submission object with valid/invalid flag
 	submission := types.Submission{
 		Creator: msg.Creator,       // the submitter's account address
 		Region:  msg.Region,
 		Hash:    msg.Hash,
 		Valid:   fmt.Sprintf("%t", valid),
 	}
-	// 8. Append to state (store it)
+	// 6. Append to state (store it)
 	id := k.AppendSubmission(ctx, submission)
 	
-	// 9. Emit an event with details
+	// 7. Emit an event with details
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent("submission",
 			sdk.NewAttribute("region", msg.Region),
