@@ -75,6 +75,7 @@ import (
 	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 
+	ardamodulekeeper "arda/x/arda/keeper"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	"arda/docs"
@@ -145,6 +146,7 @@ type App struct {
 	ScopedICAHostKeeper       capabilitykeeper.ScopedKeeper
 	ScopedKeepers             map[string]capabilitykeeper.ScopedKeeper
 
+	ArdaKeeper ardamodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// simulation manager
@@ -158,7 +160,7 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	
+
 	// Set the default bond denomination to uarda
 	sdk.DefaultBondDenom = consts.BondDenom
 }
@@ -251,6 +253,7 @@ func New(
 		&app.NFTKeeper,
 		&app.GroupKeeper,
 		&app.CircuitBreakerKeeper,
+		&app.ArdaKeeper,
 		// this line is used by starport scaffolding # stargate/app/keeperDefinition
 	); err != nil {
 		panic(err)
