@@ -91,7 +91,7 @@ proto-gen:
 golangci_lint_cmd=golangci-lint
 golangci_version=v1.61.0
 
-lint:
+lint: lint-fix govet govulncheck
 	@echo "--> Running linter"
 	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(golangci_version)
 	@$(golangci_lint_cmd) run ./... --timeout 15m
@@ -106,6 +106,10 @@ lint-fix:
 ###################
 ### Development ###
 ###################
+
+dev:
+	@echo "--> Running dev"
+	@ignite chain serve --home ./.arda_data
 
 govet:
 	@echo Running go vet...
