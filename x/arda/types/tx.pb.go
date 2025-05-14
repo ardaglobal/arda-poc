@@ -35,8 +35,6 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 type MsgUpdateParams struct {
 	// authority is the address that controls the module (defaults to x/gov unless overwritten).
 	Authority string `protobuf:"bytes,1,opt,name=authority,proto3" json:"authority,omitempty"`
-	// params defines the module parameters to update.
-	//
 	// NOTE: All parameters must be supplied.
 	Params Params `protobuf:"bytes,2,opt,name=params,proto3" json:"params"`
 }
@@ -126,35 +124,157 @@ func (m *MsgUpdateParamsResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateParamsResponse proto.InternalMessageInfo
 
+type MsgSubmitHash struct {
+	Creator   string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	Region    string `protobuf:"bytes,2,opt,name=region,proto3" json:"region,omitempty"`
+	Hash      string `protobuf:"bytes,3,opt,name=hash,proto3" json:"hash,omitempty"`
+	Signature string `protobuf:"bytes,4,opt,name=signature,proto3" json:"signature,omitempty"`
+}
+
+func (m *MsgSubmitHash) Reset()         { *m = MsgSubmitHash{} }
+func (m *MsgSubmitHash) String() string { return proto.CompactTextString(m) }
+func (*MsgSubmitHash) ProtoMessage()    {}
+func (*MsgSubmitHash) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a309d740a2d00e3e, []int{2}
+}
+func (m *MsgSubmitHash) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgSubmitHash) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgSubmitHash.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgSubmitHash) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSubmitHash.Merge(m, src)
+}
+func (m *MsgSubmitHash) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgSubmitHash) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSubmitHash.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgSubmitHash proto.InternalMessageInfo
+
+func (m *MsgSubmitHash) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgSubmitHash) GetRegion() string {
+	if m != nil {
+		return m.Region
+	}
+	return ""
+}
+
+func (m *MsgSubmitHash) GetHash() string {
+	if m != nil {
+		return m.Hash
+	}
+	return ""
+}
+
+func (m *MsgSubmitHash) GetSignature() string {
+	if m != nil {
+		return m.Signature
+	}
+	return ""
+}
+
+type MsgSubmitHashResponse struct {
+	Id uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (m *MsgSubmitHashResponse) Reset()         { *m = MsgSubmitHashResponse{} }
+func (m *MsgSubmitHashResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgSubmitHashResponse) ProtoMessage()    {}
+func (*MsgSubmitHashResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a309d740a2d00e3e, []int{3}
+}
+func (m *MsgSubmitHashResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgSubmitHashResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgSubmitHashResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgSubmitHashResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSubmitHashResponse.Merge(m, src)
+}
+func (m *MsgSubmitHashResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgSubmitHashResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSubmitHashResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgSubmitHashResponse proto.InternalMessageInfo
+
+func (m *MsgSubmitHashResponse) GetId() uint64 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
 func init() {
 	proto.RegisterType((*MsgUpdateParams)(nil), "arda.arda.MsgUpdateParams")
 	proto.RegisterType((*MsgUpdateParamsResponse)(nil), "arda.arda.MsgUpdateParamsResponse")
+	proto.RegisterType((*MsgSubmitHash)(nil), "arda.arda.MsgSubmitHash")
+	proto.RegisterType((*MsgSubmitHashResponse)(nil), "arda.arda.MsgSubmitHashResponse")
 }
 
 func init() { proto.RegisterFile("arda/arda/tx.proto", fileDescriptor_a309d740a2d00e3e) }
 
 var fileDescriptor_a309d740a2d00e3e = []byte{
-	// 312 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x4a, 0x2c, 0x4a, 0x49,
-	0xd4, 0x07, 0x13, 0x25, 0x15, 0x7a, 0x05, 0x45, 0xf9, 0x25, 0xf9, 0x42, 0x9c, 0x20, 0xae, 0x1e,
-	0x88, 0x90, 0x12, 0x4c, 0xcc, 0xcd, 0xcc, 0xcb, 0xd7, 0x07, 0x93, 0x10, 0x59, 0x29, 0xf1, 0xe4,
-	0xfc, 0xe2, 0xdc, 0xfc, 0x62, 0xfd, 0xdc, 0xe2, 0x74, 0xfd, 0x32, 0x43, 0x10, 0x05, 0x95, 0x90,
-	0x84, 0x48, 0xc4, 0x83, 0x79, 0xfa, 0x10, 0x0e, 0x54, 0x4a, 0x24, 0x3d, 0x3f, 0x3d, 0x1f, 0x22,
-	0x0e, 0x62, 0x41, 0x45, 0xc5, 0x10, 0x76, 0x17, 0x24, 0x16, 0x25, 0xe6, 0x42, 0x55, 0x2b, 0xad,
-	0x67, 0xe4, 0xe2, 0xf7, 0x2d, 0x4e, 0x0f, 0x2d, 0x48, 0x49, 0x2c, 0x49, 0x0d, 0x00, 0xcb, 0x08,
-	0x99, 0x71, 0x71, 0x26, 0x96, 0x96, 0x64, 0xe4, 0x17, 0x65, 0x96, 0x54, 0x4a, 0x30, 0x2a, 0x30,
-	0x6a, 0x70, 0x3a, 0x49, 0x5c, 0xda, 0xa2, 0x2b, 0x02, 0xb5, 0xc6, 0x31, 0x25, 0xa5, 0x28, 0xb5,
-	0xb8, 0x38, 0xb8, 0xa4, 0x28, 0x33, 0x2f, 0x3d, 0x08, 0xa1, 0x54, 0xc8, 0x84, 0x8b, 0x0d, 0x62,
-	0xb6, 0x04, 0x93, 0x02, 0xa3, 0x06, 0xb7, 0x91, 0xa0, 0x1e, 0xdc, 0x73, 0x7a, 0x10, 0xa3, 0x9d,
-	0x38, 0x4f, 0xdc, 0x93, 0x67, 0x58, 0xf1, 0x7c, 0x83, 0x16, 0x63, 0x10, 0x54, 0xad, 0x95, 0x5e,
-	0xd3, 0xf3, 0x0d, 0x5a, 0x08, 0x53, 0xba, 0x9e, 0x6f, 0xd0, 0x92, 0x06, 0xbb, 0xb3, 0x02, 0xe2,
-	0x5c, 0x34, 0xd7, 0x29, 0x49, 0x72, 0x89, 0xa3, 0x09, 0x05, 0xa5, 0x16, 0x17, 0xe4, 0xe7, 0x15,
-	0xa7, 0x1a, 0xc5, 0x70, 0x31, 0xfb, 0x16, 0xa7, 0x0b, 0xf9, 0x71, 0xf1, 0xa0, 0xf8, 0x47, 0x0a,
-	0xc9, 0x1d, 0x68, 0x5a, 0xa5, 0x94, 0x70, 0xcb, 0xc1, 0x8c, 0x95, 0x62, 0x6d, 0x00, 0x39, 0xd8,
-	0x49, 0xfb, 0xc4, 0x23, 0x39, 0xc6, 0x0b, 0x8f, 0xe4, 0x18, 0x1f, 0x3c, 0x92, 0x63, 0x9c, 0xf0,
-	0x58, 0x8e, 0xe1, 0xc2, 0x63, 0x39, 0x86, 0x1b, 0x8f, 0xe5, 0x18, 0xa2, 0x04, 0x91, 0xdd, 0x5b,
-	0x52, 0x59, 0x90, 0x5a, 0x9c, 0xc4, 0x06, 0x0e, 0x5e, 0x63, 0x40, 0x00, 0x00, 0x00, 0xff, 0xff,
-	0x63, 0xc3, 0x46, 0x16, 0xf4, 0x01, 0x00, 0x00,
+	// 435 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x52, 0x31, 0x6f, 0xd3, 0x40,
+	0x14, 0xf6, 0xa5, 0x21, 0xc8, 0x8f, 0x02, 0xca, 0xa9, 0xb4, 0xae, 0x41, 0x26, 0xf2, 0x42, 0x15,
+	0x84, 0x2d, 0x0a, 0x62, 0xe8, 0x46, 0xa6, 0x2e, 0x41, 0xc8, 0x15, 0x0b, 0x0b, 0xba, 0xd6, 0xa7,
+	0xf3, 0x0d, 0xf6, 0x59, 0x77, 0x17, 0xd4, 0x6e, 0xc0, 0xc8, 0xc4, 0xaf, 0x40, 0x6c, 0x64, 0xe0,
+	0x47, 0x74, 0xac, 0x98, 0x98, 0x10, 0x4a, 0x86, 0xfc, 0x0d, 0xe4, 0x3b, 0x3b, 0x4e, 0x22, 0x65,
+	0x79, 0xbe, 0xf7, 0x7d, 0xcf, 0xdf, 0xfb, 0xde, 0xbb, 0x03, 0x4c, 0x64, 0x4a, 0x62, 0x13, 0xf4,
+	0x65, 0x54, 0x4a, 0xa1, 0x05, 0x76, 0xab, 0x34, 0xaa, 0x82, 0xdf, 0x27, 0x39, 0x2f, 0x44, 0x6c,
+	0xa2, 0x65, 0xfd, 0x83, 0x0b, 0xa1, 0x72, 0xa1, 0xe2, 0x5c, 0xb1, 0xf8, 0xe3, 0xf3, 0xea, 0x53,
+	0x13, 0x87, 0x96, 0xf8, 0x60, 0xb2, 0xd8, 0x26, 0x35, 0xb5, 0xc7, 0x04, 0x13, 0x16, 0xaf, 0x4e,
+	0x35, 0xba, 0xdf, 0xf6, 0x2e, 0x89, 0x24, 0x79, 0x5d, 0x1d, 0xfe, 0x44, 0x70, 0x7f, 0xac, 0xd8,
+	0xbb, 0x32, 0x25, 0x9a, 0xbe, 0x35, 0x0c, 0x7e, 0x05, 0x2e, 0x99, 0xe8, 0x4c, 0x48, 0xae, 0xaf,
+	0x3c, 0x34, 0x40, 0x47, 0xee, 0xc8, 0xfb, 0xfd, 0xeb, 0xd9, 0x5e, 0xdd, 0xe6, 0x75, 0x9a, 0x4a,
+	0xaa, 0xd4, 0x99, 0x96, 0xbc, 0x60, 0x49, 0x5b, 0x8a, 0x5f, 0x42, 0xcf, 0x6a, 0x7b, 0x9d, 0x01,
+	0x3a, 0xba, 0x73, 0xdc, 0x8f, 0x96, 0xc3, 0x45, 0x56, 0x7a, 0xe4, 0x5e, 0xff, 0x7d, 0xec, 0xfc,
+	0x58, 0x4c, 0x87, 0x28, 0xa9, 0x6b, 0x4f, 0xa2, 0x2f, 0x8b, 0xe9, 0xb0, 0x55, 0xf9, 0xba, 0x98,
+	0x0e, 0x1f, 0x1a, 0x9f, 0x97, 0xd6, 0xee, 0x86, 0xbb, 0xf0, 0x10, 0x0e, 0x36, 0xa0, 0x84, 0xaa,
+	0x52, 0x14, 0x8a, 0x86, 0x9f, 0x11, 0xdc, 0x1d, 0x2b, 0x76, 0x36, 0x39, 0xcf, 0xb9, 0x3e, 0x25,
+	0x2a, 0xc3, 0x1e, 0xdc, 0xbe, 0x90, 0x94, 0x68, 0x21, 0xed, 0x20, 0x49, 0x93, 0xe2, 0x7d, 0xe8,
+	0x49, 0xca, 0xb8, 0x28, 0x8c, 0x59, 0x37, 0xa9, 0x33, 0x8c, 0xa1, 0x9b, 0x11, 0x95, 0x79, 0x3b,
+	0x06, 0x35, 0x67, 0xfc, 0x08, 0x5c, 0xc5, 0x59, 0x41, 0xf4, 0x44, 0x52, 0xaf, 0x6b, 0x88, 0x16,
+	0x38, 0xd9, 0xad, 0x06, 0x68, 0x74, 0xc3, 0x27, 0xf0, 0x60, 0xcd, 0x42, 0x63, 0x0e, 0xdf, 0x83,
+	0x0e, 0x4f, 0x8d, 0x8b, 0x6e, 0xd2, 0xe1, 0xe9, 0xf1, 0x77, 0x04, 0x3b, 0x63, 0xc5, 0xf0, 0x1b,
+	0xd8, 0x5d, 0xdb, 0xbe, 0xbf, 0xb2, 0xb5, 0x8d, 0x41, 0xfd, 0x70, 0x3b, 0xb7, 0xec, 0x73, 0x0a,
+	0xb0, 0xba, 0x80, 0xf5, 0x3f, 0x5a, 0xc6, 0x1f, 0x6c, 0x63, 0x1a, 0x25, 0xff, 0xd6, 0xa7, 0xea,
+	0xa2, 0x46, 0x4f, 0xaf, 0x67, 0x01, 0xba, 0x99, 0x05, 0xe8, 0xdf, 0x2c, 0x40, 0xdf, 0xe6, 0x81,
+	0x73, 0x33, 0x0f, 0x9c, 0x3f, 0xf3, 0xc0, 0x79, 0xdf, 0x5f, 0xbd, 0x27, 0x7d, 0x55, 0x52, 0x75,
+	0xde, 0x33, 0xcf, 0xea, 0xc5, 0xff, 0x00, 0x00, 0x00, 0xff, 0xff, 0x12, 0x6e, 0x80, 0xd3, 0xec,
+	0x02, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -172,6 +292,7 @@ type MsgClient interface {
 	// UpdateParams defines a (governance) operation for updating the module
 	// parameters. The authority defaults to the x/gov module account.
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
+	SubmitHash(ctx context.Context, in *MsgSubmitHash, opts ...grpc.CallOption) (*MsgSubmitHashResponse, error)
 }
 
 type msgClient struct {
@@ -191,11 +312,21 @@ func (c *msgClient) UpdateParams(ctx context.Context, in *MsgUpdateParams, opts 
 	return out, nil
 }
 
+func (c *msgClient) SubmitHash(ctx context.Context, in *MsgSubmitHash, opts ...grpc.CallOption) (*MsgSubmitHashResponse, error) {
+	out := new(MsgSubmitHashResponse)
+	err := c.cc.Invoke(ctx, "/arda.arda.Msg/SubmitHash", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	// UpdateParams defines a (governance) operation for updating the module
 	// parameters. The authority defaults to the x/gov module account.
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
+	SubmitHash(context.Context, *MsgSubmitHash) (*MsgSubmitHashResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -204,6 +335,9 @@ type UnimplementedMsgServer struct {
 
 func (*UnimplementedMsgServer) UpdateParams(ctx context.Context, req *MsgUpdateParams) (*MsgUpdateParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateParams not implemented")
+}
+func (*UnimplementedMsgServer) SubmitHash(ctx context.Context, req *MsgSubmitHash) (*MsgSubmitHashResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SubmitHash not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -228,6 +362,24 @@ func _Msg_UpdateParams_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_SubmitHash_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgSubmitHash)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).SubmitHash(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/arda.arda.Msg/SubmitHash",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).SubmitHash(ctx, req.(*MsgSubmitHash))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var Msg_serviceDesc = _Msg_serviceDesc
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "arda.arda.Msg",
@@ -236,6 +388,10 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateParams",
 			Handler:    _Msg_UpdateParams_Handler,
+		},
+		{
+			MethodName: "SubmitHash",
+			Handler:    _Msg_SubmitHash_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -305,6 +461,85 @@ func (m *MsgUpdateParamsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgSubmitHash) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgSubmitHash) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgSubmitHash) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Signature) > 0 {
+		i -= len(m.Signature)
+		copy(dAtA[i:], m.Signature)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Signature)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.Hash) > 0 {
+		i -= len(m.Hash)
+		copy(dAtA[i:], m.Hash)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Hash)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Region) > 0 {
+		i -= len(m.Region)
+		copy(dAtA[i:], m.Region)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Region)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgSubmitHashResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgSubmitHashResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgSubmitHashResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Id != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.Id))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTx(v)
 	base := offset
@@ -337,6 +572,43 @@ func (m *MsgUpdateParamsResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
+	return n
+}
+
+func (m *MsgSubmitHash) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Region)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Hash)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Signature)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgSubmitHashResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Id != 0 {
+		n += 1 + sovTx(uint64(m.Id))
+	}
 	return n
 }
 
@@ -490,6 +762,253 @@ func (m *MsgUpdateParamsResponse) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: MsgUpdateParamsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgSubmitHash) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgSubmitHash: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgSubmitHash: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Region", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Region = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Hash", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Hash = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Signature", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Signature = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgSubmitHashResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgSubmitHashResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgSubmitHashResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			m.Id = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Id |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])

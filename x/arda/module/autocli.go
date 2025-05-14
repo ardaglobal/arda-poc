@@ -28,6 +28,12 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					RpcMethod: "UpdateParams",
 					Skip:      true, // skipped because authority gated
 				},
+				{
+					RpcMethod:      "SubmitHash",
+					Use:            "submit-hash [region] [hash] [signature]",
+					Short:          "Send a submit-hash tx",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "region"}, {ProtoField: "hash"}, {ProtoField: "signature"}},
+				},
 				// this line is used by ignite scaffolding # autocli/tx
 			},
 		},
