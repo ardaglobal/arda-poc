@@ -131,3 +131,34 @@ func (k Keeper) GetSubmission(ctx sdk.Context, id uint64) (types.Submission, boo
 	k.cdc.MustUnmarshal(b, &submission)
 	return submission, true
 }
+
+// GetAllSubmissions returns all submissions in the store
+func (k Keeper) GetAllSubmissions(ctx sdk.Context) ([]types.Submission, error) {
+	kvStore := k.storeService.OpenKVStore(ctx)
+	submissionPrefix := types.KeyPrefix(types.KeyPrefixSubmission)
+
+	// Get an iterator over all submission keys
+	iterator, err := kvStore.Iterator(submissionPrefix, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get iterator: %w", err)
+	}
+	defer iterator.Close()
+
+	submissions := []types.Submission{}
+
+	// Iterate over all keys
+	for ; iterator.Valid(); iterator.Next() {
+		// Ensure the key has the proper format (prefix + submission ID)
+		key := iterator.Key()
+		if len(key) <= len(submissionPrefix) {
+			continue
+		}
+
+		value := iterator.Value()
+		var submission types.Submission
+		k.cdc.MustUnmarshal(value, &submission)
+		submissions = append(submissions, submission)
+	}
+
+	return submissions, nil
+}

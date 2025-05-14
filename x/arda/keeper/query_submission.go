@@ -9,8 +9,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	ardaTypes "arda/x/arda/types"
-
-	storetypes "cosmossdk.io/store/types"
 )
 
 func (k Keeper) SubmissionAll(goCtx context.Context, req *ardaTypes.QueryAllSubmissionRequest) (*ardaTypes.QueryAllSubmissionResponse, error) {
@@ -18,28 +16,56 @@ func (k Keeper) SubmissionAll(goCtx context.Context, req *ardaTypes.QueryAllSubm
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
-	var submissions []*ardaTypes.Submission
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	kvStore := k.storeService.OpenKVStore(ctx).(storetypes.KVStore)
-
-	pageRes, err := query.Paginate(kvStore, req.Pagination, func(key []byte, value []byte) error {
-		var submission ardaTypes.Submission
-		if err := k.cdc.Unmarshal(value, &submission); err != nil {
-			return err
-		}
-		submissions = append(submissions, &submission)
-		return nil
-	})
+	// Use GetAllSubmissions to get all submissions
+	allSubmissions, err := k.GetAllSubmissions(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	// Convert to pointers for response type
+	submissionPtrs := make([]*ardaTypes.Submission, len(allSubmissions))
+	for i, sub := range allSubmissions {
+		submissionCopy := sub // Create a copy to avoid reference issues
+		submissionPtrs[i] = &submissionCopy
+	}
+
+	// Apply pagination if provided
+	start, end := 0, len(submissionPtrs)
+	if req.Pagination != nil {
+		start = int(req.Pagination.Offset)
+		if start > len(submissionPtrs) {
+			start = len(submissionPtrs)
+		}
+
+		if req.Pagination.Limit > 0 && start+int(req.Pagination.Limit) < len(submissionPtrs) {
+			end = start + int(req.Pagination.Limit)
+		}
+	}
+
+	// Slice the submissions based on pagination
+	paginatedSubmissions := submissionPtrs
+	if start < end {
+		paginatedSubmissions = submissionPtrs[start:end]
+	} else {
+		paginatedSubmissions = []*ardaTypes.Submission{}
+	}
+
+	// Create pagination response
+	pageRes := &query.PageResponse{
+		Total: uint64(len(submissionPtrs)),
+	}
+	if req.Pagination != nil && req.Pagination.CountTotal {
+		pageRes.Total = uint64(len(submissionPtrs))
+	}
+
 	return &ardaTypes.QueryAllSubmissionResponse{
-		Submission: submissions,
+		Submission: paginatedSubmissions,
 		Pagination: pageRes,
 	}, nil
 }
+
 func (k Keeper) Submission(goCtx context.Context, req *ardaTypes.QueryGetSubmissionRequest) (*ardaTypes.QueryGetSubmissionResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
