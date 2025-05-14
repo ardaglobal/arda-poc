@@ -1,12 +1,15 @@
 package keeper
 
 import (
+	"encoding/binary"
+	"errors"
 	"fmt"
 
 	"cosmossdk.io/core/store"
 	"cosmossdk.io/log"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"arda/x/arda/types"
 )
@@ -50,4 +53,52 @@ func (k Keeper) GetAuthority() string {
 // Logger returns a module-specific logger.
 func (k Keeper) Logger() log.Logger {
 	return k.logger.With("module", fmt.Sprintf("x/%s", types.ModuleName))
+}
+
+// AppendSubmission saves a new submission in the store and returns its ID.
+func (k Keeper) AppendSubmission(ctx sdk.Context, submission types.Submission) uint64 {
+	kvStore := k.storeService.OpenKVStore(ctx)
+
+	// Define prefixes
+	submissionPrefix := types.KeyPrefix(types.KeyPrefixSubmission)
+	countPrefix := types.KeyPrefix(types.KeyPrefixSubmissionCount)
+
+	// Get current count
+	countRecordKey := append(countPrefix, []byte{0}...)
+	bz, err := kvStore.Get(countRecordKey)
+	if err != nil {
+		// If key is not found, count is 0. Otherwise, panic.
+		if !errors.Is(err, sdkerrors.ErrKeyNotFound) {
+			panic(fmt.Errorf("failed to get submission count: %w", err))
+		}
+		// bz remains nil if key not found, which is handled below
+	}
+
+	var count uint64
+	if bz == nil {
+		count = 0
+	} else {
+		count = binary.LittleEndian.Uint64(bz)
+	}
+
+	// Marshal the submission into bytes
+	appendedValue := k.cdc.MustMarshal(&submission)
+
+	// Store the submission
+	submissionKey := append(submissionPrefix, types.GetSubmissionIDBytes(count)...)
+	err = kvStore.Set(submissionKey, appendedValue)
+	if err != nil {
+		panic(fmt.Errorf("failed to set submission: %w", err))
+	}
+
+	// Update the count
+	newCount := count + 1
+	newCountBz := make([]byte, 8)
+	binary.LittleEndian.PutUint64(newCountBz, newCount)
+	err = kvStore.Set(countRecordKey, newCountBz) // Use the same countRecordKey
+	if err != nil {
+		panic(fmt.Errorf("failed to set new submission count: %w", err))
+	}
+
+	return count
 }
