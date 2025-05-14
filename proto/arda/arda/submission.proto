@@ -1,0 +1,13 @@
+syntax = "proto3";
+package arda.arda;
+
+option go_package = "arda/x/arda/types";
+
+message Submission {
+  
+  string id = 1; 
+  string creator = 2; 
+  string region = 3; 
+  string hash = 4; 
+  string valid = 5; 
+}
