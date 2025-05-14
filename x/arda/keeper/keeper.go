@@ -107,3 +107,21 @@ func (k Keeper) AppendSubmission(ctx sdk.Context, submission types.Submission) u
 
 	return count
 }
+
+func (k Keeper) GetSubmission(ctx sdk.Context, id uint64) (types.Submission, bool) {
+	kvStore := k.storeService.OpenKVStore(ctx)
+
+	// Use the same prefix as AppendSubmission
+	submissionPrefix := types.KeyPrefix(types.KeyPrefixSubmission)
+	submissionKey := append(submissionPrefix, types.GetSubmissionIDBytes(id)...)
+
+	b, err := kvStore.Get(submissionKey)
+	if err != nil {
+		return types.Submission{}, false
+	}
+
+	var submission types.Submission
+	k.cdc.MustUnmarshal(b, &submission)
+	return submission, true
+}
+
