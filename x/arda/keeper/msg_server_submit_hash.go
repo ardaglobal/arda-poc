@@ -28,7 +28,7 @@ func (k Keeper) SubmitHash(goCtx context.Context, msg *types.MsgSubmitHash) (*ty
 	if len(pubKeyBytes) != ed25519.PublicKeySize {
 		return nil, errors.New("invalid pubkey length")
 	}
-	
+
 	// 2. Decode the signature from hex/base64 string to bytes
 	sigBytes, err := hex.DecodeString(msg.Signature)
 	if err != nil {
@@ -37,7 +37,7 @@ func (k Keeper) SubmitHash(goCtx context.Context, msg *types.MsgSubmitHash) (*ty
 	if len(sigBytes) != ed25519.SignatureSize {
 		return nil, errors.New("invalid signature length")
 	}
-	
+
 	// 3. Decode the hash string into bytes
 	hashBytes, err := hex.DecodeString(msg.Hash)
 	if err != nil {
@@ -49,17 +49,17 @@ func (k Keeper) SubmitHash(goCtx context.Context, msg *types.MsgSubmitHash) (*ty
 	}
 	// 4. Verify the signature using Ed25519
 	valid := ed25519.Verify(pubKeyBytes, hashBytes, sigBytes)
-	
+
 	// 5. Create the Submission object with valid/invalid flag
 	submission := types.Submission{
-		Creator: msg.Creator,       // the submitter's account address
+		Creator: msg.Creator, // the submitter's account address
 		Region:  msg.Region,
 		Hash:    msg.Hash,
 		Valid:   fmt.Sprintf("%t", valid),
 	}
 	// 6. Append to state (store it)
 	id := k.AppendSubmission(ctx, submission)
-	
+
 	// 7. Emit an event with details
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent("submission",
