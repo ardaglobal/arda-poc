@@ -32,7 +32,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 
-	"arda/app"
+	"github.com/ardaglobal/arda-poc/app"
 )
 
 const (

@@ -20,7 +20,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"arda/app"
+	"github.com/ardaglobal/arda-poc/app"
 )
 
 // NewRootCmd creates a new root command for ardad. It is called once in the main function.

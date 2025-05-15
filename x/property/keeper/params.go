@@ -5,7 +5,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/runtime"
 
-	"arda/x/property/types"
+	"github.com/ardaglobal/arda-poc/x/property/types"
 )
 
 // GetParams get all parameters as types.Params

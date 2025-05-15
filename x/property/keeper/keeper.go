@@ -8,7 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"arda/x/property/types"
+	"github.com/ardaglobal/arda-poc/x/property/types"
 )
 
 type (

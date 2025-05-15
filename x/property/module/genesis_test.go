@@ -3,10 +3,12 @@ package property_test
 import (
 	"testing"
 
-	keepertest "arda/testutil/keeper"
-	"arda/testutil/nullify"
-	property "arda/x/property/module"
-	"arda/x/property/types"
+	property "github.com/ardaglobal/arda-poc/x/property/module"
+
+	keepertest "github.com/ardaglobal/arda-poc/testutil/keeper"
+	"github.com/ardaglobal/arda-poc/testutil/nullify"
+
+	"github.com/ardaglobal/arda-poc/x/property/types"
 
 	"github.com/stretchr/testify/require"
 )

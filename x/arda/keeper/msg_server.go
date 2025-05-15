@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"arda/x/arda/types"
+	"github.com/ardaglobal/arda-poc/x/arda/types"
 )
 
 type msgServer struct {

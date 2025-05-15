@@ -26,7 +26,7 @@ import (
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 
-	"arda/app"
+	"github.com/ardaglobal/arda-poc/app"
 )
 
 const (

@@ -3,13 +3,13 @@ package app
 import (
 	"time"
 
-	ardamodulev1 "arda/api/arda/arda/module"
-	_ "arda/x/arda/module" // import for side-effects
-	ardamoduletypes "arda/x/arda/types"
+	ardamodulev1 "github.com/ardaglobal/arda-poc/api/arda/arda/module"
+	_ "github.com/ardaglobal/arda-poc/x/arda/module" // import for side-effects
+	ardamoduletypes "github.com/ardaglobal/arda-poc/x/arda/types"
 
-	propertymodulev1 "arda/api/arda/property/module"
-	_ "arda/x/property/module" // import for side-effects
-	propertymoduletypes "arda/x/property/types"
+	propertymodulev1 "github.com/ardaglobal/arda-poc/api/arda/property/module"
+	_ "github.com/ardaglobal/arda-poc/x/property/module" // import for side-effects
+	propertymoduletypes "github.com/ardaglobal/arda-poc/x/property/types"
 
 	runtimev1alpha1 "cosmossdk.io/api/cosmos/app/runtime/v1alpha1"
 	appv1alpha1 "cosmossdk.io/api/cosmos/app/v1alpha1"

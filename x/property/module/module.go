@@ -20,9 +20,11 @@ import (
 
 	// this line is used by starport scaffolding # 1
 
-	modulev1 "arda/api/arda/property/module"
-	"arda/x/property/keeper"
-	"arda/x/property/types"
+	modulev1 "github.com/ardaglobal/arda-poc/api/arda/property/module"
+
+	"github.com/ardaglobal/arda-poc/x/property/keeper"
+
+	"github.com/ardaglobal/arda-poc/x/property/types"
 )
 
 var (

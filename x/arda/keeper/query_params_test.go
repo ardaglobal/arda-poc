@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	keepertest "arda/testutil/keeper"
-	"arda/x/arda/types"
+	keepertest "github.com/ardaglobal/arda-poc/testutil/keeper"
+	"github.com/ardaglobal/arda-poc/x/arda/types"
 )
 
 func TestParamsQuery(t *testing.T) {

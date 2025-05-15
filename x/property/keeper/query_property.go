@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	propertyTypes "arda/x/property/types"
+	propertyTypes "github.com/ardaglobal/arda-poc/x/property/types"
 )
 
 func (k Keeper) PropertyAll(goCtx context.Context, req *propertyTypes.QueryAllPropertyRequest) (*propertyTypes.QueryAllPropertyResponse, error) {

@@ -7,7 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 	"github.com/stretchr/testify/require"
 
-	"arda/app"
+	"github.com/ardaglobal/arda-poc/app"
 )
 
 type (

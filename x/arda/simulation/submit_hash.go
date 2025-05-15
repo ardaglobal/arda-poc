@@ -3,8 +3,8 @@ package simulation
 import (
 	"math/rand"
 
-	"arda/x/arda/keeper"
-	"arda/x/arda/types"
+	"github.com/ardaglobal/arda-poc/x/arda/keeper"
+	"github.com/ardaglobal/arda-poc/x/arda/types"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"

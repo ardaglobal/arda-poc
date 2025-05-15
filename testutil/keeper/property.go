@@ -17,8 +17,8 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/stretchr/testify/require"
 
-	"arda/x/property/keeper"
-	"arda/x/property/types"
+	"github.com/ardaglobal/arda-poc/x/property/keeper"
+	"github.com/ardaglobal/arda-poc/x/property/types"
 )
 
 func PropertyKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {

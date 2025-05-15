@@ -17,8 +17,8 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/stretchr/testify/require"
 
-	"arda/x/arda/keeper"
-	"arda/x/arda/types"
+	"github.com/ardaglobal/arda-poc/x/arda/keeper"
+	"github.com/ardaglobal/arda-poc/x/arda/types"
 )
 
 func ArdaKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {

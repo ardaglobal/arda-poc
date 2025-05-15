@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 
-	"arda/x/property/types"
+	"github.com/ardaglobal/arda-poc/x/property/types"
 )
 
 func TestMsgUpdateParams(t *testing.T) {

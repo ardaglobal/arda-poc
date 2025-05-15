@@ -3,7 +3,7 @@ package property
 import (
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
 
-	modulev1 "arda/api/arda/property"
+	modulev1 "github.com/ardaglobal/arda-poc/api/arda/property"
 )
 
 // AutoCLIOptions implements the autocli.HasAutoCLIConfig interface.

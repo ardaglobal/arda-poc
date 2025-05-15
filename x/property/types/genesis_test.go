@@ -3,7 +3,7 @@ package types_test
 import (
 	"testing"
 
-	"arda/x/property/types"
+	"github.com/ardaglobal/arda-poc/x/property/types"
 
 	"github.com/stretchr/testify/require"
 )

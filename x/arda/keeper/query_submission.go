@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	ardaTypes "arda/x/arda/types"
+	ardaTypes "github.com/ardaglobal/arda-poc/x/arda/types"
 )
 
 func (k Keeper) SubmissionAll(goCtx context.Context, req *ardaTypes.QueryAllSubmissionRequest) (*ardaTypes.QueryAllSubmissionResponse, error) {

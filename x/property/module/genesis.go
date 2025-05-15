@@ -3,8 +3,9 @@ package property
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"arda/x/property/keeper"
-	"arda/x/property/types"
+	"github.com/ardaglobal/arda-poc/x/property/keeper"
+
+	"github.com/ardaglobal/arda-poc/x/property/types"
 )
 
 // InitGenesis initializes the module's state from a provided genesis state.

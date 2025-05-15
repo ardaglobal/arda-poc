@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"arda/x/property/types"
+	"github.com/ardaglobal/arda-poc/x/property/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

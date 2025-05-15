@@ -6,9 +6,11 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	keepertest "arda/testutil/keeper"
-	"arda/x/property/keeper"
-	"arda/x/property/types"
+	"github.com/ardaglobal/arda-poc/x/property/keeper"
+
+	keepertest "github.com/ardaglobal/arda-poc/testutil/keeper"
+
+	"github.com/ardaglobal/arda-poc/x/property/types"
 )
 
 func setupMsgServer(t testing.TB) (keeper.Keeper, types.MsgServer, context.Context) {

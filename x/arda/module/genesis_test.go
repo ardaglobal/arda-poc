@@ -3,10 +3,11 @@ package arda_test
 import (
 	"testing"
 
-	keepertest "arda/testutil/keeper"
-	"arda/testutil/nullify"
-	arda "arda/x/arda/module"
-	"arda/x/arda/types"
+	arda "github.com/ardaglobal/arda-poc/x/arda/module"
+	"github.com/ardaglobal/arda-poc/x/arda/types"
+
+	keepertest "github.com/ardaglobal/arda-poc/testutil/keeper"
+	"github.com/ardaglobal/arda-poc/testutil/nullify"
 
 	"github.com/stretchr/testify/require"
 )

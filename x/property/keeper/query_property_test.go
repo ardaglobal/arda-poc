@@ -6,8 +6,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/query"
 	"github.com/stretchr/testify/require"
 
-	keepertest "arda/testutil/keeper"
-	"arda/x/property/types"
+	keepertest "github.com/ardaglobal/arda-poc/testutil/keeper"
+
+	"github.com/ardaglobal/arda-poc/x/property/types"
 )
 
 func TestPropertyAllQuery(t *testing.T) {

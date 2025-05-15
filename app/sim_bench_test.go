@@ -14,7 +14,7 @@ import (
 	simcli "github.com/cosmos/cosmos-sdk/x/simulation/client/cli"
 	"github.com/stretchr/testify/require"
 
-	"arda/app"
+	"github.com/ardaglobal/arda-poc/app"
 )
 
 // Profile with:

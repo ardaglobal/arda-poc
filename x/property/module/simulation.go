@@ -8,9 +8,11 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
-	"arda/testutil/sample"
-	propertysimulation "arda/x/property/simulation"
-	"arda/x/property/types"
+	propertysimulation "github.com/ardaglobal/arda-poc/x/property/simulation"
+
+	"github.com/ardaglobal/arda-poc/testutil/sample"
+
+	"github.com/ardaglobal/arda-poc/x/property/types"
 )
 
 // avoid unused import issue

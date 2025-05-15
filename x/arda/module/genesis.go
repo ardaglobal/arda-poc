@@ -3,8 +3,8 @@ package arda
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"arda/x/arda/keeper"
-	"arda/x/arda/types"
+	"github.com/ardaglobal/arda-poc/x/arda/keeper"
+	"github.com/ardaglobal/arda-poc/x/arda/types"
 )
 
 // InitGenesis initializes the module's state from a provided genesis state.
