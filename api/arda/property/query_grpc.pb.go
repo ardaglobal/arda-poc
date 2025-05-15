@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             (unknown)
-// source: arda/arda/query.proto
+// source: arda/property/query.proto
 
-package arda
+package property
 
 import (
 	context "context"
@@ -20,9 +20,7 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Query_Params_FullMethodName        = "/arda.arda.Query/Params"
-	Query_Submission_FullMethodName    = "/arda.arda.Query/Submission"
-	Query_SubmissionAll_FullMethodName = "/arda.arda.Query/SubmissionAll"
+	Query_Params_FullMethodName = "/arda.property.Query/Params"
 )
 
 // QueryClient is the client API for Query service.
@@ -31,8 +29,6 @@ const (
 type QueryClient interface {
 	// Parameters queries the parameters of the module.
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
-	Submission(ctx context.Context, in *QueryGetSubmissionRequest, opts ...grpc.CallOption) (*QueryGetSubmissionResponse, error)
-	SubmissionAll(ctx context.Context, in *QueryAllSubmissionRequest, opts ...grpc.CallOption) (*QueryAllSubmissionResponse, error)
 }
 
 type queryClient struct {
@@ -52,32 +48,12 @@ func (c *queryClient) Params(ctx context.Context, in *QueryParamsRequest, opts .
 	return out, nil
 }
 
-func (c *queryClient) Submission(ctx context.Context, in *QueryGetSubmissionRequest, opts ...grpc.CallOption) (*QueryGetSubmissionResponse, error) {
-	out := new(QueryGetSubmissionResponse)
-	err := c.cc.Invoke(ctx, Query_Submission_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *queryClient) SubmissionAll(ctx context.Context, in *QueryAllSubmissionRequest, opts ...grpc.CallOption) (*QueryAllSubmissionResponse, error) {
-	out := new(QueryAllSubmissionResponse)
-	err := c.cc.Invoke(ctx, Query_SubmissionAll_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // QueryServer is the server API for Query service.
 // All implementations must embed UnimplementedQueryServer
 // for forward compatibility
 type QueryServer interface {
 	// Parameters queries the parameters of the module.
 	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
-	Submission(context.Context, *QueryGetSubmissionRequest) (*QueryGetSubmissionResponse, error)
-	SubmissionAll(context.Context, *QueryAllSubmissionRequest) (*QueryAllSubmissionResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -87,12 +63,6 @@ type UnimplementedQueryServer struct {
 
 func (UnimplementedQueryServer) Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Params not implemented")
-}
-func (UnimplementedQueryServer) Submission(context.Context, *QueryGetSubmissionRequest) (*QueryGetSubmissionResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Submission not implemented")
-}
-func (UnimplementedQueryServer) SubmissionAll(context.Context, *QueryAllSubmissionRequest) (*QueryAllSubmissionResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SubmissionAll not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}
 
@@ -125,62 +95,18 @@ func _Query_Params_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_Submission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetSubmissionRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(QueryServer).Submission(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Query_Submission_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).Submission(ctx, req.(*QueryGetSubmissionRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Query_SubmissionAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryAllSubmissionRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(QueryServer).SubmissionAll(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Query_SubmissionAll_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).SubmissionAll(ctx, req.(*QueryAllSubmissionRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // Query_ServiceDesc is the grpc.ServiceDesc for Query service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Query_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "arda.arda.Query",
+	ServiceName: "arda.property.Query",
 	HandlerType: (*QueryServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Params",
 			Handler:    _Query_Params_Handler,
 		},
-		{
-			MethodName: "Submission",
-			Handler:    _Query_Submission_Handler,
-		},
-		{
-			MethodName: "SubmissionAll",
-			Handler:    _Query_SubmissionAll_Handler,
-		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "arda/arda/query.proto",
+	Metadata: "arda/property/query.proto",
 }

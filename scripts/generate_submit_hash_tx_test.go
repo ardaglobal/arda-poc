@@ -32,4 +32,4 @@ func TestGenerateHashAndSignature_SubmitHash(t *testing.T) {
 func setupMsgServer(t testing.TB) (keeper.Keeper, types.MsgServer, context.Context) {
 	k, ctx := keepertest.ArdaKeeper(t)
 	return k, keeper.NewMsgServerImpl(k), ctx
-} 
+}

@@ -7,6 +7,10 @@ import (
 	_ "arda/x/arda/module" // import for side-effects
 	ardamoduletypes "arda/x/arda/types"
 
+	propertymodulev1 "arda/api/arda/property/module"
+	_ "arda/x/property/module" // import for side-effects
+	propertymoduletypes "arda/x/property/types"
+
 	runtimev1alpha1 "cosmossdk.io/api/cosmos/app/runtime/v1alpha1"
 	appv1alpha1 "cosmossdk.io/api/cosmos/app/v1alpha1"
 	authmodulev1 "cosmossdk.io/api/cosmos/auth/module/v1"
@@ -94,6 +98,7 @@ var (
 		circuittypes.ModuleName,
 		// chain modules
 		ardamoduletypes.ModuleName,
+		propertymoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 
@@ -119,6 +124,7 @@ var (
 		ibcfeetypes.ModuleName,
 		// chain modules
 		ardamoduletypes.ModuleName,
+		propertymoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	}
 
@@ -138,6 +144,7 @@ var (
 		ibcfeetypes.ModuleName,
 		// chain modules
 		ardamoduletypes.ModuleName,
+		propertymoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	}
 
@@ -296,6 +303,10 @@ var (
 			{
 				Name:   ardamoduletypes.ModuleName,
 				Config: appconfig.WrapAny(&ardamodulev1.Module{}),
+			},
+			{
+				Name:   propertymoduletypes.ModuleName,
+				Config: appconfig.WrapAny(&propertymodulev1.Module{}),
 			},
 			// this line is used by starport scaffolding # stargate/app/moduleConfig
 		},
