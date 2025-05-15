@@ -51,3 +51,20 @@ func (k Keeper) GetAuthority() string {
 func (k Keeper) Logger() log.Logger {
 	return k.logger.With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
+
+func (k Keeper) GetProperty(ctx sdk.Context, id string) (types.Property, bool) {
+	kvStore := k.storeService.OpenKVStore(ctx)
+	bz, err := kvStore.Get([]byte(id))
+	if err != nil {
+		return types.Property{}, false
+	}
+
+	var property types.Property
+	k.cdc.MustUnmarshal(bz, &property)
+	return property, true
+}
+
+func (k Keeper) SetProperty(ctx sdk.Context, property types.Property) {
+	kvStore := k.storeService.OpenKVStore(ctx)
+	kvStore.Set([]byte(property.Index), k.cdc.MustMarshal(&property))
+}
