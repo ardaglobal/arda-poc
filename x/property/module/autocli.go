@@ -28,6 +28,12 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					RpcMethod: "UpdateParams",
 					Skip:      true, // skipped because authority gated
 				},
+				{
+					RpcMethod:      "RegisterProperty",
+					Use:            "register-property [address] [region] [value]",
+					Short:          "Send a register-property tx",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "address"}, {ProtoField: "region"}, {ProtoField: "value"}},
+				},
 				// this line is used by ignite scaffolding # autocli/tx
 			},
 		},
