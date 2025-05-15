@@ -9,6 +9,8 @@ const (
 
 	// MemStoreKey defines the in-memory store key
 	MemStoreKey = "mem_property"
+	// KeyPrefixProperty is the prefix used to store properties by ID.
+	KeyPrefixProperty = "Property/value/"
 )
 
 var (

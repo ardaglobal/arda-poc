@@ -19,7 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Query_Params_FullMethodName = "/arda.property.Query/Params"
+	Query_Params_FullMethodName      = "/arda.property.Query/Params"
+	Query_PropertyAll_FullMethodName = "/arda.property.Query/PropertyAll"
+	Query_Property_FullMethodName    = "/arda.property.Query/Property"
 )
 
 // QueryClient is the client API for Query service.
@@ -28,6 +30,8 @@ const (
 type QueryClient interface {
 	// Parameters queries the parameters of the module.
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
+	PropertyAll(ctx context.Context, in *QueryAllPropertyRequest, opts ...grpc.CallOption) (*QueryAllPropertyResponse, error)
+	Property(ctx context.Context, in *QueryGetPropertyRequest, opts ...grpc.CallOption) (*QueryGetPropertyResponse, error)
 }
 
 type queryClient struct {
@@ -47,12 +51,32 @@ func (c *queryClient) Params(ctx context.Context, in *QueryParamsRequest, opts .
 	return out, nil
 }
 
+func (c *queryClient) PropertyAll(ctx context.Context, in *QueryAllPropertyRequest, opts ...grpc.CallOption) (*QueryAllPropertyResponse, error) {
+	out := new(QueryAllPropertyResponse)
+	err := c.cc.Invoke(ctx, Query_PropertyAll_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) Property(ctx context.Context, in *QueryGetPropertyRequest, opts ...grpc.CallOption) (*QueryGetPropertyResponse, error) {
+	out := new(QueryGetPropertyResponse)
+	err := c.cc.Invoke(ctx, Query_Property_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 // All implementations must embed UnimplementedQueryServer
 // for forward compatibility
 type QueryServer interface {
 	// Parameters queries the parameters of the module.
 	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
+	PropertyAll(context.Context, *QueryAllPropertyRequest) (*QueryAllPropertyResponse, error)
+	Property(context.Context, *QueryGetPropertyRequest) (*QueryGetPropertyResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -62,6 +86,12 @@ type UnimplementedQueryServer struct {
 
 func (UnimplementedQueryServer) Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Params not implemented")
+}
+func (UnimplementedQueryServer) PropertyAll(context.Context, *QueryAllPropertyRequest) (*QueryAllPropertyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PropertyAll not implemented")
+}
+func (UnimplementedQueryServer) Property(context.Context, *QueryGetPropertyRequest) (*QueryGetPropertyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Property not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}
 
@@ -94,6 +124,42 @@ func _Query_Params_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_PropertyAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryAllPropertyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).PropertyAll(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_PropertyAll_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).PropertyAll(ctx, req.(*QueryAllPropertyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_Property_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryGetPropertyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).Property(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_Property_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).Property(ctx, req.(*QueryGetPropertyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Query_ServiceDesc is the grpc.ServiceDesc for Query service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -104,6 +170,14 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Params",
 			Handler:    _Query_Params_Handler,
+		},
+		{
+			MethodName: "PropertyAll",
+			Handler:    _Query_PropertyAll_Handler,
+		},
+		{
+			MethodName: "Property",
+			Handler:    _Query_Property_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

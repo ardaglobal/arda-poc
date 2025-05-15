@@ -68,3 +68,34 @@ func (k Keeper) SetProperty(ctx sdk.Context, property types.Property) {
 	kvStore := k.storeService.OpenKVStore(ctx)
 	kvStore.Set([]byte(property.Index), k.cdc.MustMarshal(&property))
 }
+
+// GetAllProperties returns all properties in the store
+func (k Keeper) GetAllProperties(ctx sdk.Context) ([]types.Property, error) {
+	kvStore := k.storeService.OpenKVStore(ctx)
+	propertyPrefix := types.KeyPrefix(types.KeyPrefixProperty)
+
+	// Get an iterator over all submission keys
+	iterator, err := kvStore.Iterator(propertyPrefix, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get iterator: %w", err)
+	}
+	defer iterator.Close()
+
+	properties := []types.Property{}
+
+	// Iterate over all keys
+	for ; iterator.Valid(); iterator.Next() {
+		// Ensure the key has the proper format (prefix + submission ID)
+		key := iterator.Key()
+		if len(key) <= len(propertyPrefix) {
+			continue
+		}
+
+		value := iterator.Value()
+		var property types.Property
+		k.cdc.MustUnmarshal(value, &property)
+		properties = append(properties, property)
+	}
+
+	return properties, nil
+}

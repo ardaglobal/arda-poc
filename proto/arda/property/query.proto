@@ -6,6 +6,7 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "arda/property/params.proto";
+import "arda/property/property.proto";
 
 option go_package = "arda/x/property/types";
 
@@ -14,6 +15,14 @@ service Query {
   // Parameters queries the parameters of the module.
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/arda/property/params";
+  }
+  
+  rpc PropertyAll(QueryAllPropertyRequest) returns (QueryAllPropertyResponse) {
+    option (google.api.http).get = "/cosmonaut/arda/property/properties";
+  }
+
+  rpc Property(QueryGetPropertyRequest) returns (QueryGetPropertyResponse) {
+    option (google.api.http).get = "/cosmonaut/arda/property/properties/{index}";
   }
 }
 
@@ -27,4 +36,19 @@ message QueryParamsResponse {
     (gogoproto.nullable) = false,
     (amino.dont_omitempty) = true
   ];
+}
+
+message QueryAllPropertyRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+message QueryAllPropertyResponse {
+  repeated Property properties = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetPropertyRequest {
+  string index = 1;
+}
+message QueryGetPropertyResponse {
+  Property property = 1;
 }
