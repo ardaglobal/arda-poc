@@ -13,23 +13,8 @@ import (
 func (k msgServer) RegisterProperty(goCtx context.Context, msg *types.MsgRegisterProperty) (*types.MsgRegisterPropertyResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	fmt.Println()
-	fmt.Println()
-	fmt.Println("Registering property", msg)
-	fmt.Println("Address", msg.Address)
-	fmt.Println("Region", msg.Region)
-	fmt.Println("Value", msg.Value)
-	fmt.Println("Owners", msg.Owners)
-	fmt.Println()
-	fmt.Println()
-
 	// Use address as deterministic property ID
 	id := strings.ToLower(strings.TrimSpace(msg.Address))
-	fmt.Println()
-	fmt.Println()
-	fmt.Println("ID", id)
-	fmt.Println()
-	fmt.Println()
 
 	// Prevent duplicate registration
 	if p, found := k.GetProperty(ctx, id); found {
