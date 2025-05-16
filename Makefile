@@ -109,7 +109,7 @@ lint-fix:
 
 dev:
 	@echo "--> Running dev"
-	@ignite chain serve --home ./.arda_data
+	@ignite chain serve -v --home ./.arda_data
 
 govet:
 	@echo Running go vet...

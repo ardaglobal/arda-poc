@@ -35,7 +35,7 @@ func TestPropertyAllQuery(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 	require.Equal(t, uint64(len(properties)), resp.Pagination.Total)
-	require.Len(t, resp.Property, len(properties))
+	require.Len(t, resp.Properties, len(properties))
 
 	// Test with pagination (limit = 2)
 	resp, err = queryServer(ctx, &types.QueryAllPropertyRequest{
@@ -47,7 +47,7 @@ func TestPropertyAllQuery(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 	require.Equal(t, uint64(len(properties)), resp.Pagination.Total)
-	require.Len(t, resp.Property, 2)
+	require.Len(t, resp.Properties, 2)
 
 	// Test with pagination (offset = 2, limit = 2)
 	resp, err = queryServer(ctx, &types.QueryAllPropertyRequest{
@@ -60,7 +60,7 @@ func TestPropertyAllQuery(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 	require.Equal(t, uint64(len(properties)), resp.Pagination.Total)
-	require.Len(t, resp.Property, 2)
+	require.Len(t, resp.Properties, 2)
 
 	// Test with offset beyond available items
 	resp, err = queryServer(ctx, &types.QueryAllPropertyRequest{
@@ -72,11 +72,11 @@ func TestPropertyAllQuery(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 	require.Equal(t, uint64(len(properties)), resp.Pagination.Total)
-	require.Empty(t, resp.Property)
+	require.Empty(t, resp.Properties)
 }
 
 func TestPropertyQuery(t *testing.T) {
-	k, ctx := keepertest.ArdaKeeper(t)
+	k, ctx := keepertest.PropertyKeeper(t)
 
 	// Create query server for single submission queries
 	queryServer := k.Property
@@ -88,10 +88,10 @@ func TestPropertyQuery(t *testing.T) {
 		{Index: "addr3", Region: "london", Value: 300},
 	}
 
-	var ids []uint64
+	var ids []string
 	for _, property := range properties {
-		id := k.SetProperty(ctx, property)
-		ids = append(ids, id)
+		k.SetProperty(ctx, property)
+		ids = append(ids, property.Index)
 	}
 
 	// Test getting each submission by ID
@@ -109,7 +109,7 @@ func TestPropertyQuery(t *testing.T) {
 	}
 
 	// Test getting a non-existent submission
-	nonExistentID := uint64(999)
+	nonExistentID := "nonExistentID"
 	_, err := queryServer(ctx, &types.QueryGetPropertyRequest{Index: nonExistentID})
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "property not found")

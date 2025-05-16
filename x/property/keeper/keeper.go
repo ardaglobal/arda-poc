@@ -54,8 +54,17 @@ func (k Keeper) Logger() log.Logger {
 
 func (k Keeper) GetProperty(ctx sdk.Context, id string) (types.Property, bool) {
 	kvStore := k.storeService.OpenKVStore(ctx)
-	bz, err := kvStore.Get([]byte(id))
+
+	// Use prefixed key for getting property
+	propertyKey := types.KeyPrefix(types.KeyPrefixProperty)
+	propertyKey = append(propertyKey, []byte(id)...)
+
+	bz, err := kvStore.Get(propertyKey)
 	if err != nil {
+		return types.Property{}, false
+	}
+
+	if bz == nil {
 		return types.Property{}, false
 	}
 
@@ -66,7 +75,12 @@ func (k Keeper) GetProperty(ctx sdk.Context, id string) (types.Property, bool) {
 
 func (k Keeper) SetProperty(ctx sdk.Context, property types.Property) {
 	kvStore := k.storeService.OpenKVStore(ctx)
-	kvStore.Set([]byte(property.Index), k.cdc.MustMarshal(&property))
+
+	// Use prefixed key for storing property
+	propertyKey := types.KeyPrefix(types.KeyPrefixProperty)
+	propertyKey = append(propertyKey, []byte(property.Index)...)
+
+	kvStore.Set(propertyKey, k.cdc.MustMarshal(&property))
 }
 
 // GetAllProperties returns all properties in the store
@@ -74,7 +88,7 @@ func (k Keeper) GetAllProperties(ctx sdk.Context) ([]types.Property, error) {
 	kvStore := k.storeService.OpenKVStore(ctx)
 	propertyPrefix := types.KeyPrefix(types.KeyPrefixProperty)
 
-	// Get an iterator over all submission keys
+	// Get an iterator over all property keys with the prefix
 	iterator, err := kvStore.Iterator(propertyPrefix, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get iterator: %w", err)
@@ -85,7 +99,7 @@ func (k Keeper) GetAllProperties(ctx sdk.Context) ([]types.Property, error) {
 
 	// Iterate over all keys
 	for ; iterator.Valid(); iterator.Next() {
-		// Ensure the key has the proper format (prefix + submission ID)
+		// Ensure the key has the proper format (prefix + property ID)
 		key := iterator.Key()
 		if len(key) <= len(propertyPrefix) {
 			continue

@@ -50,7 +50,7 @@ func GenerateHashAndSignature() (hashHex string, sigHex string, err error) {
 	fmt.Printf("ardad tx arda submit-hash dubai \\\n")
 	fmt.Printf("    %s \\\n", hashHex)
 	fmt.Printf("    %s \\\n", sigHex)
-	fmt.Printf("    --from ERES --chain-id arda -y --home .arda_data\n\n")
+	fmt.Printf("    --from ERES --chain-id ardapoc -y --home .arda_data\n\n")
 
 	return hashHex, sigHex, nil
 }
