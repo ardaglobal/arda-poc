@@ -3,7 +3,7 @@ package arda
 import (
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
 
-	modulev1 "github.com/ardaglobal/arda-poc/api/arda/arda"
+	modulev1 "github.com/ardaglobal/arda-poc/api/ardapoc/arda"
 )
 
 // AutoCLIOptions implements the autocli.HasAutoCLIConfig interface.

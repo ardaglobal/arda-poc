@@ -20,7 +20,7 @@ import (
 
 	// this line is used by starport scaffolding # 1
 
-	modulev1 "github.com/ardaglobal/arda-poc/api/arda/property/module"
+	modulev1 "github.com/ardaglobal/arda-poc/api/ardapoc/property/module"
 
 	"github.com/ardaglobal/arda-poc/x/property/keeper"
 

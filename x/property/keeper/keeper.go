@@ -73,6 +73,32 @@ func (k Keeper) GetProperty(ctx sdk.Context, id string) (types.Property, bool) {
 	return property, true
 }
 
+// ConvertPropertyOwnersToMap converts the owners and shares slices in a property to a map
+func (k Keeper) ConvertPropertyOwnersToMap(property types.Property) map[string]uint64 {
+    ownerMap := make(map[string]uint64)
+    for i, owner := range property.Owners {
+        if i >= len(property.Shares) {
+			panic(fmt.Sprintf("property %s has more owners than shares", property.Index))
+        }
+        ownerMap[owner] = property.Shares[i]
+    }
+    return ownerMap
+}
+
+// UpdatePropertyFromOwnerMap updates a property's owners and shares slices from a map
+func (k Keeper) UpdatePropertyFromOwnerMap(property *types.Property, ownerMap map[string]uint64) {
+    // Clear existing slices
+    property.Owners = make([]string, 0, len(ownerMap))
+    property.Shares = make([]uint64, 0, len(ownerMap))
+
+    // Convert map back to slices
+    for owner, shares := range ownerMap {
+        property.Owners = append(property.Owners, owner)
+        property.Shares = append(property.Shares, shares)
+    }
+}
+
+
 func (k Keeper) SetProperty(ctx sdk.Context, property types.Property) {
 	kvStore := k.storeService.OpenKVStore(ctx)
 

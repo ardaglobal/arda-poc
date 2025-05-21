@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package ardapoc.property;
+
+import "amino/amino.proto";
+import "cosmos/msg/v1/msg.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "ardapoc/property/params.proto";
+
+option go_package = "github.com/ardaglobal/arda-poc/x/property/types";
+
+// Msg defines the Msg service.
+service Msg {
+  option (cosmos.msg.v1.service) = true;
+  
+  // UpdateParams defines a (governance) operation for updating the module
+  // parameters. The authority defaults to the x/gov module account.
+  rpc UpdateParams     (MsgUpdateParams    ) returns (MsgUpdateParamsResponse    );
+  rpc RegisterProperty (MsgRegisterProperty) returns (MsgRegisterPropertyResponse);
+  rpc TransferShares   (MsgTransferShares  ) returns (MsgTransferSharesResponse  );
+}
+// MsgUpdateParams is the Msg/UpdateParams request type.
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) =                       "authority";
+  option           (amino.name) = "arda/x/property/MsgUpdateParams";
+  
+  // authority is the address that controls the module (defaults to x/gov unless overwritten).
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  // params defines the module parameters to update.
+  
+  // NOTE: All parameters must be supplied.
+  Params params = 2 [(gogoproto.nullable) = false, (amino.dont_omitempty) = true];
+}
+
+// MsgUpdateParamsResponse defines the response structure for executing a
+// MsgUpdateParams message.
+message MsgUpdateParamsResponse {}
+
+message MsgRegisterProperty {
+  option (cosmos.msg.v1.signer) = "creator";
+           string creator = 1;
+           string address = 2;
+           string region  = 3;
+           uint64 value   = 4;
+  repeated string owners  = 5; // list of owner addresses
+  repeated uint64 shares  = 6; // corresponding shares for each owner
+}
+
+message MsgRegisterPropertyResponse {}
+
+message MsgTransferShares {
+  option (cosmos.msg.v1.signer) = "creator";
+           string creator    = 1;
+           string propertyId = 2;
+  repeated string fromOwners = 3;
+  repeated uint64  fromShares = 4;
+  repeated string toOwners   = 5;
+  repeated uint64  toShares   = 6;
+}
+
+message MsgTransferSharesResponse {}
+

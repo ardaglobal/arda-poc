@@ -13,6 +13,8 @@ You can use https://github.com/ardaglobal/dexplorer to view the blockchain on th
 
 ### Functionality
 
+
+#### Submit Hash
 Currently the blockchain is setup to submit a hash and a signature. This hash can represent any off chain data.
 
 By running the tests in ./scripts you can generate the command to submit a hash to the blockchain and run the mock global node to track the valid hashes being submitted.
@@ -20,6 +22,16 @@ By running the tests in ./scripts you can generate the command to submit a hash 
 The chain name is arda and the token is uarda.
 
 It is set up to be a single validator chain with the name of the validator being ERES.
+
+#### Register Property
+
+The property module is used to register properties on the blockchain.
+
+It is used to register properties and their owners and shares.
+
+#### Transfer Property
+
+WIP
 
 ### Configure
 

@@ -3,11 +3,11 @@ package app
 import (
 	"time"
 
-	ardamodulev1 "github.com/ardaglobal/arda-poc/api/arda/arda/module"
+	ardamodulev1 "github.com/ardaglobal/arda-poc/api/ardapoc/arda/module"
 	_ "github.com/ardaglobal/arda-poc/x/arda/module" // import for side-effects
 	ardamoduletypes "github.com/ardaglobal/arda-poc/x/arda/types"
 
-	propertymodulev1 "github.com/ardaglobal/arda-poc/api/arda/property/module"
+	propertymodulev1 "github.com/ardaglobal/arda-poc/api/ardapoc/property/module"
 	_ "github.com/ardaglobal/arda-poc/x/property/module" // import for side-effects
 	propertymoduletypes "github.com/ardaglobal/arda-poc/x/property/types"
 

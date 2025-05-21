@@ -1,0 +1,17 @@
+syntax = "proto3";
+package ardapoc.property;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+import "ardapoc/property/params.proto";
+
+option go_package = "github.com/ardaglobal/arda-poc/x/property/types";
+
+// GenesisState defines the property module's genesis state.
+message GenesisState {
+  // params defines all the parameters of the module.
+  Params params = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}

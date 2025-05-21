@@ -1,0 +1,15 @@
+syntax = "proto3";
+package ardapoc.arda;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/ardaglobal/arda-poc/x/arda/types";
+
+// Params defines the parameters for the module.
+message Params {
+  option (amino.name) = "arda/x/arda/Params";
+  option (gogoproto.equal) = true;
+
+  
+}

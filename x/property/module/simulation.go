@@ -29,6 +29,10 @@ const (
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgRegisterProperty int = 100
 
+	opWeightMsgTransferShares = "op_weight_msg_transfer_shares"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgTransferShares int = 100
+
 	// this line is used by starport scaffolding # simapp/module/const
 )
 
@@ -63,6 +67,17 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 		propertysimulation.SimulateMsgRegisterProperty(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
+	var weightMsgTransferShares int
+	simState.AppParams.GetOrGenerate(opWeightMsgTransferShares, &weightMsgTransferShares, nil,
+		func(_ *rand.Rand) {
+			weightMsgTransferShares = defaultWeightMsgTransferShares
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgTransferShares,
+		propertysimulation.SimulateMsgTransferShares(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
 	// this line is used by starport scaffolding # simapp/module/operation
 
 	return operations
@@ -76,6 +91,14 @@ func (am AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.Wei
 			defaultWeightMsgRegisterProperty,
 			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
 				propertysimulation.SimulateMsgRegisterProperty(am.accountKeeper, am.bankKeeper, am.keeper)
+				return nil
+			},
+		),
+		simulation.NewWeightedProposalMsg(
+			opWeightMsgTransferShares,
+			defaultWeightMsgTransferShares,
+			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+				propertysimulation.SimulateMsgTransferShares(am.accountKeeper, am.bankKeeper, am.keeper)
 				return nil
 			},
 		),
