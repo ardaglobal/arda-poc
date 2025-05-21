@@ -19,11 +19,11 @@ func TestPropertyAllQuery(t *testing.T) {
 
 	// Add properties to the store
 	properties := []types.Property{
-		{Index: "addr1", Region: "dubai", Value: 100},
-		{Index: "addr2", Region: "dubai", Value: 200},
-		{Index: "addr3", Region: "singapore", Value: 300},
-		{Index: "addr4", Region: "london", Value: 400},
-		{Index: "addr5", Region: "singapore", Value: 500},
+		{Index: "addr1", Region: "dubai", Value: 100, Owners: []string{"cosmos1abcdefg"}, Shares: []uint64{100}},
+		{Index: "addr2", Region: "dubai", Value: 200, Owners: []string{"cosmos1hijklmn"}, Shares: []uint64{100}},
+		{Index: "addr3", Region: "singapore", Value: 300, Owners: []string{"cosmos1opqrstu"}, Shares: []uint64{100}},
+		{Index: "addr4", Region: "london", Value: 400, Owners: []string{"cosmos1uvwxyz0"}, Shares: []uint64{100}},
+		{Index: "addr5", Region: "singapore", Value: 500, Owners: []string{"cosmos1mnopqrs"}, Shares: []uint64{100}},
 	}
 
 	for _, property := range properties {
@@ -83,9 +83,9 @@ func TestPropertyQuery(t *testing.T) {
 
 	// Add submissions to the store
 	properties := []types.Property{
-		{Index: "addr1", Region: "dubai", Value: 100},
-		{Index: "addr2", Region: "singapore", Value: 200},
-		{Index: "addr3", Region: "london", Value: 300},
+		{Index: "addr1", Region: "dubai", Value: 100, Owners: []string{"cosmos1abcdefg"}, Shares: []uint64{100}},
+		{Index: "addr2", Region: "singapore", Value: 200, Owners: []string{"cosmos1hijklmn"}, Shares: []uint64{100}},
+		{Index: "addr3", Region: "london", Value: 300, Owners: []string{"cosmos1opqrstu"}, Shares: []uint64{100}},
 	}
 
 	var ids []string
@@ -106,6 +106,7 @@ func TestPropertyQuery(t *testing.T) {
 		require.Equal(t, properties[i].Region, property.Region)
 		require.Equal(t, properties[i].Value, property.Value)
 		require.Equal(t, properties[i].Owners, property.Owners)
+		require.Equal(t, properties[i].Shares, property.Shares)
 	}
 
 	// Test getting a non-existent submission

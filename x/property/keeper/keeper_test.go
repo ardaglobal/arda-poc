@@ -18,7 +18,8 @@ func TestGetSetProperty(t *testing.T) {
 		Address: "123 Main St",
 		Region:  "Test Region",
 		Value:   1000,
-		Owners:  map[string]uint64{"cosmos1abcdefg": 100},
+		Owners:  []string{"cosmos1abcdefg"},
+		Shares:  []uint64{100},
 	}
 
 	// Test that getting a non-existent property returns false
@@ -47,21 +48,24 @@ func TestGetAllProperties(t *testing.T) {
 			Address: "123 Main St",
 			Region:  "Test Region 1",
 			Value:   1000,
-			Owners:  map[string]uint64{"cosmos1abcdefg": 100},
+			Owners:  []string{"cosmos1abcdefg"},
+			Shares:  []uint64{100},
 		},
 		{
 			Index:   "property2",
 			Address: "456 Oak Ave",
 			Region:  "Test Region 2",
 			Value:   2000,
-			Owners:  map[string]uint64{"cosmos1hijklmn": 200},
+			Owners:  []string{"cosmos1hijklmn"},
+			Shares:  []uint64{100},
 		},
 		{
 			Index:   "property3",
 			Address: "789 Pine Blvd",
 			Region:  "Test Region 3",
 			Value:   3000,
-			Owners:  map[string]uint64{"cosmos1opqrstu": 300},
+			Owners:  []string{"cosmos1opqrstu"},
+			Shares:  []uint64{100},
 		},
 	}
 

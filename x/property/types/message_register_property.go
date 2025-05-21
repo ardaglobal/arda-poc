@@ -8,13 +8,14 @@ import (
 
 var _ sdk.Msg = &MsgRegisterProperty{}
 
-func NewMsgRegisterProperty(creator string, address string, region string, value uint64, owners map[string]uint64) *MsgRegisterProperty {
+func NewMsgRegisterProperty(creator string, address string, region string, value uint64, owners []string, shares []uint64) *MsgRegisterProperty {
 	return &MsgRegisterProperty{
 		Creator: creator,
 		Address: address,
 		Region:  region,
 		Value:   value,
 		Owners:  owners,
+		Shares:  shares,
 	}
 }
 

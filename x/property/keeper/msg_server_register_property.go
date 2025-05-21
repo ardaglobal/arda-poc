@@ -28,12 +28,17 @@ func (k msgServer) RegisterProperty(goCtx context.Context, msg *types.MsgRegiste
 
 	if msg.Owners == nil {
 		fmt.Println("Debug - RegisterProperty - owners is nil!")
-		msg.Owners = make(map[string]uint64)
+		msg.Owners = []string{}
 	}
 
-	for owner, share := range msg.Owners {
-		fmt.Printf("Debug - Owner: %s, Share: %d\n", owner, share)
-		total += share
+	if msg.Shares == nil {
+		fmt.Println("Debug - RegisterProperty - shares is nil!")
+		msg.Shares = []uint64{}
+	}
+
+	for i, owner := range msg.Owners {
+		fmt.Printf("Debug - Owner: %s, Share: %d\n", owner, msg.Shares[i])
+		total += msg.Shares[i]
 	}
 	fmt.Printf("Debug - Total ownership shares: %d\n", total)
 
@@ -48,6 +53,7 @@ func (k msgServer) RegisterProperty(goCtx context.Context, msg *types.MsgRegiste
 		Region:  msg.Region,
 		Value:   msg.Value,
 		Owners:  msg.Owners,
+		Shares:  msg.Shares,
 	}
 	k.SetProperty(ctx, property)
 
