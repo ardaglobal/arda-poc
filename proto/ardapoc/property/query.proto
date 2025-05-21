@@ -1,12 +1,12 @@
 syntax = "proto3";
-package arda.property;
+package ardapoc.property;
 
 import "amino/amino.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
-import "arda/property/params.proto";
-import "arda/property/property.proto";
+import "ardapoc/property/params.proto";
+import "ardapoc/property/property.proto";
 
 option go_package = "github.com/ardaglobal/arda-poc/x/property/types";
 

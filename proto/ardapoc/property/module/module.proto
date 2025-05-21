@@ -1,12 +1,12 @@
 syntax = "proto3";
-package arda.arda.module;
+package ardapoc.property.module;
 
 import "cosmos/app/v1alpha1/module.proto";
 
 // Module is the config object for the module.
 message Module {
   option (cosmos.app.v1alpha1.module) = {
-    go_import: "arda/x/arda"
+    go_import: "ardapoc/x/property"
   };
 
   // authority defines the custom module authority. If not set, defaults to the governance module.

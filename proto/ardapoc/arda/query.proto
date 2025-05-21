@@ -1,12 +1,12 @@
 syntax = "proto3";
-package arda.arda;
+package ardapoc.arda;
 
 import "amino/amino.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
-import "arda/arda/params.proto";
-import "arda/arda/submission.proto";
+import "ardapoc/arda/params.proto";
+import "ardapoc/arda/submission.proto";
 
 option go_package = "github.com/ardaglobal/arda-poc/x/arda/types";
 

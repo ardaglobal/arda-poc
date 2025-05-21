@@ -1,5 +1,5 @@
 syntax = "proto3";
-package arda.arda;
+package ardapoc.arda;
 
 import "amino/amino.proto";
 import "gogoproto/gogo.proto";

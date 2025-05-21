@@ -1,5 +1,5 @@
 syntax = "proto3";
-package arda.property;
+package ardapoc.property;
 
 option go_package = "github.com/ardaglobal/arda-poc/x/property/types";
 

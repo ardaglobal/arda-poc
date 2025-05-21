@@ -1,9 +1,9 @@
 syntax = "proto3";
-package arda.property;
+package ardapoc.property;
 
 import "amino/amino.proto";
 import "gogoproto/gogo.proto";
-import "arda/property/params.proto";
+import "ardapoc/property/params.proto";
 
 option go_package = "github.com/ardaglobal/arda-poc/x/property/types";
 
