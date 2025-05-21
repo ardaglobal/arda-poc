@@ -23,9 +23,20 @@ func (k msgServer) RegisterProperty(goCtx context.Context, msg *types.MsgRegiste
 
 	// Validate ownership sum = 100
 	var total uint64
-	for _, share := range msg.Owners {
+	fmt.Println("Debug - RegisterProperty - msg:", msg)
+	fmt.Println("Debug - RegisterProperty - owners:", msg.Owners)
+
+	if msg.Owners == nil {
+		fmt.Println("Debug - RegisterProperty - owners is nil!")
+		msg.Owners = make(map[string]uint64)
+	}
+
+	for owner, share := range msg.Owners {
+		fmt.Printf("Debug - Owner: %s, Share: %d\n", owner, share)
 		total += share
 	}
+	fmt.Printf("Debug - Total ownership shares: %d\n", total)
+
 	// if total != 100 {
 	// 	return nil, fmt.Errorf("ownership shares must total 100, got %d", total)
 	// }
@@ -39,6 +50,8 @@ func (k msgServer) RegisterProperty(goCtx context.Context, msg *types.MsgRegiste
 		Owners:  msg.Owners,
 	}
 	k.SetProperty(ctx, property)
+
+	fmt.Println("Debug - Property saved with owners:", property.Owners)
 
 	return &types.MsgRegisterPropertyResponse{}, nil
 }
