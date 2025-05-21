@@ -58,6 +58,7 @@ func (k msgServer) RegisterProperty(goCtx context.Context, msg *types.MsgRegiste
 	k.SetProperty(ctx, property)
 
 	fmt.Println("Debug - Property saved with owners:", property.Owners)
+	fmt.Println("Debug - Property saved with shares:", property.Shares)
 
 	return &types.MsgRegisterPropertyResponse{}, nil
 }
