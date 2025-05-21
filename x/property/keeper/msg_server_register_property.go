@@ -21,26 +21,23 @@ func (k msgServer) RegisterProperty(goCtx context.Context, msg *types.MsgRegiste
 		return nil, fmt.Errorf("property already exists: %s: %v", id, p)
 	}
 
-	// Validate ownership sum = 100
+	if len(msg.Owners) != len(msg.Shares) {
+		return nil, fmt.Errorf("owners and shares length mismatch")
+	}
+
 	var total uint64
-	fmt.Println("Debug - RegisterProperty - msg:", msg)
-	fmt.Println("Debug - RegisterProperty - owners:", msg.Owners)
-
-	if msg.Owners == nil {
-		fmt.Println("Debug - RegisterProperty - owners is nil!")
-		msg.Owners = []string{}
+	for i, share := range msg.Shares {
+		if share == 0 {
+			continue
+		}
+		total += share
+		if total < share { // overflow check
+			return nil, fmt.Errorf("ownership share overflow")
+		}
+		if i >= len(msg.Owners) {
+			break
+		}
 	}
-
-	if msg.Shares == nil {
-		fmt.Println("Debug - RegisterProperty - shares is nil!")
-		msg.Shares = []uint64{}
-	}
-
-	for i, owner := range msg.Owners {
-		fmt.Printf("Debug - Owner: %s, Share: %d\n", owner, msg.Shares[i])
-		total += msg.Shares[i]
-	}
-	fmt.Printf("Debug - Total ownership shares: %d\n", total)
 
 	// if total != 100 {
 	// 	return nil, fmt.Errorf("ownership shares must total 100, got %d", total)
@@ -56,9 +53,6 @@ func (k msgServer) RegisterProperty(goCtx context.Context, msg *types.MsgRegiste
 		Shares:  msg.Shares,
 	}
 	k.SetProperty(ctx, property)
-
-	fmt.Println("Debug - Property saved with owners:", property.Owners)
-	fmt.Println("Debug - Property saved with shares:", property.Shares)
 
 	return &types.MsgRegisterPropertyResponse{}, nil
 }
