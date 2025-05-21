@@ -104,6 +104,21 @@ lint-fix:
 .PHONY: lint lint-fix
 
 ###################
+### Setup Dev   ###
+###################
+
+# setup-dev installs tooling required for local development including
+# protobuf generators, Ignite CLI and linters.
+setup-dev: proto-deps
+	@echo "--> Installing Ignite CLI"
+	@go install github.com/ignite/cli/cmd/ignite@latest
+	@echo "--> Installing lint and security tools"
+	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(golangci_version)
+	@go install golang.org/x/vuln/cmd/govulncheck@latest
+	@go install golang.org/x/tools/cmd/goimports@latest
+
+
+###################
 ### Development ###
 ###################
 
