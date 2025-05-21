@@ -16,4 +16,4 @@ jobs:
           go-version-file: go.mod
           cache: true
       - name: Run tests
-        run: make test
+        run: make test-unit
