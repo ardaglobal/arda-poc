@@ -109,9 +109,12 @@ lint-fix:
 
 # setup-dev installs tooling required for local development including
 # protobuf generators, Ignite CLI and linters.
+
+ignite-version=v28.10.0
+
 setup-dev: proto-deps
 	@echo "--> Installing Ignite CLI"
-	@go install github.com/ignite/cli/cmd/ignite@latest
+	@curl https://get.ignite.com/cli@$(ignite-version)! | bash
 	@echo "--> Installing lint and security tools"
 	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(golangci_version)
 	@go install golang.org/x/vuln/cmd/govulncheck@latest
