@@ -16,7 +16,7 @@ import (
 
 // ERES key for dubai region from .arda_data/config/priv_validator_key.json
 var regionPubKeys = map[string]string{
-	"dubai": "uzHG3r56+TWyPCsnO4q9V4VEqV2IDjIAkloboUTOAsM=",
+	"dubai": "ABUyZSZcO7xWfzXhN4Tkv8yZtKy6e03daCfEmPkXg6Q=",
 }
 
 type (

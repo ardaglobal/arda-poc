@@ -47,10 +47,10 @@ func GenerateHashAndSignature() (hashHex string, sigHex string, err error) {
 	sigHex = hex.EncodeToString(signature)
 
 	fmt.Printf("🔐 Signing complete. Here's your ardad tx command:\n\n")
-	fmt.Printf("ardad tx arda submit-hash dubai \\\n")
+	fmt.Printf("arda-pocd tx arda submit-hash dubai \\\n")
 	fmt.Printf("    %s \\\n", hashHex)
 	fmt.Printf("    %s \\\n", sigHex)
-	fmt.Printf("    --from ERES --chain-id ardapoc -y --home .arda_data\n\n")
+	fmt.Printf("    --from ERES -y\n\n")
 
 	return hashHex, sigHex, nil
 }
