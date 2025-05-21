@@ -8,7 +8,7 @@ import (
 	"errors"
 	"fmt"
 
-	"arda/x/arda/types"
+	"github.com/ardaglobal/arda-poc/x/arda/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

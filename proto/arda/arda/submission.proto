@@ -1,7 +1,7 @@
 syntax = "proto3";
 package arda.arda;
 
-option go_package = "arda/x/arda/types";
+option go_package = "github.com/ardaglobal/arda-poc/x/arda/types";
 
 message Submission {
   

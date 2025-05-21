@@ -1,4 +1,4 @@
-module arda
+module github.com/ardaglobal/arda-poc
 
 go 1.23.0
 

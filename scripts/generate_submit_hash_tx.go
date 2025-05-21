@@ -21,7 +21,7 @@ type KeyJSON struct {
 func GenerateHashAndSignature() (hashHex string, sigHex string, err error) {
 	keyFile := "priv_validator_key.json"
 	message := "Hello Dubai!"
-	
+
 	file, err := os.ReadFile(keyFile)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to read %s: %w", keyFile, err)
@@ -45,12 +45,12 @@ func GenerateHashAndSignature() (hashHex string, sigHex string, err error) {
 	hashHex = hex.EncodeToString(hash[:])
 	signature := ed25519.Sign(privKey, hash[:])
 	sigHex = hex.EncodeToString(signature)
-	
+
 	fmt.Printf("🔐 Signing complete. Here's your ardad tx command:\n\n")
 	fmt.Printf("ardad tx arda submit-hash dubai \\\n")
 	fmt.Printf("    %s \\\n", hashHex)
 	fmt.Printf("    %s \\\n", sigHex)
-	fmt.Printf("    --from ERES --chain-id arda -y --home .arda_data\n\n")
+	fmt.Printf("    --from ERES --chain-id ardapoc -y --home .arda_data\n\n")
 
 	return hashHex, sigHex, nil
 }

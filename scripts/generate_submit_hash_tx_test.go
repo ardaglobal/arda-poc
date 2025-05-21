@@ -3,11 +3,12 @@ package scripts
 import (
 	"testing"
 
-	keepertest "arda/testutil/keeper"
-	"arda/testutil/sample"
-	"arda/x/arda/keeper"
-	"arda/x/arda/types"
 	"context"
+
+	keepertest "github.com/ardaglobal/arda-poc/testutil/keeper"
+	"github.com/ardaglobal/arda-poc/testutil/sample"
+	"github.com/ardaglobal/arda-poc/x/arda/keeper"
+	"github.com/ardaglobal/arda-poc/x/arda/types"
 )
 
 func TestGenerateHashAndSignature_SubmitHash(t *testing.T) {
@@ -32,4 +33,4 @@ func TestGenerateHashAndSignature_SubmitHash(t *testing.T) {
 func setupMsgServer(t testing.TB) (keeper.Keeper, types.MsgServer, context.Context) {
 	k, ctx := keepertest.ArdaKeeper(t)
 	return k, keeper.NewMsgServerImpl(k), ctx
-} 
+}

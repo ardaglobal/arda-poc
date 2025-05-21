@@ -75,11 +75,13 @@ import (
 	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 
-	ardamodulekeeper "arda/x/arda/keeper"
+	ardamodulekeeper "github.com/ardaglobal/arda-poc/x/arda/keeper"
+	propertymodulekeeper "github.com/ardaglobal/arda-poc/x/property/keeper"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
-	"arda/docs"
-	"arda/pkg/consts"
+	"github.com/ardaglobal/arda-poc/docs"
+	"github.com/ardaglobal/arda-poc/pkg/consts"
 )
 
 const (
@@ -146,7 +148,8 @@ type App struct {
 	ScopedICAHostKeeper       capabilitykeeper.ScopedKeeper
 	ScopedKeepers             map[string]capabilitykeeper.ScopedKeeper
 
-	ArdaKeeper ardamodulekeeper.Keeper
+	ArdaKeeper     ardamodulekeeper.Keeper
+	PropertyKeeper propertymodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// simulation manager
@@ -254,6 +257,7 @@ func New(
 		&app.GroupKeeper,
 		&app.CircuitBreakerKeeper,
 		&app.ArdaKeeper,
+		&app.PropertyKeeper,
 		// this line is used by starport scaffolding # stargate/app/keeperDefinition
 	); err != nil {
 		panic(err)

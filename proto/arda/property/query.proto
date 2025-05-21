@@ -1,0 +1,54 @@
+syntax = "proto3";
+package arda.property;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "arda/property/params.proto";
+import "arda/property/property.proto";
+
+option go_package = "github.com/ardaglobal/arda-poc/x/property/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  // Parameters queries the parameters of the module.
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/arda/property/params";
+  }
+  
+  rpc PropertyAll(QueryAllPropertyRequest) returns (QueryAllPropertyResponse) {
+    option (google.api.http).get = "/cosmonaut/arda/property/properties";
+  }
+
+  rpc Property(QueryGetPropertyRequest) returns (QueryGetPropertyResponse) {
+    option (google.api.http).get = "/cosmonaut/arda/property/properties/{index}";
+  }
+}
+
+// QueryParamsRequest is request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  // params holds all the parameters of this module.
+  Params params = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}
+
+message QueryAllPropertyRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+message QueryAllPropertyResponse {
+  repeated Property properties = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetPropertyRequest {
+  string index = 1;
+}
+message QueryGetPropertyResponse {
+  Property property = 1;
+}

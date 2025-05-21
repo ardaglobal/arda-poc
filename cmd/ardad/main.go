@@ -7,8 +7,8 @@ import (
 	clienthelpers "cosmossdk.io/client/v2/helpers"
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
 
-	"arda/app"
-	"arda/cmd/ardad/cmd"
+	"github.com/ardaglobal/arda-poc/app"
+	"github.com/ardaglobal/arda-poc/cmd/ardad/cmd"
 )
 
 func main() {
