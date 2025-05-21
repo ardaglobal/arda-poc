@@ -5,7 +5,7 @@ import "amino/amino.proto";
 import "gogoproto/gogo.proto";
 import "arda/arda/params.proto";
 
-option go_package = "arda/x/arda/types";
+option go_package = "github.com/ardaglobal/arda-poc/x/arda/types";
 
 // GenesisState defines the arda module's genesis state.
 message GenesisState {

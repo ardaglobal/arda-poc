@@ -13,7 +13,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	io "io"
 	reflect "reflect"
-	sort "sort"
 	sync "sync"
 )
 
@@ -872,86 +871,96 @@ func (x *fastReflection_MsgUpdateParamsResponse) ProtoMethods() *protoiface.Meth
 	}
 }
 
-var _ protoreflect.Map = (*_MsgRegisterProperty_5_map)(nil)
+var _ protoreflect.List = (*_MsgRegisterProperty_5_list)(nil)
 
-type _MsgRegisterProperty_5_map struct {
-	m *map[string]uint64
+type _MsgRegisterProperty_5_list struct {
+	list *[]string
 }
 
-func (x *_MsgRegisterProperty_5_map) Len() int {
-	if x.m == nil {
+func (x *_MsgRegisterProperty_5_list) Len() int {
+	if x.list == nil {
 		return 0
 	}
-	return len(*x.m)
+	return len(*x.list)
 }
 
-func (x *_MsgRegisterProperty_5_map) Range(f func(protoreflect.MapKey, protoreflect.Value) bool) {
-	if x.m == nil {
-		return
-	}
-	for k, v := range *x.m {
-		mapKey := (protoreflect.MapKey)(protoreflect.ValueOfString(k))
-		mapValue := protoreflect.ValueOfUint64(v)
-		if !f(mapKey, mapValue) {
-			break
-		}
-	}
+func (x *_MsgRegisterProperty_5_list) Get(i int) protoreflect.Value {
+	return protoreflect.ValueOfString((*x.list)[i])
 }
 
-func (x *_MsgRegisterProperty_5_map) Has(key protoreflect.MapKey) bool {
-	if x.m == nil {
-		return false
-	}
-	keyUnwrapped := key.String()
-	concreteValue := keyUnwrapped
-	_, ok := (*x.m)[concreteValue]
-	return ok
+func (x *_MsgRegisterProperty_5_list) Set(i int, value protoreflect.Value) {
+	valueUnwrapped := value.String()
+	concreteValue := valueUnwrapped
+	(*x.list)[i] = concreteValue
 }
 
-func (x *_MsgRegisterProperty_5_map) Clear(key protoreflect.MapKey) {
-	if x.m == nil {
-		return
-	}
-	keyUnwrapped := key.String()
-	concreteKey := keyUnwrapped
-	delete(*x.m, concreteKey)
+func (x *_MsgRegisterProperty_5_list) Append(value protoreflect.Value) {
+	valueUnwrapped := value.String()
+	concreteValue := valueUnwrapped
+	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_MsgRegisterProperty_5_map) Get(key protoreflect.MapKey) protoreflect.Value {
-	if x.m == nil {
-		return protoreflect.Value{}
-	}
-	keyUnwrapped := key.String()
-	concreteKey := keyUnwrapped
-	v, ok := (*x.m)[concreteKey]
-	if !ok {
-		return protoreflect.Value{}
-	}
-	return protoreflect.ValueOfUint64(v)
+func (x *_MsgRegisterProperty_5_list) AppendMutable() protoreflect.Value {
+	panic(fmt.Errorf("AppendMutable can not be called on message MsgRegisterProperty at list field Owners as it is not of Message kind"))
 }
 
-func (x *_MsgRegisterProperty_5_map) Set(key protoreflect.MapKey, value protoreflect.Value) {
-	if !key.IsValid() || !value.IsValid() {
-		panic("invalid key or value provided")
+func (x *_MsgRegisterProperty_5_list) Truncate(n int) {
+	*x.list = (*x.list)[:n]
+}
+
+func (x *_MsgRegisterProperty_5_list) NewElement() protoreflect.Value {
+	v := ""
+	return protoreflect.ValueOfString(v)
+}
+
+func (x *_MsgRegisterProperty_5_list) IsValid() bool {
+	return x.list != nil
+}
+
+var _ protoreflect.List = (*_MsgRegisterProperty_6_list)(nil)
+
+type _MsgRegisterProperty_6_list struct {
+	list *[]uint64
+}
+
+func (x *_MsgRegisterProperty_6_list) Len() int {
+	if x.list == nil {
+		return 0
 	}
-	keyUnwrapped := key.String()
-	concreteKey := keyUnwrapped
+	return len(*x.list)
+}
+
+func (x *_MsgRegisterProperty_6_list) Get(i int) protoreflect.Value {
+	return protoreflect.ValueOfUint64((*x.list)[i])
+}
+
+func (x *_MsgRegisterProperty_6_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.Uint()
 	concreteValue := valueUnwrapped
-	(*x.m)[concreteKey] = concreteValue
+	(*x.list)[i] = concreteValue
 }
 
-func (x *_MsgRegisterProperty_5_map) Mutable(key protoreflect.MapKey) protoreflect.Value {
-	panic("should not call Mutable on protoreflect.Map whose value is not of type protoreflect.Message")
+func (x *_MsgRegisterProperty_6_list) Append(value protoreflect.Value) {
+	valueUnwrapped := value.Uint()
+	concreteValue := valueUnwrapped
+	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_MsgRegisterProperty_5_map) NewValue() protoreflect.Value {
+func (x *_MsgRegisterProperty_6_list) AppendMutable() protoreflect.Value {
+	panic(fmt.Errorf("AppendMutable can not be called on message MsgRegisterProperty at list field Shares as it is not of Message kind"))
+}
+
+func (x *_MsgRegisterProperty_6_list) Truncate(n int) {
+	*x.list = (*x.list)[:n]
+}
+
+func (x *_MsgRegisterProperty_6_list) NewElement() protoreflect.Value {
 	v := uint64(0)
 	return protoreflect.ValueOfUint64(v)
 }
 
-func (x *_MsgRegisterProperty_5_map) IsValid() bool {
-	return x.m != nil
+func (x *_MsgRegisterProperty_6_list) IsValid() bool {
+	return x.list != nil
 }
 
 var (
@@ -961,6 +970,7 @@ var (
 	fd_MsgRegisterProperty_region  protoreflect.FieldDescriptor
 	fd_MsgRegisterProperty_value   protoreflect.FieldDescriptor
 	fd_MsgRegisterProperty_owners  protoreflect.FieldDescriptor
+	fd_MsgRegisterProperty_shares  protoreflect.FieldDescriptor
 )
 
 func init() {
@@ -971,6 +981,7 @@ func init() {
 	fd_MsgRegisterProperty_region = md_MsgRegisterProperty.Fields().ByName("region")
 	fd_MsgRegisterProperty_value = md_MsgRegisterProperty.Fields().ByName("value")
 	fd_MsgRegisterProperty_owners = md_MsgRegisterProperty.Fields().ByName("owners")
+	fd_MsgRegisterProperty_shares = md_MsgRegisterProperty.Fields().ByName("shares")
 }
 
 var _ protoreflect.Message = (*fastReflection_MsgRegisterProperty)(nil)
@@ -1063,8 +1074,14 @@ func (x *fastReflection_MsgRegisterProperty) Range(f func(protoreflect.FieldDesc
 		}
 	}
 	if len(x.Owners) != 0 {
-		value := protoreflect.ValueOfMap(&_MsgRegisterProperty_5_map{m: &x.Owners})
+		value := protoreflect.ValueOfList(&_MsgRegisterProperty_5_list{list: &x.Owners})
 		if !f(fd_MsgRegisterProperty_owners, value) {
+			return
+		}
+	}
+	if len(x.Shares) != 0 {
+		value := protoreflect.ValueOfList(&_MsgRegisterProperty_6_list{list: &x.Shares})
+		if !f(fd_MsgRegisterProperty_shares, value) {
 			return
 		}
 	}
@@ -1093,6 +1110,8 @@ func (x *fastReflection_MsgRegisterProperty) Has(fd protoreflect.FieldDescriptor
 		return x.Value != uint64(0)
 	case "arda.property.MsgRegisterProperty.owners":
 		return len(x.Owners) != 0
+	case "arda.property.MsgRegisterProperty.shares":
+		return len(x.Shares) != 0
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: arda.property.MsgRegisterProperty"))
@@ -1119,6 +1138,8 @@ func (x *fastReflection_MsgRegisterProperty) Clear(fd protoreflect.FieldDescript
 		x.Value = uint64(0)
 	case "arda.property.MsgRegisterProperty.owners":
 		x.Owners = nil
+	case "arda.property.MsgRegisterProperty.shares":
+		x.Shares = nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: arda.property.MsgRegisterProperty"))
@@ -1149,10 +1170,16 @@ func (x *fastReflection_MsgRegisterProperty) Get(descriptor protoreflect.FieldDe
 		return protoreflect.ValueOfUint64(value)
 	case "arda.property.MsgRegisterProperty.owners":
 		if len(x.Owners) == 0 {
-			return protoreflect.ValueOfMap(&_MsgRegisterProperty_5_map{})
+			return protoreflect.ValueOfList(&_MsgRegisterProperty_5_list{})
 		}
-		mapValue := &_MsgRegisterProperty_5_map{m: &x.Owners}
-		return protoreflect.ValueOfMap(mapValue)
+		listValue := &_MsgRegisterProperty_5_list{list: &x.Owners}
+		return protoreflect.ValueOfList(listValue)
+	case "arda.property.MsgRegisterProperty.shares":
+		if len(x.Shares) == 0 {
+			return protoreflect.ValueOfList(&_MsgRegisterProperty_6_list{})
+		}
+		listValue := &_MsgRegisterProperty_6_list{list: &x.Shares}
+		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: arda.property.MsgRegisterProperty"))
@@ -1182,9 +1209,13 @@ func (x *fastReflection_MsgRegisterProperty) Set(fd protoreflect.FieldDescriptor
 	case "arda.property.MsgRegisterProperty.value":
 		x.Value = value.Uint()
 	case "arda.property.MsgRegisterProperty.owners":
-		mv := value.Map()
-		cmv := mv.(*_MsgRegisterProperty_5_map)
-		x.Owners = *cmv.m
+		lv := value.List()
+		clv := lv.(*_MsgRegisterProperty_5_list)
+		x.Owners = *clv.list
+	case "arda.property.MsgRegisterProperty.shares":
+		lv := value.List()
+		clv := lv.(*_MsgRegisterProperty_6_list)
+		x.Shares = *clv.list
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: arda.property.MsgRegisterProperty"))
@@ -1207,10 +1238,16 @@ func (x *fastReflection_MsgRegisterProperty) Mutable(fd protoreflect.FieldDescri
 	switch fd.FullName() {
 	case "arda.property.MsgRegisterProperty.owners":
 		if x.Owners == nil {
-			x.Owners = make(map[string]uint64)
+			x.Owners = []string{}
 		}
-		value := &_MsgRegisterProperty_5_map{m: &x.Owners}
-		return protoreflect.ValueOfMap(value)
+		value := &_MsgRegisterProperty_5_list{list: &x.Owners}
+		return protoreflect.ValueOfList(value)
+	case "arda.property.MsgRegisterProperty.shares":
+		if x.Shares == nil {
+			x.Shares = []uint64{}
+		}
+		value := &_MsgRegisterProperty_6_list{list: &x.Shares}
+		return protoreflect.ValueOfList(value)
 	case "arda.property.MsgRegisterProperty.creator":
 		panic(fmt.Errorf("field creator of message arda.property.MsgRegisterProperty is not mutable"))
 	case "arda.property.MsgRegisterProperty.address":
@@ -1241,8 +1278,11 @@ func (x *fastReflection_MsgRegisterProperty) NewField(fd protoreflect.FieldDescr
 	case "arda.property.MsgRegisterProperty.value":
 		return protoreflect.ValueOfUint64(uint64(0))
 	case "arda.property.MsgRegisterProperty.owners":
-		m := make(map[string]uint64)
-		return protoreflect.ValueOfMap(&_MsgRegisterProperty_5_map{m: &m})
+		list := []string{}
+		return protoreflect.ValueOfList(&_MsgRegisterProperty_5_list{list: &list})
+	case "arda.property.MsgRegisterProperty.shares":
+		list := []uint64{}
+		return protoreflect.ValueOfList(&_MsgRegisterProperty_6_list{list: &list})
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: arda.property.MsgRegisterProperty"))
@@ -1328,25 +1368,17 @@ func (x *fastReflection_MsgRegisterProperty) ProtoMethods() *protoiface.Methods 
 			n += 1 + runtime.Sov(uint64(x.Value))
 		}
 		if len(x.Owners) > 0 {
-			SiZeMaP := func(k string, v uint64) {
-				mapEntrySize := 1 + len(k) + runtime.Sov(uint64(len(k))) + 1 + runtime.Sov(uint64(v))
-				n += mapEntrySize + 1 + runtime.Sov(uint64(mapEntrySize))
+			for _, s := range x.Owners {
+				l = len(s)
+				n += 1 + l + runtime.Sov(uint64(l))
 			}
-			if options.Deterministic {
-				sortme := make([]string, 0, len(x.Owners))
-				for k := range x.Owners {
-					sortme = append(sortme, k)
-				}
-				sort.Strings(sortme)
-				for _, k := range sortme {
-					v := x.Owners[k]
-					SiZeMaP(k, v)
-				}
-			} else {
-				for k, v := range x.Owners {
-					SiZeMaP(k, v)
-				}
+		}
+		if len(x.Shares) > 0 {
+			l = 0
+			for _, e := range x.Shares {
+				l += runtime.Sov(uint64(e))
 			}
+			n += 1 + runtime.Sov(uint64(l)) + l
 		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
@@ -1377,45 +1409,33 @@ func (x *fastReflection_MsgRegisterProperty) ProtoMethods() *protoiface.Methods 
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
+		if len(x.Shares) > 0 {
+			var pksize2 int
+			for _, num := range x.Shares {
+				pksize2 += runtime.Sov(uint64(num))
+			}
+			i -= pksize2
+			j1 := i
+			for _, num := range x.Shares {
+				for num >= 1<<7 {
+					dAtA[j1] = uint8(uint64(num)&0x7f | 0x80)
+					num >>= 7
+					j1++
+				}
+				dAtA[j1] = uint8(num)
+				j1++
+			}
+			i = runtime.EncodeVarint(dAtA, i, uint64(pksize2))
+			i--
+			dAtA[i] = 0x32
+		}
 		if len(x.Owners) > 0 {
-			MaRsHaLmAp := func(k string, v uint64) (protoiface.MarshalOutput, error) {
-				baseI := i
-				i = runtime.EncodeVarint(dAtA, i, uint64(v))
-				i--
-				dAtA[i] = 0x10
-				i -= len(k)
-				copy(dAtA[i:], k)
-				i = runtime.EncodeVarint(dAtA, i, uint64(len(k)))
-				i--
-				dAtA[i] = 0xa
-				i = runtime.EncodeVarint(dAtA, i, uint64(baseI-i))
+			for iNdEx := len(x.Owners) - 1; iNdEx >= 0; iNdEx-- {
+				i -= len(x.Owners[iNdEx])
+				copy(dAtA[i:], x.Owners[iNdEx])
+				i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Owners[iNdEx])))
 				i--
 				dAtA[i] = 0x2a
-				return protoiface.MarshalOutput{}, nil
-			}
-			if options.Deterministic {
-				keysForOwners := make([]string, 0, len(x.Owners))
-				for k := range x.Owners {
-					keysForOwners = append(keysForOwners, string(k))
-				}
-				sort.Slice(keysForOwners, func(i, j int) bool {
-					return keysForOwners[i] < keysForOwners[j]
-				})
-				for iNdEx := len(keysForOwners) - 1; iNdEx >= 0; iNdEx-- {
-					v := x.Owners[string(keysForOwners[iNdEx])]
-					out, err := MaRsHaLmAp(keysForOwners[iNdEx], v)
-					if err != nil {
-						return out, err
-					}
-				}
-			} else {
-				for k := range x.Owners {
-					v := x.Owners[k]
-					out, err := MaRsHaLmAp(k, v)
-					if err != nil {
-						return out, err
-					}
-				}
 			}
 		}
 		if x.Value != 0 {
@@ -1612,7 +1632,7 @@ func (x *fastReflection_MsgRegisterProperty) ProtoMethods() *protoiface.Methods 
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Owners", wireType)
 				}
-				var msglen int
+				var stringLen uint64
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
@@ -1622,29 +1642,27 @@ func (x *fastReflection_MsgRegisterProperty) ProtoMethods() *protoiface.Methods 
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					msglen |= int(b&0x7F) << shift
+					stringLen |= uint64(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
 				}
-				if msglen < 0 {
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
 				}
-				postIndex := iNdEx + msglen
+				postIndex := iNdEx + intStringLen
 				if postIndex < 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
 				}
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				if x.Owners == nil {
-					x.Owners = make(map[string]uint64)
-				}
-				var mapkey string
-				var mapvalue uint64
-				for iNdEx < postIndex {
-					entryPreIndex := iNdEx
-					var wire uint64
+				x.Owners = append(x.Owners, string(dAtA[iNdEx:postIndex]))
+				iNdEx = postIndex
+			case 6:
+				if wireType == 0 {
+					var v uint64
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
 							return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
@@ -1654,73 +1672,70 @@ func (x *fastReflection_MsgRegisterProperty) ProtoMethods() *protoiface.Methods 
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						wire |= uint64(b&0x7F) << shift
+						v |= uint64(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
 					}
-					fieldNum := int32(wire >> 3)
-					if fieldNum == 1 {
-						var stringLenmapkey uint64
-						for shift := uint(0); ; shift += 7 {
-							if shift >= 64 {
-								return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-							}
-							if iNdEx >= l {
-								return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-							}
-							b := dAtA[iNdEx]
-							iNdEx++
-							stringLenmapkey |= uint64(b&0x7F) << shift
-							if b < 0x80 {
-								break
-							}
+					x.Shares = append(x.Shares, v)
+				} else if wireType == 2 {
+					var packedLen int
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
 						}
-						intStringLenmapkey := int(stringLenmapkey)
-						if intStringLenmapkey < 0 {
-							return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-						}
-						postStringIndexmapkey := iNdEx + intStringLenmapkey
-						if postStringIndexmapkey < 0 {
-							return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-						}
-						if postStringIndexmapkey > l {
+						if iNdEx >= l {
 							return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 						}
-						mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
-						iNdEx = postStringIndexmapkey
-					} else if fieldNum == 2 {
-						for shift := uint(0); ; shift += 7 {
-							if shift >= 64 {
-								return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-							}
-							if iNdEx >= l {
-								return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-							}
-							b := dAtA[iNdEx]
-							iNdEx++
-							mapvalue |= uint64(b&0x7F) << shift
-							if b < 0x80 {
-								break
-							}
+						b := dAtA[iNdEx]
+						iNdEx++
+						packedLen |= int(b&0x7F) << shift
+						if b < 0x80 {
+							break
 						}
-					} else {
-						iNdEx = entryPreIndex
-						skippy, err := runtime.Skip(dAtA[iNdEx:])
-						if err != nil {
-							return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-						}
-						if (skippy < 0) || (iNdEx+skippy) < 0 {
-							return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-						}
-						if (iNdEx + skippy) > postIndex {
-							return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-						}
-						iNdEx += skippy
 					}
+					if packedLen < 0 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+					}
+					postIndex := iNdEx + packedLen
+					if postIndex < 0 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+					}
+					if postIndex > l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					var elementCount int
+					var count int
+					for _, integer := range dAtA[iNdEx:postIndex] {
+						if integer < 128 {
+							count++
+						}
+					}
+					elementCount = count
+					if elementCount != 0 && len(x.Shares) == 0 {
+						x.Shares = make([]uint64, 0, elementCount)
+					}
+					for iNdEx < postIndex {
+						var v uint64
+						for shift := uint(0); ; shift += 7 {
+							if shift >= 64 {
+								return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+							}
+							if iNdEx >= l {
+								return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+							}
+							b := dAtA[iNdEx]
+							iNdEx++
+							v |= uint64(b&0x7F) << shift
+							if b < 0x80 {
+								break
+							}
+						}
+						x.Shares = append(x.Shares, v)
+					}
+				} else {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Shares", wireType)
 				}
-				x.Owners[mapkey] = mapvalue
-				iNdEx = postIndex
 			default:
 				iNdEx = preIndex
 				skippy, err := runtime.Skip(dAtA[iNdEx:])
@@ -2204,11 +2219,12 @@ type MsgRegisterProperty struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Creator string            `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	Address string            `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
-	Region  string            `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
-	Value   uint64            `protobuf:"varint,4,opt,name=value,proto3" json:"value,omitempty"`
-	Owners  map[string]uint64 `protobuf:"bytes,5,rep,name=owners,proto3" json:"owners,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"varint,2,opt,name=value,proto3"` // owner → share (e.g., alice: 60, bob: 40)
+	Creator string   `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	Address string   `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
+	Region  string   `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
+	Value   uint64   `protobuf:"varint,4,opt,name=value,proto3" json:"value,omitempty"`
+	Owners  []string `protobuf:"bytes,5,rep,name=owners,proto3" json:"owners,omitempty"`         // list of owner addresses
+	Shares  []uint64 `protobuf:"varint,6,rep,packed,name=shares,proto3" json:"shares,omitempty"` // corresponding shares for each owner
 }
 
 func (x *MsgRegisterProperty) Reset() {
@@ -2259,9 +2275,16 @@ func (x *MsgRegisterProperty) GetValue() uint64 {
 	return 0
 }
 
-func (x *MsgRegisterProperty) GetOwners() map[string]uint64 {
+func (x *MsgRegisterProperty) GetOwners() []string {
 	if x != nil {
 		return x.Owners
+	}
+	return nil
+}
+
+func (x *MsgRegisterProperty) GetShares() []uint64 {
+	if x != nil {
+		return x.Shares
 	}
 	return nil
 }
@@ -2318,7 +2341,7 @@ var file_arda_property_tx_proto_rawDesc = []byte{
 	0x78, 0x2f, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x2f, 0x4d, 0x73, 0x67, 0x55, 0x70,
 	0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x22, 0x19, 0x0a, 0x17, 0x4d, 0x73,
 	0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x88, 0x02, 0x0a, 0x13, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x67,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0xb5, 0x01, 0x0a, 0x13, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x67,
 	0x69, 0x73, 0x74, 0x65, 0x72, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x12, 0x18, 0x0a,
 	0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07,
 	0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x18, 0x0a, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65,
@@ -2326,39 +2349,34 @@ var file_arda_property_tx_proto_rawDesc = []byte{
 	0x73, 0x12, 0x16, 0x0a, 0x06, 0x72, 0x65, 0x67, 0x69, 0x6f, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28,
 	0x09, 0x52, 0x06, 0x72, 0x65, 0x67, 0x69, 0x6f, 0x6e, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c,
 	0x75, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x04, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x12,
-	0x46, 0x0a, 0x06, 0x6f, 0x77, 0x6e, 0x65, 0x72, 0x73, 0x18, 0x05, 0x20, 0x03, 0x28, 0x0b, 0x32,
-	0x2e, 0x2e, 0x61, 0x72, 0x64, 0x61, 0x2e, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x2e,
-	0x4d, 0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x50, 0x72, 0x6f, 0x70, 0x65,
-	0x72, 0x74, 0x79, 0x2e, 0x4f, 0x77, 0x6e, 0x65, 0x72, 0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x52,
-	0x06, 0x6f, 0x77, 0x6e, 0x65, 0x72, 0x73, 0x1a, 0x39, 0x0a, 0x0b, 0x4f, 0x77, 0x6e, 0x65, 0x72,
-	0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75,
-	0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02,
-	0x38, 0x01, 0x3a, 0x0c, 0x82, 0xe7, 0xb0, 0x2a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72,
-	0x22, 0x1d, 0x0a, 0x1b, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x50,
-	0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32,
-	0xc8, 0x01, 0x0a, 0x03, 0x4d, 0x73, 0x67, 0x12, 0x56, 0x0a, 0x0c, 0x55, 0x70, 0x64, 0x61, 0x74,
-	0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12, 0x1e, 0x2e, 0x61, 0x72, 0x64, 0x61, 0x2e, 0x70,
-	0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74,
-	0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x1a, 0x26, 0x2e, 0x61, 0x72, 0x64, 0x61, 0x2e, 0x70,
-	0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74,
-	0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
-	0x62, 0x0a, 0x10, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x50, 0x72, 0x6f, 0x70, 0x65,
-	0x72, 0x74, 0x79, 0x12, 0x22, 0x2e, 0x61, 0x72, 0x64, 0x61, 0x2e, 0x70, 0x72, 0x6f, 0x70, 0x65,
-	0x72, 0x74, 0x79, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x50,
-	0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x1a, 0x2a, 0x2e, 0x61, 0x72, 0x64, 0x61, 0x2e, 0x70,
-	0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73,
-	0x74, 0x65, 0x72, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x1a, 0x05, 0x80, 0xe7, 0xb0, 0x2a, 0x01, 0x42, 0x89, 0x01, 0x0a, 0x11, 0x63,
-	0x6f, 0x6d, 0x2e, 0x61, 0x72, 0x64, 0x61, 0x2e, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79,
-	0x42, 0x07, 0x54, 0x78, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x16, 0x61, 0x72, 0x64,
-	0x61, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x61, 0x72, 0x64, 0x61, 0x2f, 0x70, 0x72, 0x6f, 0x70, 0x65,
-	0x72, 0x74, 0x79, 0xa2, 0x02, 0x03, 0x41, 0x50, 0x58, 0xaa, 0x02, 0x0d, 0x41, 0x72, 0x64, 0x61,
-	0x2e, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0xca, 0x02, 0x0d, 0x41, 0x72, 0x64, 0x61,
-	0x5c, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0xe2, 0x02, 0x19, 0x41, 0x72, 0x64, 0x61,
-	0x5c, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74,
-	0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x0e, 0x41, 0x72, 0x64, 0x61, 0x3a, 0x3a, 0x50, 0x72,
-	0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x16, 0x0a, 0x06, 0x6f, 0x77, 0x6e, 0x65, 0x72, 0x73, 0x18, 0x05, 0x20, 0x03, 0x28, 0x09, 0x52,
+	0x06, 0x6f, 0x77, 0x6e, 0x65, 0x72, 0x73, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x68, 0x61, 0x72, 0x65,
+	0x73, 0x18, 0x06, 0x20, 0x03, 0x28, 0x04, 0x52, 0x06, 0x73, 0x68, 0x61, 0x72, 0x65, 0x73, 0x3a,
+	0x0c, 0x82, 0xe7, 0xb0, 0x2a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x1d, 0x0a,
+	0x1b, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x50, 0x72, 0x6f, 0x70,
+	0x65, 0x72, 0x74, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0xc8, 0x01, 0x0a,
+	0x03, 0x4d, 0x73, 0x67, 0x12, 0x56, 0x0a, 0x0c, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61,
+	0x72, 0x61, 0x6d, 0x73, 0x12, 0x1e, 0x2e, 0x61, 0x72, 0x64, 0x61, 0x2e, 0x70, 0x72, 0x6f, 0x70,
+	0x65, 0x72, 0x74, 0x79, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61,
+	0x72, 0x61, 0x6d, 0x73, 0x1a, 0x26, 0x2e, 0x61, 0x72, 0x64, 0x61, 0x2e, 0x70, 0x72, 0x6f, 0x70,
+	0x65, 0x72, 0x74, 0x79, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61,
+	0x72, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x62, 0x0a, 0x10,
+	0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79,
+	0x12, 0x22, 0x2e, 0x61, 0x72, 0x64, 0x61, 0x2e, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79,
+	0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x50, 0x72, 0x6f, 0x70,
+	0x65, 0x72, 0x74, 0x79, 0x1a, 0x2a, 0x2e, 0x61, 0x72, 0x64, 0x61, 0x2e, 0x70, 0x72, 0x6f, 0x70,
+	0x65, 0x72, 0x74, 0x79, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72,
+	0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x1a, 0x05, 0x80, 0xe7, 0xb0, 0x2a, 0x01, 0x42, 0x89, 0x01, 0x0a, 0x11, 0x63, 0x6f, 0x6d, 0x2e,
+	0x61, 0x72, 0x64, 0x61, 0x2e, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x42, 0x07, 0x54,
+	0x78, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x16, 0x61, 0x72, 0x64, 0x61, 0x2f, 0x61,
+	0x70, 0x69, 0x2f, 0x61, 0x72, 0x64, 0x61, 0x2f, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79,
+	0xa2, 0x02, 0x03, 0x41, 0x50, 0x58, 0xaa, 0x02, 0x0d, 0x41, 0x72, 0x64, 0x61, 0x2e, 0x50, 0x72,
+	0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0xca, 0x02, 0x0d, 0x41, 0x72, 0x64, 0x61, 0x5c, 0x50, 0x72,
+	0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0xe2, 0x02, 0x19, 0x41, 0x72, 0x64, 0x61, 0x5c, 0x50, 0x72,
+	0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61,
+	0x74, 0x61, 0xea, 0x02, 0x0e, 0x41, 0x72, 0x64, 0x61, 0x3a, 0x3a, 0x50, 0x72, 0x6f, 0x70, 0x65,
+	0x72, 0x74, 0x79, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -2373,27 +2391,25 @@ func file_arda_property_tx_proto_rawDescGZIP() []byte {
 	return file_arda_property_tx_proto_rawDescData
 }
 
-var file_arda_property_tx_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_arda_property_tx_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_arda_property_tx_proto_goTypes = []interface{}{
 	(*MsgUpdateParams)(nil),             // 0: arda.property.MsgUpdateParams
 	(*MsgUpdateParamsResponse)(nil),     // 1: arda.property.MsgUpdateParamsResponse
 	(*MsgRegisterProperty)(nil),         // 2: arda.property.MsgRegisterProperty
 	(*MsgRegisterPropertyResponse)(nil), // 3: arda.property.MsgRegisterPropertyResponse
-	nil,                                 // 4: arda.property.MsgRegisterProperty.OwnersEntry
-	(*Params)(nil),                      // 5: arda.property.Params
+	(*Params)(nil),                      // 4: arda.property.Params
 }
 var file_arda_property_tx_proto_depIdxs = []int32{
-	5, // 0: arda.property.MsgUpdateParams.params:type_name -> arda.property.Params
-	4, // 1: arda.property.MsgRegisterProperty.owners:type_name -> arda.property.MsgRegisterProperty.OwnersEntry
-	0, // 2: arda.property.Msg.UpdateParams:input_type -> arda.property.MsgUpdateParams
-	2, // 3: arda.property.Msg.RegisterProperty:input_type -> arda.property.MsgRegisterProperty
-	1, // 4: arda.property.Msg.UpdateParams:output_type -> arda.property.MsgUpdateParamsResponse
-	3, // 5: arda.property.Msg.RegisterProperty:output_type -> arda.property.MsgRegisterPropertyResponse
-	4, // [4:6] is the sub-list for method output_type
-	2, // [2:4] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	4, // 0: arda.property.MsgUpdateParams.params:type_name -> arda.property.Params
+	0, // 1: arda.property.Msg.UpdateParams:input_type -> arda.property.MsgUpdateParams
+	2, // 2: arda.property.Msg.RegisterProperty:input_type -> arda.property.MsgRegisterProperty
+	1, // 3: arda.property.Msg.UpdateParams:output_type -> arda.property.MsgUpdateParamsResponse
+	3, // 4: arda.property.Msg.RegisterProperty:output_type -> arda.property.MsgRegisterPropertyResponse
+	3, // [3:5] is the sub-list for method output_type
+	1, // [1:3] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_arda_property_tx_proto_init() }
@@ -2458,7 +2474,7 @@ func file_arda_property_tx_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_arda_property_tx_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

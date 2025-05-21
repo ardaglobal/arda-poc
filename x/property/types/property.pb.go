@@ -23,11 +23,12 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type Property struct {
-	Index   string            `protobuf:"bytes,1,opt,name=index,proto3" json:"index,omitempty"`
-	Address string            `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
-	Region  string            `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
-	Value   uint64            `protobuf:"varint,4,opt,name=value,proto3" json:"value,omitempty"`
-	Owners  map[string]uint64 `protobuf:"bytes,5,rep,name=owners,proto3" json:"owners,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"varint,2,opt,name=value,proto3"`
+	Index   string   `protobuf:"bytes,1,opt,name=index,proto3" json:"index,omitempty"`
+	Address string   `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
+	Region  string   `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
+	Value   uint64   `protobuf:"varint,4,opt,name=value,proto3" json:"value,omitempty"`
+	Owners  []string `protobuf:"bytes,5,rep,name=owners,proto3" json:"owners,omitempty"`
+	Shares  []uint64 `protobuf:"varint,6,rep,packed,name=shares,proto3" json:"shares,omitempty"`
 }
 
 func (m *Property) Reset()         { *m = Property{} }
@@ -91,37 +92,43 @@ func (m *Property) GetValue() uint64 {
 	return 0
 }
 
-func (m *Property) GetOwners() map[string]uint64 {
+func (m *Property) GetOwners() []string {
 	if m != nil {
 		return m.Owners
 	}
 	return nil
 }
 
+func (m *Property) GetShares() []uint64 {
+	if m != nil {
+		return m.Shares
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*Property)(nil), "arda.property.Property")
-	proto.RegisterMapType((map[string]uint64)(nil), "arda.property.Property.OwnersEntry")
 }
 
 func init() { proto.RegisterFile("arda/property/property.proto", fileDescriptor_786eb53ceb265be6) }
 
 var fileDescriptor_786eb53ceb265be6 = []byte{
-	// 236 bytes of a gzipped FileDescriptorProto
+	// 229 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0x49, 0x2c, 0x4a, 0x49,
 	0xd4, 0x2f, 0x28, 0xca, 0x2f, 0x48, 0x2d, 0x2a, 0xa9, 0x84, 0x33, 0xf4, 0x0a, 0x8a, 0xf2, 0x4b,
-	0xf2, 0x85, 0x78, 0x41, 0xb2, 0x7a, 0x30, 0x41, 0xa5, 0x07, 0x8c, 0x5c, 0x1c, 0x01, 0x50, 0x8e,
+	0xf2, 0x85, 0x78, 0x41, 0xb2, 0x7a, 0x30, 0x41, 0xa5, 0x19, 0x8c, 0x5c, 0x1c, 0x01, 0x50, 0x8e,
 	0x90, 0x08, 0x17, 0x6b, 0x66, 0x5e, 0x4a, 0x6a, 0x85, 0x04, 0xa3, 0x02, 0xa3, 0x06, 0x67, 0x10,
 	0x84, 0x23, 0x24, 0xc1, 0xc5, 0x9e, 0x98, 0x92, 0x52, 0x94, 0x5a, 0x5c, 0x2c, 0xc1, 0x04, 0x16,
 	0x87, 0x71, 0x85, 0xc4, 0xb8, 0xd8, 0x8a, 0x52, 0xd3, 0x33, 0xf3, 0xf3, 0x24, 0x98, 0xc1, 0x12,
 	0x50, 0x1e, 0xc8, 0x9c, 0xb2, 0xc4, 0x9c, 0xd2, 0x54, 0x09, 0x16, 0x05, 0x46, 0x0d, 0x96, 0x20,
-	0x08, 0x47, 0xc8, 0x9a, 0x8b, 0x2d, 0xbf, 0x3c, 0x2f, 0xb5, 0xa8, 0x58, 0x82, 0x55, 0x81, 0x59,
-	0x83, 0xdb, 0x48, 0x59, 0x0f, 0xc5, 0x29, 0x7a, 0x30, 0x67, 0xe8, 0xf9, 0x83, 0x55, 0xb9, 0xe6,
-	0x95, 0x14, 0x55, 0x06, 0x41, 0xb5, 0x48, 0x59, 0x72, 0x71, 0x23, 0x09, 0x0b, 0x09, 0x70, 0x31,
-	0x67, 0xa7, 0x56, 0x42, 0xdd, 0x09, 0x62, 0x22, 0xec, 0x64, 0x42, 0xb2, 0xd3, 0x8a, 0xc9, 0x82,
-	0xd1, 0x49, 0xff, 0xc4, 0x23, 0x39, 0xc6, 0x0b, 0x8f, 0xe4, 0x18, 0x1f, 0x3c, 0x92, 0x63, 0x9c,
-	0xf0, 0x58, 0x8e, 0xe1, 0xc2, 0x63, 0x39, 0x86, 0x1b, 0x8f, 0xe5, 0x18, 0xa2, 0x44, 0xc1, 0x21,
-	0x55, 0x81, 0x08, 0xab, 0x92, 0xca, 0x82, 0xd4, 0xe2, 0x24, 0x36, 0x70, 0x48, 0x19, 0x03, 0x02,
-	0x00, 0x00, 0xff, 0xff, 0xb5, 0x1c, 0xff, 0x43, 0x49, 0x01, 0x00, 0x00,
+	0x08, 0x07, 0xa4, 0x3a, 0xbf, 0x3c, 0x2f, 0xb5, 0xa8, 0x58, 0x82, 0x55, 0x81, 0x19, 0xa4, 0x1a,
+	0xc2, 0x03, 0x89, 0x17, 0x67, 0x24, 0x16, 0xa5, 0x16, 0x4b, 0xb0, 0x29, 0x30, 0x6b, 0xb0, 0x04,
+	0x41, 0x79, 0x4e, 0x9e, 0x27, 0x1e, 0xc9, 0x31, 0x5e, 0x78, 0x24, 0xc7, 0xf8, 0xe0, 0x91, 0x1c,
+	0xe3, 0x84, 0xc7, 0x72, 0x0c, 0x17, 0x1e, 0xcb, 0x31, 0xdc, 0x78, 0x2c, 0xc7, 0x10, 0xa5, 0x9f,
+	0x9e, 0x59, 0x92, 0x51, 0x9a, 0xa4, 0x97, 0x9c, 0x9f, 0xab, 0x0f, 0xf2, 0x4e, 0x7a, 0x4e, 0x7e,
+	0x52, 0x62, 0x0e, 0x98, 0xa9, 0x5b, 0x90, 0x9f, 0xac, 0x5f, 0x81, 0xf0, 0x7d, 0x49, 0x65, 0x41,
+	0x6a, 0x71, 0x12, 0x1b, 0xd8, 0xef, 0xc6, 0x80, 0x00, 0x00, 0x00, 0xff, 0xff, 0x37, 0x29, 0x08,
+	0x66, 0x1b, 0x01, 0x00, 0x00,
 }
 
 func (m *Property) Marshal() (dAtA []byte, err error) {
@@ -144,19 +151,29 @@ func (m *Property) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if len(m.Shares) > 0 {
+		dAtA2 := make([]byte, len(m.Shares)*10)
+		var j1 int
+		for _, num := range m.Shares {
+			for num >= 1<<7 {
+				dAtA2[j1] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j1++
+			}
+			dAtA2[j1] = uint8(num)
+			j1++
+		}
+		i -= j1
+		copy(dAtA[i:], dAtA2[:j1])
+		i = encodeVarintProperty(dAtA, i, uint64(j1))
+		i--
+		dAtA[i] = 0x32
+	}
 	if len(m.Owners) > 0 {
-		for k := range m.Owners {
-			v := m.Owners[k]
-			baseI := i
-			i = encodeVarintProperty(dAtA, i, uint64(v))
-			i--
-			dAtA[i] = 0x10
-			i -= len(k)
-			copy(dAtA[i:], k)
-			i = encodeVarintProperty(dAtA, i, uint64(len(k)))
-			i--
-			dAtA[i] = 0xa
-			i = encodeVarintProperty(dAtA, i, uint64(baseI-i))
+		for iNdEx := len(m.Owners) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Owners[iNdEx])
+			copy(dAtA[i:], m.Owners[iNdEx])
+			i = encodeVarintProperty(dAtA, i, uint64(len(m.Owners[iNdEx])))
 			i--
 			dAtA[i] = 0x2a
 		}
@@ -223,12 +240,17 @@ func (m *Property) Size() (n int) {
 		n += 1 + sovProperty(uint64(m.Value))
 	}
 	if len(m.Owners) > 0 {
-		for k, v := range m.Owners {
-			_ = k
-			_ = v
-			mapEntrySize := 1 + len(k) + sovProperty(uint64(len(k))) + 1 + sovProperty(uint64(v))
-			n += mapEntrySize + 1 + sovProperty(uint64(mapEntrySize))
+		for _, s := range m.Owners {
+			l = len(s)
+			n += 1 + l + sovProperty(uint64(l))
 		}
+	}
+	if len(m.Shares) > 0 {
+		l = 0
+		for _, e := range m.Shares {
+			l += sovProperty(uint64(e))
+		}
+		n += 1 + sovProperty(uint64(l)) + l
 	}
 	return n
 }
@@ -387,7 +409,7 @@ func (m *Property) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Owners", wireType)
 			}
-			var msglen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowProperty
@@ -397,29 +419,27 @@ func (m *Property) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				msglen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if msglen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthProperty
 			}
-			postIndex := iNdEx + msglen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthProperty
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Owners == nil {
-				m.Owners = make(map[string]uint64)
-			}
-			var mapkey string
-			var mapvalue uint64
-			for iNdEx < postIndex {
-				entryPreIndex := iNdEx
-				var wire uint64
+			m.Owners = append(m.Owners, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 6:
+			if wireType == 0 {
+				var v uint64
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return ErrIntOverflowProperty
@@ -429,73 +449,70 @@ func (m *Property) Unmarshal(dAtA []byte) error {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					wire |= uint64(b&0x7F) << shift
+					v |= uint64(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
 				}
-				fieldNum := int32(wire >> 3)
-				if fieldNum == 1 {
-					var stringLenmapkey uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowProperty
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapkey |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
+				m.Shares = append(m.Shares, v)
+			} else if wireType == 2 {
+				var packedLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowProperty
 					}
-					intStringLenmapkey := int(stringLenmapkey)
-					if intStringLenmapkey < 0 {
-						return ErrInvalidLengthProperty
-					}
-					postStringIndexmapkey := iNdEx + intStringLenmapkey
-					if postStringIndexmapkey < 0 {
-						return ErrInvalidLengthProperty
-					}
-					if postStringIndexmapkey > l {
+					if iNdEx >= l {
 						return io.ErrUnexpectedEOF
 					}
-					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
-					iNdEx = postStringIndexmapkey
-				} else if fieldNum == 2 {
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowProperty
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						mapvalue |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
+					b := dAtA[iNdEx]
+					iNdEx++
+					packedLen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
 					}
-				} else {
-					iNdEx = entryPreIndex
-					skippy, err := skipProperty(dAtA[iNdEx:])
-					if err != nil {
-						return err
-					}
-					if (skippy < 0) || (iNdEx+skippy) < 0 {
-						return ErrInvalidLengthProperty
-					}
-					if (iNdEx + skippy) > postIndex {
-						return io.ErrUnexpectedEOF
-					}
-					iNdEx += skippy
 				}
+				if packedLen < 0 {
+					return ErrInvalidLengthProperty
+				}
+				postIndex := iNdEx + packedLen
+				if postIndex < 0 {
+					return ErrInvalidLengthProperty
+				}
+				if postIndex > l {
+					return io.ErrUnexpectedEOF
+				}
+				var elementCount int
+				var count int
+				for _, integer := range dAtA[iNdEx:postIndex] {
+					if integer < 128 {
+						count++
+					}
+				}
+				elementCount = count
+				if elementCount != 0 && len(m.Shares) == 0 {
+					m.Shares = make([]uint64, 0, elementCount)
+				}
+				for iNdEx < postIndex {
+					var v uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowProperty
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						v |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					m.Shares = append(m.Shares, v)
+				}
+			} else {
+				return fmt.Errorf("proto: wrong wireType = %d for field Shares", wireType)
 			}
-			m.Owners[mapkey] = mapvalue
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipProperty(dAtA[iNdEx:])

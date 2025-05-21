@@ -8,7 +8,7 @@ import "cosmos/base/query/v1beta1/pagination.proto";
 import "arda/property/params.proto";
 import "arda/property/property.proto";
 
-option go_package = "arda/x/property/types";
+option go_package = "github.com/ardaglobal/arda-poc/x/property/types";
 
 // Query defines the gRPC querier service.
 service Query {

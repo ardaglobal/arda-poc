@@ -1,12 +1,13 @@
 syntax = "proto3";
 package arda.property;
 
-option go_package = "arda/x/property/types";
+option go_package = "github.com/ardaglobal/arda-poc/x/property/types";
 
 message Property {
   string index = 1; // auto-generated key; we'll use this as ID = address  
   string address = 2; 
   string region = 3; 
   uint64 value = 4;
-  map<string, uint64> owners = 5; // address → share
+  repeated string owners = 5; // list of owner addresses
+  repeated uint64 shares = 6; // corresponding shares for each owner
 }
