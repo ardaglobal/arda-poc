@@ -26,10 +26,10 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Short:     "Shows the parameters of the module",
 				},
 				{
-					RpcMethod:      "PropertyAll",
-					Use:            "property-all",
-					Short:          "Query all properties",
-					Long:           "Query all registered properties with formatted display of owners and shares",
+					RpcMethod: "PropertyAll",
+					Use:       "property-all",
+					Short:     "Query all properties",
+					Long:      "Query all registered properties with formatted display of owners and shares",
 				},
 				{
 					RpcMethod:      "Property",
@@ -54,6 +54,12 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Use:            "register-property [address] [region] [value]",
 					Short:          "Send a register-property tx",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "address"}, {ProtoField: "region"}, {ProtoField: "value"}},
+				},
+				{
+					RpcMethod:      "TransferShares",
+					Use:            "transfer-shares [property-id] [from-owners] [from-shares] [to-owners] [to-shares]",
+					Short:          "Send a transfer-shares tx",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "propertyId"}, {ProtoField: "fromOwners"}, {ProtoField: "fromShares"}, {ProtoField: "toOwners"}, {ProtoField: "toShares"}},
 				},
 				// this line is used by ignite scaffolding # autocli/tx
 			},
@@ -109,7 +115,7 @@ func GetCmdQueryProperties() *cobra.Command {
 			fmt.Fprintln(cmd.OutOrStdout(), "Properties:")
 			for _, prop := range res.Properties {
 				printProperty(prop)
-				
+
 				fmt.Fprintln(cmd.OutOrStdout(), "") // Empty line between properties
 			}
 
@@ -163,8 +169,8 @@ func printProperty(prop *types.Property) {
 	fmt.Printf("  Region: %s\n", prop.Region)
 	fmt.Printf("  Value: %v\n", prop.Value)
 	fmt.Println("  Owners / Shares:")
-			
-			// Display owners and shares together
+
+	// Display owners and shares together
 	for i := 0; i < len(prop.Owners); i++ {
 		ownerShare := "unknown"
 		if i < len(prop.Shares) {
