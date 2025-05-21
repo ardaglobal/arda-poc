@@ -2176,7 +2176,7 @@ func (x *_MsgTransferShares_3_list) IsValid() bool {
 var _ protoreflect.List = (*_MsgTransferShares_4_list)(nil)
 
 type _MsgTransferShares_4_list struct {
-	list *[]int32
+	list *[]uint64
 }
 
 func (x *_MsgTransferShares_4_list) Len() int {
@@ -2187,18 +2187,18 @@ func (x *_MsgTransferShares_4_list) Len() int {
 }
 
 func (x *_MsgTransferShares_4_list) Get(i int) protoreflect.Value {
-	return protoreflect.ValueOfInt32((*x.list)[i])
+	return protoreflect.ValueOfUint64((*x.list)[i])
 }
 
 func (x *_MsgTransferShares_4_list) Set(i int, value protoreflect.Value) {
-	valueUnwrapped := value.Int()
-	concreteValue := (int32)(valueUnwrapped)
+	valueUnwrapped := value.Uint()
+	concreteValue := valueUnwrapped
 	(*x.list)[i] = concreteValue
 }
 
 func (x *_MsgTransferShares_4_list) Append(value protoreflect.Value) {
-	valueUnwrapped := value.Int()
-	concreteValue := (int32)(valueUnwrapped)
+	valueUnwrapped := value.Uint()
+	concreteValue := valueUnwrapped
 	*x.list = append(*x.list, concreteValue)
 }
 
@@ -2211,8 +2211,8 @@ func (x *_MsgTransferShares_4_list) Truncate(n int) {
 }
 
 func (x *_MsgTransferShares_4_list) NewElement() protoreflect.Value {
-	v := int32(0)
-	return protoreflect.ValueOfInt32(v)
+	v := uint64(0)
+	return protoreflect.ValueOfUint64(v)
 }
 
 func (x *_MsgTransferShares_4_list) IsValid() bool {
@@ -2268,7 +2268,7 @@ func (x *_MsgTransferShares_5_list) IsValid() bool {
 var _ protoreflect.List = (*_MsgTransferShares_6_list)(nil)
 
 type _MsgTransferShares_6_list struct {
-	list *[]int32
+	list *[]uint64
 }
 
 func (x *_MsgTransferShares_6_list) Len() int {
@@ -2279,18 +2279,18 @@ func (x *_MsgTransferShares_6_list) Len() int {
 }
 
 func (x *_MsgTransferShares_6_list) Get(i int) protoreflect.Value {
-	return protoreflect.ValueOfInt32((*x.list)[i])
+	return protoreflect.ValueOfUint64((*x.list)[i])
 }
 
 func (x *_MsgTransferShares_6_list) Set(i int, value protoreflect.Value) {
-	valueUnwrapped := value.Int()
-	concreteValue := (int32)(valueUnwrapped)
+	valueUnwrapped := value.Uint()
+	concreteValue := valueUnwrapped
 	(*x.list)[i] = concreteValue
 }
 
 func (x *_MsgTransferShares_6_list) Append(value protoreflect.Value) {
-	valueUnwrapped := value.Int()
-	concreteValue := (int32)(valueUnwrapped)
+	valueUnwrapped := value.Uint()
+	concreteValue := valueUnwrapped
 	*x.list = append(*x.list, concreteValue)
 }
 
@@ -2303,8 +2303,8 @@ func (x *_MsgTransferShares_6_list) Truncate(n int) {
 }
 
 func (x *_MsgTransferShares_6_list) NewElement() protoreflect.Value {
-	v := int32(0)
-	return protoreflect.ValueOfInt32(v)
+	v := uint64(0)
+	return protoreflect.ValueOfUint64(v)
 }
 
 func (x *_MsgTransferShares_6_list) IsValid() bool {
@@ -2602,7 +2602,7 @@ func (x *fastReflection_MsgTransferShares) Mutable(fd protoreflect.FieldDescript
 		return protoreflect.ValueOfList(value)
 	case "ardapoc.property.MsgTransferShares.fromShares":
 		if x.FromShares == nil {
-			x.FromShares = []int32{}
+			x.FromShares = []uint64{}
 		}
 		value := &_MsgTransferShares_4_list{list: &x.FromShares}
 		return protoreflect.ValueOfList(value)
@@ -2614,7 +2614,7 @@ func (x *fastReflection_MsgTransferShares) Mutable(fd protoreflect.FieldDescript
 		return protoreflect.ValueOfList(value)
 	case "ardapoc.property.MsgTransferShares.toShares":
 		if x.ToShares == nil {
-			x.ToShares = []int32{}
+			x.ToShares = []uint64{}
 		}
 		value := &_MsgTransferShares_6_list{list: &x.ToShares}
 		return protoreflect.ValueOfList(value)
@@ -2643,13 +2643,13 @@ func (x *fastReflection_MsgTransferShares) NewField(fd protoreflect.FieldDescrip
 		list := []string{}
 		return protoreflect.ValueOfList(&_MsgTransferShares_3_list{list: &list})
 	case "ardapoc.property.MsgTransferShares.fromShares":
-		list := []int32{}
+		list := []uint64{}
 		return protoreflect.ValueOfList(&_MsgTransferShares_4_list{list: &list})
 	case "ardapoc.property.MsgTransferShares.toOwners":
 		list := []string{}
 		return protoreflect.ValueOfList(&_MsgTransferShares_5_list{list: &list})
 	case "ardapoc.property.MsgTransferShares.toShares":
-		list := []int32{}
+		list := []uint64{}
 		return protoreflect.ValueOfList(&_MsgTransferShares_6_list{list: &list})
 	default:
 		if fd.IsExtension() {
@@ -2790,8 +2790,7 @@ func (x *fastReflection_MsgTransferShares) ProtoMethods() *protoiface.Methods {
 			}
 			i -= pksize2
 			j1 := i
-			for _, num1 := range x.ToShares {
-				num := uint64(num1)
+			for _, num := range x.ToShares {
 				for num >= 1<<7 {
 					dAtA[j1] = uint8(uint64(num)&0x7f | 0x80)
 					num >>= 7
@@ -2820,8 +2819,7 @@ func (x *fastReflection_MsgTransferShares) ProtoMethods() *protoiface.Methods {
 			}
 			i -= pksize4
 			j3 := i
-			for _, num1 := range x.FromShares {
-				num := uint64(num1)
+			for _, num := range x.FromShares {
 				for num >= 1<<7 {
 					dAtA[j3] = uint8(uint64(num)&0x7f | 0x80)
 					num >>= 7
@@ -3004,7 +3002,7 @@ func (x *fastReflection_MsgTransferShares) ProtoMethods() *protoiface.Methods {
 				iNdEx = postIndex
 			case 4:
 				if wireType == 0 {
-					var v int32
+					var v uint64
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
 							return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
@@ -3014,7 +3012,7 @@ func (x *fastReflection_MsgTransferShares) ProtoMethods() *protoiface.Methods {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						v |= int32(b&0x7F) << shift
+						v |= uint64(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -3055,10 +3053,10 @@ func (x *fastReflection_MsgTransferShares) ProtoMethods() *protoiface.Methods {
 					}
 					elementCount = count
 					if elementCount != 0 && len(x.FromShares) == 0 {
-						x.FromShares = make([]int32, 0, elementCount)
+						x.FromShares = make([]uint64, 0, elementCount)
 					}
 					for iNdEx < postIndex {
-						var v int32
+						var v uint64
 						for shift := uint(0); ; shift += 7 {
 							if shift >= 64 {
 								return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
@@ -3068,7 +3066,7 @@ func (x *fastReflection_MsgTransferShares) ProtoMethods() *protoiface.Methods {
 							}
 							b := dAtA[iNdEx]
 							iNdEx++
-							v |= int32(b&0x7F) << shift
+							v |= uint64(b&0x7F) << shift
 							if b < 0x80 {
 								break
 							}
@@ -3112,7 +3110,7 @@ func (x *fastReflection_MsgTransferShares) ProtoMethods() *protoiface.Methods {
 				iNdEx = postIndex
 			case 6:
 				if wireType == 0 {
-					var v int32
+					var v uint64
 					for shift := uint(0); ; shift += 7 {
 						if shift >= 64 {
 							return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
@@ -3122,7 +3120,7 @@ func (x *fastReflection_MsgTransferShares) ProtoMethods() *protoiface.Methods {
 						}
 						b := dAtA[iNdEx]
 						iNdEx++
-						v |= int32(b&0x7F) << shift
+						v |= uint64(b&0x7F) << shift
 						if b < 0x80 {
 							break
 						}
@@ -3163,10 +3161,10 @@ func (x *fastReflection_MsgTransferShares) ProtoMethods() *protoiface.Methods {
 					}
 					elementCount = count
 					if elementCount != 0 && len(x.ToShares) == 0 {
-						x.ToShares = make([]int32, 0, elementCount)
+						x.ToShares = make([]uint64, 0, elementCount)
 					}
 					for iNdEx < postIndex {
-						var v int32
+						var v uint64
 						for shift := uint(0); ; shift += 7 {
 							if shift >= 64 {
 								return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
@@ -3176,7 +3174,7 @@ func (x *fastReflection_MsgTransferShares) ProtoMethods() *protoiface.Methods {
 							}
 							b := dAtA[iNdEx]
 							iNdEx++
-							v |= int32(b&0x7F) << shift
+							v |= uint64(b&0x7F) << shift
 							if b < 0x80 {
 								break
 							}
@@ -3773,9 +3771,9 @@ type MsgTransferShares struct {
 	Creator    string   `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	PropertyId string   `protobuf:"bytes,2,opt,name=propertyId,proto3" json:"propertyId,omitempty"`
 	FromOwners []string `protobuf:"bytes,3,rep,name=fromOwners,proto3" json:"fromOwners,omitempty"`
-	FromShares []int32  `protobuf:"varint,4,rep,packed,name=fromShares,proto3" json:"fromShares,omitempty"`
+	FromShares []uint64 `protobuf:"varint,4,rep,packed,name=fromShares,proto3" json:"fromShares,omitempty"`
 	ToOwners   []string `protobuf:"bytes,5,rep,name=toOwners,proto3" json:"toOwners,omitempty"`
-	ToShares   []int32  `protobuf:"varint,6,rep,packed,name=toShares,proto3" json:"toShares,omitempty"`
+	ToShares   []uint64 `protobuf:"varint,6,rep,packed,name=toShares,proto3" json:"toShares,omitempty"`
 }
 
 func (x *MsgTransferShares) Reset() {
@@ -3819,7 +3817,7 @@ func (x *MsgTransferShares) GetFromOwners() []string {
 	return nil
 }
 
-func (x *MsgTransferShares) GetFromShares() []int32 {
+func (x *MsgTransferShares) GetFromShares() []uint64 {
 	if x != nil {
 		return x.FromShares
 	}
@@ -3833,7 +3831,7 @@ func (x *MsgTransferShares) GetToOwners() []string {
 	return nil
 }
 
-func (x *MsgTransferShares) GetToShares() []int32 {
+func (x *MsgTransferShares) GetToShares() []uint64 {
 	if x != nil {
 		return x.ToShares
 	}
@@ -3914,11 +3912,11 @@ var file_ardapoc_property_tx_proto_rawDesc = []byte{
 	0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x49, 0x64, 0x12, 0x1e, 0x0a, 0x0a, 0x66, 0x72, 0x6f, 0x6d,
 	0x4f, 0x77, 0x6e, 0x65, 0x72, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28, 0x09, 0x52, 0x0a, 0x66, 0x72,
 	0x6f, 0x6d, 0x4f, 0x77, 0x6e, 0x65, 0x72, 0x73, 0x12, 0x1e, 0x0a, 0x0a, 0x66, 0x72, 0x6f, 0x6d,
-	0x53, 0x68, 0x61, 0x72, 0x65, 0x73, 0x18, 0x04, 0x20, 0x03, 0x28, 0x05, 0x52, 0x0a, 0x66, 0x72,
+	0x53, 0x68, 0x61, 0x72, 0x65, 0x73, 0x18, 0x04, 0x20, 0x03, 0x28, 0x04, 0x52, 0x0a, 0x66, 0x72,
 	0x6f, 0x6d, 0x53, 0x68, 0x61, 0x72, 0x65, 0x73, 0x12, 0x1a, 0x0a, 0x08, 0x74, 0x6f, 0x4f, 0x77,
 	0x6e, 0x65, 0x72, 0x73, 0x18, 0x05, 0x20, 0x03, 0x28, 0x09, 0x52, 0x08, 0x74, 0x6f, 0x4f, 0x77,
 	0x6e, 0x65, 0x72, 0x73, 0x12, 0x1a, 0x0a, 0x08, 0x74, 0x6f, 0x53, 0x68, 0x61, 0x72, 0x65, 0x73,
-	0x18, 0x06, 0x20, 0x03, 0x28, 0x05, 0x52, 0x08, 0x74, 0x6f, 0x53, 0x68, 0x61, 0x72, 0x65, 0x73,
+	0x18, 0x06, 0x20, 0x03, 0x28, 0x04, 0x52, 0x08, 0x74, 0x6f, 0x53, 0x68, 0x61, 0x72, 0x65, 0x73,
 	0x3a, 0x0c, 0x82, 0xe7, 0xb0, 0x2a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x1b,
 	0x0a, 0x19, 0x4d, 0x73, 0x67, 0x54, 0x72, 0x61, 0x6e, 0x73, 0x66, 0x65, 0x72, 0x53, 0x68, 0x61,
 	0x72, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0xb8, 0x02, 0x0a, 0x03,
@@ -3941,17 +3939,17 @@ var file_ardapoc_property_tx_proto_rawDesc = []byte{
 	0x65, 0x73, 0x1a, 0x2b, 0x2e, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x70, 0x72, 0x6f,
 	0x70, 0x65, 0x72, 0x74, 0x79, 0x2e, 0x4d, 0x73, 0x67, 0x54, 0x72, 0x61, 0x6e, 0x73, 0x66, 0x65,
 	0x72, 0x53, 0x68, 0x61, 0x72, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x1a,
-	0x05, 0x80, 0xe7, 0xb0, 0x2a, 0x01, 0x42, 0x9b, 0x01, 0x0a, 0x14, 0x63, 0x6f, 0x6d, 0x2e, 0x61,
+	0x05, 0x80, 0xe7, 0xb0, 0x2a, 0x01, 0x42, 0x9e, 0x01, 0x0a, 0x14, 0x63, 0x6f, 0x6d, 0x2e, 0x61,
 	0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x42,
-	0x07, 0x54, 0x78, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x19, 0x61, 0x72, 0x64, 0x61,
-	0x2f, 0x61, 0x70, 0x69, 0x2f, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2f, 0x70, 0x72, 0x6f,
-	0x70, 0x65, 0x72, 0x74, 0x79, 0xa2, 0x02, 0x03, 0x41, 0x50, 0x58, 0xaa, 0x02, 0x10, 0x41, 0x72,
-	0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0xca, 0x02,
-	0x10, 0x41, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x5c, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74,
-	0x79, 0xe2, 0x02, 0x1c, 0x41, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x5c, 0x50, 0x72, 0x6f, 0x70,
-	0x65, 0x72, 0x74, 0x79, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61,
-	0xea, 0x02, 0x11, 0x41, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x3a, 0x3a, 0x50, 0x72, 0x6f, 0x70,
-	0x65, 0x72, 0x74, 0x79, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x07, 0x54, 0x78, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x1c, 0x61, 0x72, 0x64, 0x61,
+	0x70, 0x6f, 0x63, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2f,
+	0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0xa2, 0x02, 0x03, 0x41, 0x50, 0x58, 0xaa, 0x02,
+	0x10, 0x41, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74,
+	0x79, 0xca, 0x02, 0x10, 0x41, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x5c, 0x50, 0x72, 0x6f, 0x70,
+	0x65, 0x72, 0x74, 0x79, 0xe2, 0x02, 0x1c, 0x41, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x5c, 0x50,
+	0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64,
+	0x61, 0x74, 0x61, 0xea, 0x02, 0x11, 0x41, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x3a, 0x3a, 0x50,
+	0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (

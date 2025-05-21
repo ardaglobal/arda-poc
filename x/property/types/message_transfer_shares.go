@@ -8,7 +8,7 @@ import (
 
 var _ sdk.Msg = &MsgTransferShares{}
 
-func NewMsgTransferShares(creator string, propertyId string, fromOwners []string, fromShares []int32, toOwners []string, toShares []int32) *MsgTransferShares {
+func NewMsgTransferShares(creator string, propertyId string, fromOwners []string, fromShares []uint64, toOwners []string, toShares []uint64) *MsgTransferShares {
 	return &MsgTransferShares{
 		Creator:    creator,
 		PropertyId: propertyId,

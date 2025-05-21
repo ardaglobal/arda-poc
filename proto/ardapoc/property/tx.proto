@@ -55,9 +55,9 @@ message MsgTransferShares {
            string creator    = 1;
            string propertyId = 2;
   repeated string fromOwners = 3;
-  repeated int32  fromShares = 4;
+  repeated uint64  fromShares = 4;
   repeated string toOwners   = 5;
-  repeated int32  toShares   = 6;
+  repeated uint64  toShares   = 6;
 }
 
 message MsgTransferSharesResponse {}

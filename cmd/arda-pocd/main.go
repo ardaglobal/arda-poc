@@ -8,7 +8,7 @@ import (
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
 
 	"github.com/ardaglobal/arda-poc/app"
-	"github.com/ardaglobal/arda-poc/cmd/ardad/cmd"
+	"github.com/ardaglobal/arda-poc/cmd/arda-pocd/cmd"
 )
 
 func main() {

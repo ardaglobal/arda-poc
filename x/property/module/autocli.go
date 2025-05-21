@@ -9,7 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/spf13/cobra"
 
-	modulev1 "github.com/ardaglobal/arda-poc/api/arda/property"
+	modulev1 "github.com/ardaglobal/arda-poc/api/ardapoc/property"
 	"github.com/ardaglobal/arda-poc/x/property/types"
 )
 
