@@ -57,15 +57,15 @@ The REST API endpoints exposed by the modules under `x/` are derived from the gR
 - `GET /arda/property/params` - query property module parameters
 - `GET /cosmonaut/arda/property/properties` - list all registered properties
 - `GET /cosmonaut/arda/property/properties/{index}` - get a property by index
-- `POST /cosmonaut/arda/property/properties` - register a property
-- `POST /cosmonaut/arda/property/shares/transfers` - transfer property shares
+- `POST /cosmonaut/arda/property/register` - register a property
+- `POST /cosmonaut/arda/property/transfer` - transfer property shares
 
 ### x/arda
 
 - `GET /arda/arda/params` - query arda module parameters
 - `GET /cosmonaut/arda/arda/submissions` - list all submissions
 - `GET /cosmonaut/arda/arda/submissions/{id}` - get a submission by id
-- `POST /cosmonaut/arda/arda/submissions` - submit a hash
+- `POST /cosmonaut/arda/arda/submit-hash` - submit a hash
 
 ## Release
 To release a new version of your blockchain, create and push a new tag with `v` prefix. A new draft release with the configured targets will be created.
