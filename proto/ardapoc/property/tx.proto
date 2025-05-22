@@ -7,6 +7,7 @@ import "cosmos/msg/v1/msg.proto";
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 import "ardapoc/property/params.proto";
+import "google/api/annotations.proto";
 
 option go_package = "github.com/ardaglobal/arda-poc/x/property/types";
 
@@ -17,8 +18,18 @@ service Msg {
   // UpdateParams defines a (governance) operation for updating the module
   // parameters. The authority defaults to the x/gov module account.
   rpc UpdateParams     (MsgUpdateParams    ) returns (MsgUpdateParamsResponse    );
-  rpc RegisterProperty (MsgRegisterProperty) returns (MsgRegisterPropertyResponse);
-  rpc TransferShares   (MsgTransferShares  ) returns (MsgTransferSharesResponse  );
+  rpc RegisterProperty (MsgRegisterProperty) returns (MsgRegisterPropertyResponse) {
+    option (google.api.http) = {
+      post: "/cosmonaut/arda/property/properties"
+      body: "*"
+    };
+  }
+  rpc TransferShares   (MsgTransferShares  ) returns (MsgTransferSharesResponse  ) {
+    option (google.api.http) = {
+      post: "/cosmonaut/arda/property/shares/transfers"
+      body: "*"
+    };
+  }
 }
 // MsgUpdateParams is the Msg/UpdateParams request type.
 message MsgUpdateParams {
