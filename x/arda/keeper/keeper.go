@@ -2,8 +2,11 @@ package keeper
 
 import (
 	"encoding/binary"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"cosmossdk.io/core/store"
 	"cosmossdk.io/log"
@@ -14,9 +17,34 @@ import (
 	"github.com/ardaglobal/arda-poc/x/arda/types"
 )
 
-// ERES key for dubai region from .arda_data/config/priv_validator_key.json
-var regionPubKeys = map[string]string{
-	"dubai": "ABUyZSZcO7xWfzXhN4Tkv8yZtKy6e03daCfEmPkXg6Q=",
+// Load region public keys from validator key files
+var regionPubKeys = make(map[string]string)
+
+func init() {
+    // Get home directory
+    homeDir, err := os.UserHomeDir()
+    if err != nil {
+        panic(fmt.Sprintf("failed to get home directory: %s", err))
+    }
+
+    // Read and parse validator key file
+    keyPath := filepath.Join(homeDir, ".arda-poc", "config", "priv_validator_key.json")
+    keyData, err := os.ReadFile(keyPath)
+    if err != nil {
+        panic(fmt.Sprintf("failed to read validator key file: %s", err))
+    }
+
+    var keyFile struct {
+        PubKey struct {
+            Value string `json:"value"`
+        } `json:"pub_key"`
+    }
+    if err := json.Unmarshal(keyData, &keyFile); err != nil {
+        panic(fmt.Sprintf("failed to parse validator key file: %s", err))
+    }
+
+    // Store the public key for dubai region
+    regionPubKeys["dubai"] = keyFile.PubKey.Value
 }
 
 type (

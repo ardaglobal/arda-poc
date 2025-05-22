@@ -17,11 +17,9 @@ type KeyJSON struct {
 	} `json:"priv_key"`
 }
 
-// Helper to generate hash and signature for a message
-func GenerateHashAndSignature() (hashHex string, sigHex string, err error) {
-	keyFile := "priv_validator_key.json"
-	message := "Hello Dubai!"
-
+// GenerateHashAndSignature creates a hash of the provided message and signs it with the private key
+// Returns the hex-encoded hash and signature
+func GenerateHashAndSignature(keyFile string, message string) (hashHex string, sigHex string, err error) {
 	file, err := os.ReadFile(keyFile)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to read %s: %w", keyFile, err)
@@ -46,11 +44,28 @@ func GenerateHashAndSignature() (hashHex string, sigHex string, err error) {
 	signature := ed25519.Sign(privKey, hash[:])
 	sigHex = hex.EncodeToString(signature)
 
-	fmt.Printf("🔐 Signing complete. Here's your ardad tx command:\n\n")
+	fmt.Printf("🔐 Signing complete for message: '%s'\n", message)
+	fmt.Printf("🔑 Key file used: %s\n", keyFile)
+	fmt.Printf("📝 Hash: %s\n", hashHex)
+	fmt.Printf("✅ Signature: %s\n\n", sigHex)
+
+	return hashHex, sigHex, nil
+}
+
+// Helper function for command line usage
+func GenerateAndPrintSubmitCommand() {
+	keyFile := "priv_validator_key.json"
+	message := "Hello Dubai!"
+	
+	hashHex, sigHex, err := GenerateHashAndSignature(keyFile, message)
+	if err != nil {
+		fmt.Printf("❌ Error: %v\n", err)
+		return
+	}
+
+	fmt.Printf("🔐 Here's your ardad tx command:\n\n")
 	fmt.Printf("arda-pocd tx arda submit-hash dubai \\\n")
 	fmt.Printf("    %s \\\n", hashHex)
 	fmt.Printf("    %s \\\n", sigHex)
 	fmt.Printf("    --from ERES -y\n\n")
-
-	return hashHex, sigHex, nil
 }

@@ -9,6 +9,34 @@ accounts:
   coins:
   - 10000token
   - 100000000uarda
+- name: alice
+  coins:
+  - 10000token
+  - 100000000uarda
+- name: charlie
+  coins:
+  - 10000token
+  - 100000000uarda
+- name: dan
+  coins:
+  - 10000token
+  - 100000000uarda
+- name: eve
+  coins:
+  - 10000token
+  - 100000000uarda
+- name: fred
+  coins:
+  - 10000token
+  - 100000000uarda
+- name: george
+  coins:
+  - 10000token
+  - 100000000uarda
+- name: harry
+  coins:
+  - 10000token
+  - 100000000uarda
 client:
   openapi:
     path: docs/static/openapi.yml
