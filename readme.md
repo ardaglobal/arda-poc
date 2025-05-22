@@ -48,6 +48,22 @@ These commands can be run within your scaffolded blockchain project.
 
 For more information see the [monorepo for Ignite front-end development](https://github.com/ignite/web).
 
+## API
+
+The REST API endpoints exposed by the modules under `x/` are derived from the gRPC services defined in `proto/ardapoc`. They can be accessed with any standard HTTP client.
+
+### x/property
+
+- `GET /arda/property/params` - query property module parameters
+- `GET /cosmonaut/arda/property/properties` - list all registered properties
+- `GET /cosmonaut/arda/property/properties/{index}` - get a property by index
+
+### x/arda
+
+- `GET /arda/arda/params` - query arda module parameters
+- `GET /cosmonaut/arda/arda/submissions` - list all submissions
+- `GET /cosmonaut/arda/arda/submissions/{id}` - get a submission by id
+
 ## Release
 To release a new version of your blockchain, create and push a new tag with `v` prefix. A new draft release with the configured targets will be created.
 
