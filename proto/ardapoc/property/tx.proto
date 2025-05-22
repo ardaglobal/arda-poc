@@ -20,13 +20,13 @@ service Msg {
   rpc UpdateParams     (MsgUpdateParams    ) returns (MsgUpdateParamsResponse    );
   rpc RegisterProperty (MsgRegisterProperty) returns (MsgRegisterPropertyResponse) {
     option (google.api.http) = {
-      post: "/cosmonaut/arda/property/properties"
+      post: "/cosmonaut/arda/property/register"
       body: "*"
     };
   }
   rpc TransferShares   (MsgTransferShares  ) returns (MsgTransferSharesResponse  ) {
     option (google.api.http) = {
-      post: "/cosmonaut/arda/property/shares/transfers"
+      post: "/cosmonaut/arda/property/transfer"
       body: "*"
     };
   }

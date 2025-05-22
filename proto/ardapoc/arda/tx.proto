@@ -20,7 +20,7 @@ service Msg {
   rpc UpdateParams (MsgUpdateParams) returns (MsgUpdateParamsResponse);
   rpc SubmitHash   (MsgSubmitHash  ) returns (MsgSubmitHashResponse  ) {
     option (google.api.http) = {
-      post: "/cosmonaut/arda/arda/submissions"
+      post: "/cosmonaut/arda/arda/submit/hash"
       body: "*"
     };
   }
