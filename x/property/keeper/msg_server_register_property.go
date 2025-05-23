@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	ardatypes "github.com/ardaglobal/arda-poc/x/arda/types"
 	"github.com/ardaglobal/arda-poc/x/property/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -53,6 +54,17 @@ func (k msgServer) RegisterProperty(goCtx context.Context, msg *types.MsgRegiste
 		Shares:  msg.Shares,
 	}
 	k.SetProperty(ctx, property)
+
+	// Hash property info and submit to arda module
+	hash, err := hashProperty(property)
+	if err != nil {
+		return nil, err
+	}
+	sig := strings.Repeat("00", 64)
+	_, err = k.ardaKeeper.SubmitHash(goCtx, ardatypes.NewMsgSubmitHash(msg.Creator, msg.Region, hash, sig))
+	if err != nil {
+		return nil, err
+	}
 
 	return &types.MsgRegisterPropertyResponse{}, nil
 }

@@ -3,14 +3,15 @@ package keeper
 import (
 	"context"
 	"fmt"
+	"strings"
 
+	ardatypes "github.com/ardaglobal/arda-poc/x/arda/types"
 	"github.com/ardaglobal/arda-poc/x/property/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func (k msgServer) TransferShares(goCtx context.Context, msg *types.MsgTransferShares) (*types.MsgTransferSharesResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-
 
 	// Retrieve property
 	property, found := k.GetProperty(ctx, msg.PropertyId)
@@ -41,9 +42,8 @@ func (k msgServer) TransferShares(goCtx context.Context, msg *types.MsgTransferS
 		return nil, fmt.Errorf("total shares out (%d) must match shares in (%d)", totalTo, totalFrom)
 	}
 
-
 	ownerMap := k.ConvertPropertyOwnersToMap(property)
-	
+
 	// Deduct shares from from_owners
 	for i, owner := range msg.FromOwners {
 		currentShare := ownerMap[owner]
@@ -63,6 +63,16 @@ func (k msgServer) TransferShares(goCtx context.Context, msg *types.MsgTransferS
 
 	k.UpdatePropertyFromOwnerMap(&property, ownerMap)
 	k.SetProperty(ctx, property)
+
+	hash, err := hashTransfer(msg, property)
+	if err != nil {
+		return nil, err
+	}
+	sig := strings.Repeat("00", 64)
+	_, err = k.ardaKeeper.SubmitHash(goCtx, ardatypes.NewMsgSubmitHash(msg.Creator, property.Region, hash, sig))
+	if err != nil {
+		return nil, err
+	}
 
 	return &types.MsgTransferSharesResponse{}, nil
 }
