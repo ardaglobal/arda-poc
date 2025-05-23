@@ -1,4 +1,4 @@
-package scripts
+package utils
 
 import (
 	"crypto/ed25519"
@@ -10,7 +10,7 @@ import (
 	"os"
 )
 
-var defaultKeyFile = "priv_validator_key.json"
+const DefaultKeyFile = "/Users/matt/.arda-poc/config/priv_validator_key.json"
 
 type KeyJSON struct {
 	PrivKey struct {
@@ -21,9 +21,9 @@ type KeyJSON struct {
 
 // GenerateHashAndSignature creates a hash of the provided message and signs it with the private key
 // Returns the hex-encoded hash and signature
-func generateHashAndSignature(keyFile string, message string) (hashHex string, sigHex string, err error) {
+func GenerateHashAndSignature(keyFile string, message string) (hashHex string, sigHex string, err error) {
 	hash := sha256.Sum256([]byte(message))
-	sigHex, err = signHash(keyFile, hash[:])
+	sigHex, err = SignHash(keyFile, hash[:])
 	if err != nil {
 		return "", "", fmt.Errorf("failed to sign hash: %w", err)
 	}
@@ -38,7 +38,7 @@ func generateHashAndSignature(keyFile string, message string) (hashHex string, s
 	return hashHex, sigHex, nil
 }
 
-func signHash(keyFile string, hash []byte) (sigHex string, err error) {
+func SignHash(keyFile string, hash []byte) (sigHex string, err error) {
 
 	file, err := os.ReadFile(keyFile)
 	if err != nil {
@@ -63,21 +63,4 @@ func signHash(keyFile string, hash []byte) (sigHex string, err error) {
 	sigHex = hex.EncodeToString(signature)
 
 	return sigHex, nil
-}
-
-// Helper function for command line usage
-func generateAndPrintSubmitCommand() {
-	message := "Hello Dubai!"
-
-	hashHex, sigHex, err := generateHashAndSignature(defaultKeyFile, message)
-	if err != nil {
-		fmt.Printf("❌ Error: %v\n", err)
-		return
-	}
-
-	fmt.Printf("🔐 Here's your ardad tx command:\n\n")
-	fmt.Printf("arda-pocd tx arda submit-hash dubai \\\n")
-	fmt.Printf("    %s \\\n", hashHex)
-	fmt.Printf("    %s \\\n", sigHex)
-	fmt.Printf("    --from ERES -y\n\n")
 }

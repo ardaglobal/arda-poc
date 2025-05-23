@@ -3,20 +3,31 @@ package keeper
 import (
 	"context"
 	"fmt"
+	"strings"
 
+	"github.com/ardaglobal/arda-poc/pkg/utils"
+	ardatypes "github.com/ardaglobal/arda-poc/x/arda/types"
 	"github.com/ardaglobal/arda-poc/x/property/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k msgServer) TransferShares(goCtx context.Context, msg *types.MsgTransferShares) (*types.MsgTransferSharesResponse, error) {
+func (k msgServer) TransferShares(goCtx context.Context, msg *types.MsgTransferShares) (_ *types.MsgTransferSharesResponse, err error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-
 
 	// Retrieve property
 	property, found := k.GetProperty(ctx, msg.PropertyId)
 	if !found {
 		return nil, fmt.Errorf("property not found: %s", msg.PropertyId)
 	}
+
+	// If error, submit bad hash to arda module to show an invalid hash
+	defer func() {
+		if err != nil {
+			badSig := strings.Repeat("00", 64)
+			nilHash, _ := hashProperty(types.Property{})
+			_, _ = k.ardaKeeper.SubmitHash(goCtx, ardatypes.NewMsgSubmitHash(msg.Creator, property.Region, nilHash, badSig))
+		}
+	}()
 
 	// Validate input
 	if len(msg.FromOwners) != len(msg.FromShares) {
@@ -41,9 +52,8 @@ func (k msgServer) TransferShares(goCtx context.Context, msg *types.MsgTransferS
 		return nil, fmt.Errorf("total shares out (%d) must match shares in (%d)", totalTo, totalFrom)
 	}
 
-
 	ownerMap := k.ConvertPropertyOwnersToMap(property)
-	
+
 	// Deduct shares from from_owners
 	for i, owner := range msg.FromOwners {
 		currentShare := ownerMap[owner]
@@ -63,6 +73,19 @@ func (k msgServer) TransferShares(goCtx context.Context, msg *types.MsgTransferS
 
 	k.UpdatePropertyFromOwnerMap(&property, ownerMap)
 	k.SetProperty(ctx, property)
+
+	hash, err := hashTransfer(msg, property)
+	if err != nil {
+		return nil, err
+	}
+	hashHex, sigHex, err := utils.GenerateHashAndSignature(utils.DefaultKeyFile, hash)
+	if err != nil {
+		return nil, err
+	}
+	_, err = k.ardaKeeper.SubmitHash(goCtx, ardatypes.NewMsgSubmitHash(msg.Creator, property.Region, hashHex, sigHex))
+	if err != nil {
+		return nil, err
+	}
 
 	return &types.MsgTransferSharesResponse{}, nil
 }

@@ -21,6 +21,7 @@ import (
 	// this line is used by starport scaffolding # 1
 
 	modulev1 "github.com/ardaglobal/arda-poc/api/ardapoc/property/module"
+	ardamodulekeeper "github.com/ardaglobal/arda-poc/x/arda/keeper"
 
 	"github.com/ardaglobal/arda-poc/x/property/keeper"
 
@@ -98,6 +99,7 @@ type AppModule struct {
 	AppModuleBasic
 
 	keeper        keeper.Keeper
+	ardaKeeper    ardamodulekeeper.Keeper
 	accountKeeper types.AccountKeeper
 	bankKeeper    types.BankKeeper
 }
@@ -105,12 +107,14 @@ type AppModule struct {
 func NewAppModule(
 	cdc codec.Codec,
 	keeper keeper.Keeper,
+	ardaKeeper ardamodulekeeper.Keeper,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
 ) AppModule {
 	return AppModule{
 		AppModuleBasic: NewAppModuleBasic(cdc),
 		keeper:         keeper,
+		ardaKeeper:     ardaKeeper,
 		accountKeeper:  accountKeeper,
 		bankKeeper:     bankKeeper,
 	}
@@ -118,7 +122,7 @@ func NewAppModule(
 
 // RegisterServices registers a gRPC query service to respond to the module-specific gRPC queries
 func (am AppModule) RegisterServices(cfg module.Configurator) {
-	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
+	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper, am.ardaKeeper))
 	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
 }
 
@@ -184,6 +188,7 @@ type ModuleInputs struct {
 
 	AccountKeeper types.AccountKeeper
 	BankKeeper    types.BankKeeper
+	ArdaKeeper    ardamodulekeeper.Keeper
 }
 
 type ModuleOutputs struct {
@@ -208,6 +213,7 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 	m := NewAppModule(
 		in.Cdc,
 		k,
+		in.ArdaKeeper,
 		in.AccountKeeper,
 		in.BankKeeper,
 	)

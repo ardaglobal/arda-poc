@@ -12,7 +12,9 @@ import (
 )
 
 func TestGenerateHashAndSignature_SubmitHash(t *testing.T) {
-	hashHex, sigHex, err := GenerateHashAndSignature()
+	message := "Hello Dubai!"
+
+	hashHex, sigHex, err := generateHashAndSignature(defaultKeyFile, message)
 	if err != nil {
 		t.Fatalf("failed to generate hash and signature: %v", err)
 	}
