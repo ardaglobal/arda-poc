@@ -21,30 +21,31 @@ import (
 var regionPubKeys = make(map[string]string)
 
 func init() {
-    // Get home directory
-    homeDir, err := os.UserHomeDir()
-    if err != nil {
-        panic(fmt.Sprintf("failed to get home directory: %s", err))
-    }
+	// Get home directory
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		panic(fmt.Sprintf("failed to get home directory: %s", err))
+	}
 
-    // Read and parse validator key file
-    keyPath := filepath.Join(homeDir, ".arda-poc", "config", "priv_validator_key.json")
-    keyData, err := os.ReadFile(keyPath)
-    if err != nil {
-        panic(fmt.Sprintf("failed to read validator key file: %s", err))
-    }
+	// Read and parse validator key file
+	keyPath := filepath.Join(homeDir, ".arda-poc", "config", "priv_validator_key.json")
+	keyData, err := os.ReadFile(keyPath)
+	if err != nil {
+		fmt.Printf("failed to read validator key file: %s", err)
+		return
+	}
 
-    var keyFile struct {
-        PubKey struct {
-            Value string `json:"value"`
-        } `json:"pub_key"`
-    }
-    if err := json.Unmarshal(keyData, &keyFile); err != nil {
-        panic(fmt.Sprintf("failed to parse validator key file: %s", err))
-    }
+	var keyFile struct {
+		PubKey struct {
+			Value string `json:"value"`
+		} `json:"pub_key"`
+	}
+	if err := json.Unmarshal(keyData, &keyFile); err != nil {
+		panic(fmt.Sprintf("failed to parse validator key file: %s", err))
+	}
 
-    // Store the public key for dubai region
-    regionPubKeys["dubai"] = keyFile.PubKey.Value
+	// Store the public key for dubai region
+	regionPubKeys["dubai"] = keyFile.PubKey.Value
 }
 
 type (

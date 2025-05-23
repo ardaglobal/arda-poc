@@ -5,17 +5,27 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/ardaglobal/arda-poc/pkg/utils"
 	ardatypes "github.com/ardaglobal/arda-poc/x/arda/types"
 	"github.com/ardaglobal/arda-poc/x/property/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (k msgServer) RegisterProperty(goCtx context.Context, msg *types.MsgRegisterProperty) (*types.MsgRegisterPropertyResponse, error) {
+func (k msgServer) RegisterProperty(goCtx context.Context, msg *types.MsgRegisterProperty) (_ *types.MsgRegisterPropertyResponse, err error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Use address as deterministic property ID
 	id := strings.ToLower(strings.TrimSpace(msg.Address))
+
+	// If error, submit bad hash to arda module to show an invalid hash
+	defer func() {
+		if err != nil {
+			badSig := strings.Repeat("00", 64)
+			nilHash, _ := hashProperty(types.Property{})
+			_, _ = k.ardaKeeper.SubmitHash(goCtx, ardatypes.NewMsgSubmitHash(msg.Creator, msg.Region, nilHash, badSig))
+		}
+	}()
 
 	// Prevent duplicate registration
 	if p, found := k.GetProperty(ctx, id); found {
@@ -40,9 +50,9 @@ func (k msgServer) RegisterProperty(goCtx context.Context, msg *types.MsgRegiste
 		}
 	}
 
-	// if total != 100 {
-	// 	return nil, fmt.Errorf("ownership shares must total 100, got %d", total)
-	// }
+	if total != 100 {
+		return nil, fmt.Errorf("ownership shares must total 100, got %d", total)
+	}
 
 	// Create and store property
 	property := types.Property{
@@ -60,8 +70,11 @@ func (k msgServer) RegisterProperty(goCtx context.Context, msg *types.MsgRegiste
 	if err != nil {
 		return nil, err
 	}
-	sig := strings.Repeat("00", 64)
-	_, err = k.ardaKeeper.SubmitHash(goCtx, ardatypes.NewMsgSubmitHash(msg.Creator, msg.Region, hash, sig))
+	hashHex, sigHex, err := utils.GenerateHashAndSignature(utils.DefaultKeyFile, hash)
+	if err != nil {
+		return nil, err
+	}
+	_, err = k.ardaKeeper.SubmitHash(goCtx, ardatypes.NewMsgSubmitHash(msg.Creator, msg.Region, hashHex, sigHex))
 	if err != nil {
 		return nil, err
 	}
