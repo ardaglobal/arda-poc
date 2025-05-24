@@ -17,22 +17,29 @@ import (
 	"github.com/ardaglobal/arda-poc/x/arda/types"
 )
 
-// Load region public keys from validator key files
+// Load region public keys from validator key files on demand.
+// Keys are cached in memory after the first successful load.
 var regionPubKeys = make(map[string]string)
 
-func init() {
-	// Get home directory
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		panic(fmt.Sprintf("failed to get home directory: %s", err))
+// getRegionPubKey returns the public key for the provided region. If the key is
+// not yet loaded, it attempts to read it from the validator key file. This
+// avoids errors when the key file does not exist at application startup.
+func getRegionPubKey(region string) (string, error) {
+	if key, ok := regionPubKeys[region]; ok {
+		return key, nil
 	}
 
-	// Read and parse validator key file
+	// Currently all regions use the local validator key. Attempt to load it
+	// from the default location.
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return "", fmt.Errorf("failed to get home directory: %w", err)
+	}
+
 	keyPath := filepath.Join(homeDir, ".arda-poc", "config", "priv_validator_key.json")
 	keyData, err := os.ReadFile(keyPath)
 	if err != nil {
-		fmt.Printf("failed to read validator key file: %s", err)
-		return
+		return "", fmt.Errorf("failed to read validator key file: %w", err)
 	}
 
 	var keyFile struct {
@@ -41,11 +48,16 @@ func init() {
 		} `json:"pub_key"`
 	}
 	if err := json.Unmarshal(keyData, &keyFile); err != nil {
-		panic(fmt.Sprintf("failed to parse validator key file: %s", err))
+		return "", fmt.Errorf("failed to parse validator key file: %w", err)
 	}
 
-	// Store the public key for dubai region
+	// Store the public key for dubai region and return it if requested.
 	regionPubKeys["dubai"] = keyFile.PubKey.Value
+	if key, ok := regionPubKeys[region]; ok {
+		return key, nil
+	}
+
+	return "", errors.New("region not recognized")
 }
 
 type (
