@@ -11,6 +11,17 @@ This runs `ignite chain serve` with the `config.yml` file.
 
 You can use https://github.com/ardaglobal/dexplorer to view the blockchain on the arda branch.
 
+### Setup Development Environment
+
+Run the `scripts/setup_dev_env.sh` script to install Go, Docker, Ignite CLI and
+other tooling required for development. The script ensures all dependencies are
+present and then executes `make setup-dev` to install additional Go tools and
+protoc generators.
+
+```
+./scripts/setup_dev_env.sh
+```
+
 ### Functionality
 
 
