@@ -16,11 +16,12 @@ import (
 func (k Keeper) SubmitHash(goCtx context.Context, msg *types.MsgSubmitHash) (*types.MsgSubmitHashResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// 1. Get the pubkey for the region
-	pubKeyBase64, ok := regionPubKeys[msg.Region]
-	if !ok {
-		return nil, errors.New("region not recognized")
+	// 1. Get the pubkey for the region. Load it if it hasn't been loaded yet.
+	pubKeyBase64, err := getRegionPubKey(msg.Region)
+	if err != nil {
+		return nil, err
 	}
+
 	pubKeyBytes, err := base64.StdEncoding.DecodeString(pubKeyBase64)
 	if err != nil {
 		return nil, errors.New("error decoding pubkey")
