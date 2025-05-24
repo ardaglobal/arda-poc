@@ -15,7 +15,8 @@ import (
 func setupMsgServerRegister(t testing.TB) (propertykeeper.Keeper, types.MsgServer, context.Context) {
 	pk, ctx := keeper.PropertyKeeper(t)
 	ak, _ := keeper.ArdaKeeper(t)
-	return pk, propertykeeper.NewMsgServerImpl(pk, ak), ctx
+	bk := keeper.BankKeeperMock{}
+	return pk, propertykeeper.NewMsgServerImpl(pk, ak, bk), ctx
 }
 
 func TestRegisterPropertyLengthMismatch(t *testing.T) {
