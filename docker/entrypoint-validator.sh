@@ -14,4 +14,7 @@ if [ ! -f "$HOME_DIR/config/genesis.json" ]; then
   cp "$HOME_DIR/config/genesis.json" /genesis/genesis.json
 fi
 
-exec arda-pocd start --home "$HOME_DIR" --rpc.laddr tcp://0.0.0.0:26657 --p2p.laddr tcp://0.0.0.0:26656
+exec arda-pocd start --home "$HOME_DIR" \
+  --rpc.laddr tcp://0.0.0.0:26657 \
+  --p2p.laddr tcp://0.0.0.0:26656 \
+  --minimum-gas-prices 0.001uarda
