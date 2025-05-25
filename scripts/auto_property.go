@@ -1,4 +1,4 @@
-package scripts
+package main
 
 import (
 	"fmt"
@@ -119,11 +119,13 @@ func transferShares(p *Property) {
 }
 
 // AutoProperty registers properties and continuously transfers shares.
-func AutoProperty() {
+func main() {
 	rand.Seed(time.Now().UnixNano())
 	for {
+		fmt.Println("Registering property..")
 		p := registerProperty()
 		for i := 0; i < 5; i++ {
+			fmt.Println("  Creating transfer..")
 			transferShares(&p)
 			time.Sleep(1 * time.Second)
 		}
