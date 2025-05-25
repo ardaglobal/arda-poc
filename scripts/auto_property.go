@@ -1,4 +1,5 @@
-package main
+// To run this script, update this to main. Do this after the chain is running to avoid build errors about duplicate main packages
+package scripts
 
 import (
 	"fmt"
@@ -102,7 +103,7 @@ func transferShares(p *Property) {
 
 	args := []string{
 		"tx", "property", "transfer-shares",
-		p.Address,
+		strings.ToLower(p.Address),
 		fromOwner, fmt.Sprintf("%d", share),
 		toOwner, fmt.Sprintf("%d", share),
 		"--from", "ERES",
@@ -120,15 +121,17 @@ func transferShares(p *Property) {
 
 // AutoProperty registers properties and continuously transfers shares.
 func main() {
-	rand.Seed(time.Now().UnixNano())
+	var properties []Property
 	for {
 		fmt.Println("Registering property..")
 		p := registerProperty()
-		for i := 0; i < 5; i++ {
-			fmt.Println("  Creating transfer..")
-			transferShares(&p)
-			time.Sleep(1 * time.Second)
-		}
-		time.Sleep(2 * time.Second)
+		properties = append(properties, p)
+		time.Sleep(5 * time.Second)
+
+		// Create transfers using random properties
+		fmt.Println("  Creating transfer..")
+		randIdx := rand.Intn(len(properties))
+		transferShares(&properties[randIdx])
+		time.Sleep(5 * time.Second)
 	}
 }
