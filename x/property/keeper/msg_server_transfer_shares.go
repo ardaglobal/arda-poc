@@ -53,8 +53,9 @@ func (k msgServer) TransferShares(goCtx context.Context, msg *types.MsgTransferS
 	}
 
 	ownerMap := k.ConvertPropertyOwnersToMap(property)
+	denom := types.PropertyShareDenom(property.Index)
 
-	// Deduct shares from from_owners
+	// Deduct shares from from_owners and move tokens to module account
 	for i, owner := range msg.FromOwners {
 		currentShare := ownerMap[owner]
 		if currentShare < msg.FromShares[i] {
@@ -64,11 +65,29 @@ func (k msgServer) TransferShares(goCtx context.Context, msg *types.MsgTransferS
 		if ownerMap[owner] == 0 {
 			delete(ownerMap, owner)
 		}
+
+		addr, err := sdk.AccAddressFromBech32(owner)
+		if err != nil {
+			return nil, err
+		}
+		coin := sdk.NewCoin(denom, sdk.NewIntFromUint64(msg.FromShares[i]))
+		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, addr, types.ModuleName, sdk.NewCoins(coin)); err != nil {
+			return nil, err
+		}
 	}
 
-	// Add shares to to_owners
+	// Add shares to to_owners and distribute tokens from module account
 	for i, newOwner := range msg.ToOwners {
 		ownerMap[newOwner] += msg.ToShares[i]
+
+		addr, err := sdk.AccAddressFromBech32(newOwner)
+		if err != nil {
+			return nil, err
+		}
+		coin := sdk.NewCoin(denom, sdk.NewIntFromUint64(msg.ToShares[i]))
+		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, addr, sdk.NewCoins(coin)); err != nil {
+			return nil, err
+		}
 	}
 
 	k.UpdatePropertyFromOwnerMap(&property, ownerMap)

@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"context"
 	"testing"
 
 	"cosmossdk.io/log"
@@ -33,10 +34,12 @@ func PropertyKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 	cdc := codec.NewProtoCodec(registry)
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
 
+	bk := BankKeeperMock{}
 	k := keeper.NewKeeper(
 		cdc,
 		runtime.NewKVStoreService(storeKey),
 		log.NewNopLogger(),
+		bk,
 		authority.String(),
 	)
 
@@ -48,4 +51,21 @@ func PropertyKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 	}
 
 	return k, ctx
+}
+
+// BankKeeperMock implements types.BankKeeper for tests.
+type BankKeeperMock struct{}
+
+func (BankKeeperMock) SpendableCoins(ctx context.Context, addr sdk.AccAddress) sdk.Coins {
+	return sdk.Coins{}
+}
+func (BankKeeperMock) MintCoins(ctx context.Context, module string, amt sdk.Coins) error { return nil }
+func (BankKeeperMock) SendCoinsFromModuleToAccount(ctx context.Context, sender string, recipient sdk.AccAddress, amt sdk.Coins) error {
+	return nil
+}
+func (BankKeeperMock) SendCoinsFromAccountToModule(ctx context.Context, sender sdk.AccAddress, recipient string, amt sdk.Coins) error {
+	return nil
+}
+func (BankKeeperMock) SendCoins(ctx context.Context, from sdk.AccAddress, to sdk.AccAddress, amt sdk.Coins) error {
+	return nil
 }

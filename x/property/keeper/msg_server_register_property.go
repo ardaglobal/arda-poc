@@ -65,6 +65,29 @@ func (k msgServer) RegisterProperty(goCtx context.Context, msg *types.MsgRegiste
 	}
 	k.SetProperty(ctx, property)
 
+	// Mint property share tokens to owners using x/bank
+	denom := types.PropertyShareDenom(id)
+	for i, owner := range msg.Owners {
+		if i >= len(msg.Shares) {
+			break
+		}
+		share := msg.Shares[i]
+		if share == 0 {
+			continue
+		}
+		addr, err := sdk.AccAddressFromBech32(owner)
+		if err != nil {
+			return nil, err
+		}
+		coin := sdk.NewCoin(denom, sdk.NewIntFromUint64(share))
+		if err := k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(coin)); err != nil {
+			return nil, err
+		}
+		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, addr, sdk.NewCoins(coin)); err != nil {
+			return nil, err
+		}
+	}
+
 	// Hash property info and submit to arda module
 	hash, err := hashProperty(property)
 	if err != nil {
