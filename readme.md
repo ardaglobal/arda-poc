@@ -48,6 +48,17 @@ WIP
 
 Your blockchain in development can be configured with `config.yml`. To learn more, see the [Ignite CLI docs](https://docs.ignite.com).
 
+### Docker Network
+
+Dockerfiles and a compose file are provided to run a small network locally. Build the images and start the network with:
+
+```bash
+docker compose build
+docker compose up -d
+```
+
+See [docs/docker-network.md](docs/docker-network.md) for details on interacting with the nodes.
+
 ### Web Frontend
 
 Additionally, Ignite CLI offers both Vue and React options for frontend scaffolding:

@@ -1,0 +1,78 @@
+version: '3.8'
+services:
+  validator:
+    build:
+      context: .
+      dockerfile: Dockerfile.validator
+    image: arda-validator
+    container_name: validator
+    environment:
+      - MONIKER=ERES
+      - CHAIN_ID=ardapoc
+    volumes:
+      - validator-data:/root/.arda-poc
+      - genesis:/genesis
+    ports:
+      - "26657:26657"
+      - "26656:26656"
+
+  fullnode1:
+    build:
+      context: .
+      dockerfile: Dockerfile.fullnode
+    image: arda-fullnode
+    container_name: fullnode1
+    depends_on:
+      - validator
+    environment:
+      - MONIKER=fullnode1
+      - CHAIN_ID=ardapoc
+      - SEEDS=validator:26656
+    volumes:
+      - fullnode1-data:/root/.arda-poc
+      - genesis:/genesis
+    ports:
+      - "26658:26657"
+
+  fullnode2:
+    build:
+      context: .
+      dockerfile: Dockerfile.fullnode
+    image: arda-fullnode
+    container_name: fullnode2
+    depends_on:
+      - validator
+    environment:
+      - MONIKER=fullnode2
+      - CHAIN_ID=ardapoc
+      - SEEDS=validator:26656
+    volumes:
+      - fullnode2-data:/root/.arda-poc
+      - genesis:/genesis
+    ports:
+      - "26659:26657"
+
+  fullnode3:
+    build:
+      context: .
+      dockerfile: Dockerfile.fullnode
+    image: arda-fullnode
+    container_name: fullnode3
+    depends_on:
+      - validator
+    environment:
+      - MONIKER=fullnode3
+      - CHAIN_ID=ardapoc
+      - SEEDS=validator:26656
+    volumes:
+      - fullnode3-data:/root/.arda-poc
+      - genesis:/genesis
+    ports:
+      - "26660:26657"
+
+volumes:
+  validator-data:
+  fullnode1-data:
+  fullnode2-data:
+  fullnode3-data:
+  genesis:
