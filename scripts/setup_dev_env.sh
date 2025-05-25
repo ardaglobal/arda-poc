@@ -8,10 +8,11 @@ GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
+# These versions can be overridden by setting environment variables when running the script:
+# IGNITE_VERSION=v28.11.0 GO_VERSION=1.24.1 ./scripts/setup_dev_env.sh
 
-IGNITE_VERSION="v28.10.0"
-GOLANGCI_VERSION="v1.61.0"
-GO_VERSION="1.24.0"
+IGNITE_VERSION="${IGNITE_VERSION:-v28.10.0}"
+GO_VERSION="${GO_VERSION:-1.24.0}"
 
 # Determine repository root and switch to it
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -63,7 +64,5 @@ else
 fi
 
 # Install additional Go tools and proto deps via Makefile
-echo -e "${BLUE}Installing remaining development tools via make setup-dev${NC}"
-make setup-dev
 
 echo -e "${GREEN}Development environment setup complete!${NC}"

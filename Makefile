@@ -111,15 +111,22 @@ lint-fix:
 # protobuf generators, Ignite CLI and linters.
 
 ignite-version=v28.10.0
+go-version=$(shell go list -m -f '{{.GoVersion}}')
 
-setup-dev: proto-deps
-	@echo "--> Installing Ignite CLI"
-	@curl https://get.ignite.com/cli@$(ignite-version)! | bash
+setup-script:
+	@echo "--> Making setup script executable"
+	@chmod +x scripts/setup_dev_env.sh
+	@echo "--> Running setup script"
+	@IGNITE_VERSION=$(ignite-version) GO_VERSION=$(go-version) ./scripts/setup_dev_env.sh
+.PHONY: setup-script
+
+
+setup-dev: setup-script proto-deps
 	@echo "--> Installing lint and security tools"
 	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(golangci_version)
 	@go install golang.org/x/vuln/cmd/govulncheck@latest
 	@go install golang.org/x/tools/cmd/goimports@latest
-
+.PHONY: setup-dev
 
 ###################
 ### Development ###
