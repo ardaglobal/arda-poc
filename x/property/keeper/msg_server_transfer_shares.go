@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/ardaglobal/arda-poc/pkg/utils"
 	ardatypes "github.com/ardaglobal/arda-poc/x/arda/types"
@@ -72,6 +73,15 @@ func (k msgServer) TransferShares(goCtx context.Context, msg *types.MsgTransferS
 	}
 
 	k.UpdatePropertyFromOwnerMap(&property, ownerMap)
+
+	// Append transfer history
+	transfer := &types.Transfer{
+		From:      strings.Join(msg.FromOwners, ","),
+		To:        strings.Join(msg.ToOwners, ","),
+		Timestamp: ctx.BlockTime().UTC().Format(time.RFC3339),
+	}
+	property.Transfers = append(property.Transfers, transfer)
+
 	k.SetProperty(ctx, property)
 
 	hash, err := hashTransfer(msg, property)
