@@ -56,7 +56,9 @@ func (k msgServer) TransferShares(goCtx context.Context, msg *types.MsgTransferS
 	ownerMap := k.ConvertPropertyOwnersToMap(property)
 
 	// Deduct shares from from_owners
+	fromSharesAndOwners := make([]string, 0, len(msg.FromOwners))
 	for i, owner := range msg.FromOwners {
+		fromSharesAndOwners = append(fromSharesAndOwners, fmt.Sprintf("%s:%d", owner, msg.FromShares[i]))
 		currentShare := ownerMap[owner]
 		if currentShare < msg.FromShares[i] {
 			return nil, fmt.Errorf("owner %s does not have enough shares", owner)
@@ -68,7 +70,9 @@ func (k msgServer) TransferShares(goCtx context.Context, msg *types.MsgTransferS
 	}
 
 	// Add shares to to_owners
+	toSharesAndOwners := make([]string, 0, len(msg.ToOwners))
 	for i, newOwner := range msg.ToOwners {
+		toSharesAndOwners = append(toSharesAndOwners, fmt.Sprintf("%s:%d", newOwner, msg.ToShares[i]))
 		ownerMap[newOwner] += msg.ToShares[i]
 	}
 
@@ -76,8 +80,8 @@ func (k msgServer) TransferShares(goCtx context.Context, msg *types.MsgTransferS
 
 	// Append transfer history
 	transfer := &types.Transfer{
-		From:      strings.Join(msg.FromOwners, ","),
-		To:        strings.Join(msg.ToOwners, ","),
+		From:      strings.Join(fromSharesAndOwners, ","),
+		To:        strings.Join(toSharesAndOwners, ","),
 		Timestamp: ctx.BlockTime().UTC().Format(time.RFC3339),
 	}
 	property.Transfers = append(property.Transfers, transfer)

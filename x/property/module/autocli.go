@@ -178,4 +178,10 @@ func printProperty(prop *types.Property) {
 		}
 		fmt.Printf("    - %s / %s\n", prop.Owners[i], ownerShare)
 	}
+
+	fmt.Println("  Transfers:")
+	for _, transfer := range prop.Transfers {
+		fmt.Printf("    - From: %s; To: %s; Timestamp: %s\n",
+			transfer.From, transfer.To, transfer.Timestamp)
+	}
 }
