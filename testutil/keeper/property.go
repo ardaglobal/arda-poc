@@ -54,6 +54,7 @@ func PropertyKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 }
 
 // BankKeeperMock implements types.BankKeeper for tests.
+// TODO: how can we remove this mock? What is the right way to handle this?
 type BankKeeperMock struct{}
 
 func (BankKeeperMock) SpendableCoins(ctx context.Context, addr sdk.AccAddress) sdk.Coins {

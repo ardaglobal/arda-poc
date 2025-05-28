@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"cosmossdk.io/math"
 	"github.com/ardaglobal/arda-poc/pkg/utils"
 	ardatypes "github.com/ardaglobal/arda-poc/x/arda/types"
 	"github.com/ardaglobal/arda-poc/x/property/types"
@@ -65,6 +66,20 @@ func (k msgServer) RegisterProperty(goCtx context.Context, msg *types.MsgRegiste
 	}
 	k.SetProperty(ctx, property)
 
+	// Hash property info and submit to arda module
+	hash, err := hashProperty(property)
+	if err != nil {
+		return nil, err
+	}
+	hashHex, sigHex, err := utils.GenerateHashAndSignature(utils.DefaultKeyFile, hash)
+	if err != nil {
+		return nil, err
+	}
+	_, err = k.ardaKeeper.SubmitHash(goCtx, ardatypes.NewMsgSubmitHash(msg.Creator, msg.Region, hashHex, sigHex))
+	if err != nil {
+		return nil, err
+	}
+
 	// Mint property share tokens to owners using x/bank
 	denom := types.PropertyShareDenom(id)
 	for i, owner := range msg.Owners {
@@ -79,27 +94,13 @@ func (k msgServer) RegisterProperty(goCtx context.Context, msg *types.MsgRegiste
 		if err != nil {
 			return nil, err
 		}
-		coin := sdk.NewCoin(denom, sdk.NewIntFromUint64(share))
+		coin := sdk.NewCoin(denom, math.NewInt(int64(share)))
 		if err := k.bankKeeper.MintCoins(ctx, types.ModuleName, sdk.NewCoins(coin)); err != nil {
 			return nil, err
 		}
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, addr, sdk.NewCoins(coin)); err != nil {
 			return nil, err
 		}
-	}
-
-	// Hash property info and submit to arda module
-	hash, err := hashProperty(property)
-	if err != nil {
-		return nil, err
-	}
-	hashHex, sigHex, err := utils.GenerateHashAndSignature(utils.DefaultKeyFile, hash)
-	if err != nil {
-		return nil, err
-	}
-	_, err = k.ardaKeeper.SubmitHash(goCtx, ardatypes.NewMsgSubmitHash(msg.Creator, msg.Region, hashHex, sigHex))
-	if err != nil {
-		return nil, err
 	}
 
 	return &types.MsgRegisterPropertyResponse{}, nil
