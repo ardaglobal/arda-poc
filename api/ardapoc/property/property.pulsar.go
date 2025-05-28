@@ -104,14 +104,66 @@ func (x *_Property_6_list) IsValid() bool {
 	return x.list != nil
 }
 
+var _ protoreflect.List = (*_Property_7_list)(nil)
+
+type _Property_7_list struct {
+	list *[]*Transfer
+}
+
+func (x *_Property_7_list) Len() int {
+	if x.list == nil {
+		return 0
+	}
+	return len(*x.list)
+}
+
+func (x *_Property_7_list) Get(i int) protoreflect.Value {
+	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
+}
+
+func (x *_Property_7_list) Set(i int, value protoreflect.Value) {
+	valueUnwrapped := value.Message()
+	concreteValue := valueUnwrapped.Interface().(*Transfer)
+	(*x.list)[i] = concreteValue
+}
+
+func (x *_Property_7_list) Append(value protoreflect.Value) {
+	valueUnwrapped := value.Message()
+	concreteValue := valueUnwrapped.Interface().(*Transfer)
+	*x.list = append(*x.list, concreteValue)
+}
+
+func (x *_Property_7_list) AppendMutable() protoreflect.Value {
+	v := new(Transfer)
+	*x.list = append(*x.list, v)
+	return protoreflect.ValueOfMessage(v.ProtoReflect())
+}
+
+func (x *_Property_7_list) Truncate(n int) {
+	for i := n; i < len(*x.list); i++ {
+		(*x.list)[i] = nil
+	}
+	*x.list = (*x.list)[:n]
+}
+
+func (x *_Property_7_list) NewElement() protoreflect.Value {
+	v := new(Transfer)
+	return protoreflect.ValueOfMessage(v.ProtoReflect())
+}
+
+func (x *_Property_7_list) IsValid() bool {
+	return x.list != nil
+}
+
 var (
-	md_Property         protoreflect.MessageDescriptor
-	fd_Property_index   protoreflect.FieldDescriptor
-	fd_Property_address protoreflect.FieldDescriptor
-	fd_Property_region  protoreflect.FieldDescriptor
-	fd_Property_value   protoreflect.FieldDescriptor
-	fd_Property_owners  protoreflect.FieldDescriptor
-	fd_Property_shares  protoreflect.FieldDescriptor
+	md_Property           protoreflect.MessageDescriptor
+	fd_Property_index     protoreflect.FieldDescriptor
+	fd_Property_address   protoreflect.FieldDescriptor
+	fd_Property_region    protoreflect.FieldDescriptor
+	fd_Property_value     protoreflect.FieldDescriptor
+	fd_Property_owners    protoreflect.FieldDescriptor
+	fd_Property_shares    protoreflect.FieldDescriptor
+	fd_Property_transfers protoreflect.FieldDescriptor
 )
 
 func init() {
@@ -123,6 +175,7 @@ func init() {
 	fd_Property_value = md_Property.Fields().ByName("value")
 	fd_Property_owners = md_Property.Fields().ByName("owners")
 	fd_Property_shares = md_Property.Fields().ByName("shares")
+	fd_Property_transfers = md_Property.Fields().ByName("transfers")
 }
 
 var _ protoreflect.Message = (*fastReflection_Property)(nil)
@@ -226,6 +279,12 @@ func (x *fastReflection_Property) Range(f func(protoreflect.FieldDescriptor, pro
 			return
 		}
 	}
+	if len(x.Transfers) != 0 {
+		value := protoreflect.ValueOfList(&_Property_7_list{list: &x.Transfers})
+		if !f(fd_Property_transfers, value) {
+			return
+		}
+	}
 }
 
 // Has reports whether a field is populated.
@@ -253,6 +312,8 @@ func (x *fastReflection_Property) Has(fd protoreflect.FieldDescriptor) bool {
 		return len(x.Owners) != 0
 	case "ardapoc.property.Property.shares":
 		return len(x.Shares) != 0
+	case "ardapoc.property.Property.transfers":
+		return len(x.Transfers) != 0
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.property.Property"))
@@ -281,6 +342,8 @@ func (x *fastReflection_Property) Clear(fd protoreflect.FieldDescriptor) {
 		x.Owners = nil
 	case "ardapoc.property.Property.shares":
 		x.Shares = nil
+	case "ardapoc.property.Property.transfers":
+		x.Transfers = nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.property.Property"))
@@ -321,6 +384,12 @@ func (x *fastReflection_Property) Get(descriptor protoreflect.FieldDescriptor) p
 		}
 		listValue := &_Property_6_list{list: &x.Shares}
 		return protoreflect.ValueOfList(listValue)
+	case "ardapoc.property.Property.transfers":
+		if len(x.Transfers) == 0 {
+			return protoreflect.ValueOfList(&_Property_7_list{})
+		}
+		listValue := &_Property_7_list{list: &x.Transfers}
+		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.property.Property"))
@@ -357,6 +426,10 @@ func (x *fastReflection_Property) Set(fd protoreflect.FieldDescriptor, value pro
 		lv := value.List()
 		clv := lv.(*_Property_6_list)
 		x.Shares = *clv.list
+	case "ardapoc.property.Property.transfers":
+		lv := value.List()
+		clv := lv.(*_Property_7_list)
+		x.Transfers = *clv.list
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.property.Property"))
@@ -388,6 +461,12 @@ func (x *fastReflection_Property) Mutable(fd protoreflect.FieldDescriptor) proto
 			x.Shares = []uint64{}
 		}
 		value := &_Property_6_list{list: &x.Shares}
+		return protoreflect.ValueOfList(value)
+	case "ardapoc.property.Property.transfers":
+		if x.Transfers == nil {
+			x.Transfers = []*Transfer{}
+		}
+		value := &_Property_7_list{list: &x.Transfers}
 		return protoreflect.ValueOfList(value)
 	case "ardapoc.property.Property.index":
 		panic(fmt.Errorf("field index of message ardapoc.property.Property is not mutable"))
@@ -424,6 +503,9 @@ func (x *fastReflection_Property) NewField(fd protoreflect.FieldDescriptor) prot
 	case "ardapoc.property.Property.shares":
 		list := []uint64{}
 		return protoreflect.ValueOfList(&_Property_6_list{list: &list})
+	case "ardapoc.property.Property.transfers":
+		list := []*Transfer{}
+		return protoreflect.ValueOfList(&_Property_7_list{list: &list})
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.property.Property"))
@@ -521,6 +603,12 @@ func (x *fastReflection_Property) ProtoMethods() *protoiface.Methods {
 			}
 			n += 1 + runtime.Sov(uint64(l)) + l
 		}
+		if len(x.Transfers) > 0 {
+			for _, e := range x.Transfers {
+				l = options.Size(e)
+				n += 1 + l + runtime.Sov(uint64(l))
+			}
+		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
 		}
@@ -549,6 +637,22 @@ func (x *fastReflection_Property) ProtoMethods() *protoiface.Methods {
 		if x.unknownFields != nil {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
+		}
+		if len(x.Transfers) > 0 {
+			for iNdEx := len(x.Transfers) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.Transfers[iNdEx])
+				if err != nil {
+					return protoiface.MarshalOutput{
+						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+						Buf:               input.Buf,
+					}, err
+				}
+				i -= len(encoded)
+				copy(dAtA[i:], encoded)
+				i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
+				i--
+				dAtA[i] = 0x3a
+			}
 		}
 		if len(x.Shares) > 0 {
 			var pksize2 int
@@ -877,6 +981,588 @@ func (x *fastReflection_Property) ProtoMethods() *protoiface.Methods {
 				} else {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Shares", wireType)
 				}
+			case 7:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Transfers", wireType)
+				}
+				var msglen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					msglen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if msglen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + msglen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Transfers = append(x.Transfers, &Transfer{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Transfers[len(x.Transfers)-1]); err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				iNdEx = postIndex
+			default:
+				iNdEx = preIndex
+				skippy, err := runtime.Skip(dAtA[iNdEx:])
+				if err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				if (skippy < 0) || (iNdEx+skippy) < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if (iNdEx + skippy) > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if !options.DiscardUnknown {
+					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+				}
+				iNdEx += skippy
+			}
+		}
+
+		if iNdEx > l {
+			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+		}
+		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
+	}
+	return &protoiface.Methods{
+		NoUnkeyedLiterals: struct{}{},
+		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
+		Size:              size,
+		Marshal:           marshal,
+		Unmarshal:         unmarshal,
+		Merge:             nil,
+		CheckInitialized:  nil,
+	}
+}
+
+var (
+	md_Transfer           protoreflect.MessageDescriptor
+	fd_Transfer_from      protoreflect.FieldDescriptor
+	fd_Transfer_to        protoreflect.FieldDescriptor
+	fd_Transfer_timestamp protoreflect.FieldDescriptor
+)
+
+func init() {
+	file_ardapoc_property_property_proto_init()
+	md_Transfer = File_ardapoc_property_property_proto.Messages().ByName("Transfer")
+	fd_Transfer_from = md_Transfer.Fields().ByName("from")
+	fd_Transfer_to = md_Transfer.Fields().ByName("to")
+	fd_Transfer_timestamp = md_Transfer.Fields().ByName("timestamp")
+}
+
+var _ protoreflect.Message = (*fastReflection_Transfer)(nil)
+
+type fastReflection_Transfer Transfer
+
+func (x *Transfer) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_Transfer)(x)
+}
+
+func (x *Transfer) slowProtoReflect() protoreflect.Message {
+	mi := &file_ardapoc_property_property_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+var _fastReflection_Transfer_messageType fastReflection_Transfer_messageType
+var _ protoreflect.MessageType = fastReflection_Transfer_messageType{}
+
+type fastReflection_Transfer_messageType struct{}
+
+func (x fastReflection_Transfer_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_Transfer)(nil)
+}
+func (x fastReflection_Transfer_messageType) New() protoreflect.Message {
+	return new(fastReflection_Transfer)
+}
+func (x fastReflection_Transfer_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_Transfer
+}
+
+// Descriptor returns message descriptor, which contains only the protobuf
+// type information for the message.
+func (x *fastReflection_Transfer) Descriptor() protoreflect.MessageDescriptor {
+	return md_Transfer
+}
+
+// Type returns the message type, which encapsulates both Go and protobuf
+// type information. If the Go type information is not needed,
+// it is recommended that the message descriptor be used instead.
+func (x *fastReflection_Transfer) Type() protoreflect.MessageType {
+	return _fastReflection_Transfer_messageType
+}
+
+// New returns a newly allocated and mutable empty message.
+func (x *fastReflection_Transfer) New() protoreflect.Message {
+	return new(fastReflection_Transfer)
+}
+
+// Interface unwraps the message reflection interface and
+// returns the underlying ProtoMessage interface.
+func (x *fastReflection_Transfer) Interface() protoreflect.ProtoMessage {
+	return (*Transfer)(x)
+}
+
+// Range iterates over every populated field in an undefined order,
+// calling f for each field descriptor and value encountered.
+// Range returns immediately if f returns false.
+// While iterating, mutating operations may only be performed
+// on the current field descriptor.
+func (x *fastReflection_Transfer) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if x.From != "" {
+		value := protoreflect.ValueOfString(x.From)
+		if !f(fd_Transfer_from, value) {
+			return
+		}
+	}
+	if x.To != "" {
+		value := protoreflect.ValueOfString(x.To)
+		if !f(fd_Transfer_to, value) {
+			return
+		}
+	}
+	if x.Timestamp != "" {
+		value := protoreflect.ValueOfString(x.Timestamp)
+		if !f(fd_Transfer_timestamp, value) {
+			return
+		}
+	}
+}
+
+// Has reports whether a field is populated.
+//
+// Some fields have the property of nullability where it is possible to
+// distinguish between the default value of a field and whether the field
+// was explicitly populated with the default value. Singular message fields,
+// member fields of a oneof, and proto2 scalar fields are nullable. Such
+// fields are populated only if explicitly set.
+//
+// In other cases (aside from the nullable cases above),
+// a proto3 scalar field is populated if it contains a non-zero value, and
+// a repeated field is populated if it is non-empty.
+func (x *fastReflection_Transfer) Has(fd protoreflect.FieldDescriptor) bool {
+	switch fd.FullName() {
+	case "ardapoc.property.Transfer.from":
+		return x.From != ""
+	case "ardapoc.property.Transfer.to":
+		return x.To != ""
+	case "ardapoc.property.Transfer.timestamp":
+		return x.Timestamp != ""
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.property.Transfer"))
+		}
+		panic(fmt.Errorf("message ardapoc.property.Transfer does not contain field %s", fd.FullName()))
+	}
+}
+
+// Clear clears the field such that a subsequent Has call reports false.
+//
+// Clearing an extension field clears both the extension type and value
+// associated with the given field number.
+//
+// Clear is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_Transfer) Clear(fd protoreflect.FieldDescriptor) {
+	switch fd.FullName() {
+	case "ardapoc.property.Transfer.from":
+		x.From = ""
+	case "ardapoc.property.Transfer.to":
+		x.To = ""
+	case "ardapoc.property.Transfer.timestamp":
+		x.Timestamp = ""
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.property.Transfer"))
+		}
+		panic(fmt.Errorf("message ardapoc.property.Transfer does not contain field %s", fd.FullName()))
+	}
+}
+
+// Get retrieves the value for a field.
+//
+// For unpopulated scalars, it returns the default value, where
+// the default value of a bytes scalar is guaranteed to be a copy.
+// For unpopulated composite types, it returns an empty, read-only view
+// of the value; to obtain a mutable reference, use Mutable.
+func (x *fastReflection_Transfer) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+	switch descriptor.FullName() {
+	case "ardapoc.property.Transfer.from":
+		value := x.From
+		return protoreflect.ValueOfString(value)
+	case "ardapoc.property.Transfer.to":
+		value := x.To
+		return protoreflect.ValueOfString(value)
+	case "ardapoc.property.Transfer.timestamp":
+		value := x.Timestamp
+		return protoreflect.ValueOfString(value)
+	default:
+		if descriptor.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.property.Transfer"))
+		}
+		panic(fmt.Errorf("message ardapoc.property.Transfer does not contain field %s", descriptor.FullName()))
+	}
+}
+
+// Set stores the value for a field.
+//
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType.
+// When setting a composite type, it is unspecified whether the stored value
+// aliases the source's memory in any way. If the composite value is an
+// empty, read-only value, then it panics.
+//
+// Set is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_Transfer) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+	switch fd.FullName() {
+	case "ardapoc.property.Transfer.from":
+		x.From = value.Interface().(string)
+	case "ardapoc.property.Transfer.to":
+		x.To = value.Interface().(string)
+	case "ardapoc.property.Transfer.timestamp":
+		x.Timestamp = value.Interface().(string)
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.property.Transfer"))
+		}
+		panic(fmt.Errorf("message ardapoc.property.Transfer does not contain field %s", fd.FullName()))
+	}
+}
+
+// Mutable returns a mutable reference to a composite type.
+//
+// If the field is unpopulated, it may allocate a composite value.
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType
+// if not already stored.
+// It panics if the field does not contain a composite type.
+//
+// Mutable is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_Transfer) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "ardapoc.property.Transfer.from":
+		panic(fmt.Errorf("field from of message ardapoc.property.Transfer is not mutable"))
+	case "ardapoc.property.Transfer.to":
+		panic(fmt.Errorf("field to of message ardapoc.property.Transfer is not mutable"))
+	case "ardapoc.property.Transfer.timestamp":
+		panic(fmt.Errorf("field timestamp of message ardapoc.property.Transfer is not mutable"))
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.property.Transfer"))
+		}
+		panic(fmt.Errorf("message ardapoc.property.Transfer does not contain field %s", fd.FullName()))
+	}
+}
+
+// NewField returns a new value that is assignable to the field
+// for the given descriptor. For scalars, this returns the default value.
+// For lists, maps, and messages, this returns a new, empty, mutable value.
+func (x *fastReflection_Transfer) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "ardapoc.property.Transfer.from":
+		return protoreflect.ValueOfString("")
+	case "ardapoc.property.Transfer.to":
+		return protoreflect.ValueOfString("")
+	case "ardapoc.property.Transfer.timestamp":
+		return protoreflect.ValueOfString("")
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.property.Transfer"))
+		}
+		panic(fmt.Errorf("message ardapoc.property.Transfer does not contain field %s", fd.FullName()))
+	}
+}
+
+// WhichOneof reports which field within the oneof is populated,
+// returning nil if none are populated.
+// It panics if the oneof descriptor does not belong to this message.
+func (x *fastReflection_Transfer) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+	switch d.FullName() {
+	default:
+		panic(fmt.Errorf("%s is not a oneof field in ardapoc.property.Transfer", d.FullName()))
+	}
+	panic("unreachable")
+}
+
+// GetUnknown retrieves the entire list of unknown fields.
+// The caller may only mutate the contents of the RawFields
+// if the mutated bytes are stored back into the message with SetUnknown.
+func (x *fastReflection_Transfer) GetUnknown() protoreflect.RawFields {
+	return x.unknownFields
+}
+
+// SetUnknown stores an entire list of unknown fields.
+// The raw fields must be syntactically valid according to the wire format.
+// An implementation may panic if this is not the case.
+// Once stored, the caller must not mutate the content of the RawFields.
+// An empty RawFields may be passed to clear the fields.
+//
+// SetUnknown is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_Transfer) SetUnknown(fields protoreflect.RawFields) {
+	x.unknownFields = fields
+}
+
+// IsValid reports whether the message is valid.
+//
+// An invalid message is an empty, read-only value.
+//
+// An invalid message often corresponds to a nil pointer of the concrete
+// message type, but the details are implementation dependent.
+// Validity is not part of the protobuf data model, and may not
+// be preserved in marshaling or other operations.
+func (x *fastReflection_Transfer) IsValid() bool {
+	return x != nil
+}
+
+// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
+// This method may return nil.
+//
+// The returned methods type is identical to
+// "google.golang.org/protobuf/runtime/protoiface".Methods.
+// Consult the protoiface package documentation for details.
+func (x *fastReflection_Transfer) ProtoMethods() *protoiface.Methods {
+	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
+		x := input.Message.Interface().(*Transfer)
+		if x == nil {
+			return protoiface.SizeOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Size:              0,
+			}
+		}
+		options := runtime.SizeInputToOptions(input)
+		_ = options
+		var n int
+		var l int
+		_ = l
+		l = len(x.From)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.To)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.Timestamp)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.unknownFields != nil {
+			n += len(x.unknownFields)
+		}
+		return protoiface.SizeOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Size:              n,
+		}
+	}
+
+	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
+		x := input.Message.Interface().(*Transfer)
+		if x == nil {
+			return protoiface.MarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Buf:               input.Buf,
+			}, nil
+		}
+		options := runtime.MarshalInputToOptions(input)
+		_ = options
+		size := options.Size(x)
+		dAtA := make([]byte, size)
+		i := len(dAtA)
+		_ = i
+		var l int
+		_ = l
+		if x.unknownFields != nil {
+			i -= len(x.unknownFields)
+			copy(dAtA[i:], x.unknownFields)
+		}
+		if len(x.Timestamp) > 0 {
+			i -= len(x.Timestamp)
+			copy(dAtA[i:], x.Timestamp)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Timestamp)))
+			i--
+			dAtA[i] = 0x1a
+		}
+		if len(x.To) > 0 {
+			i -= len(x.To)
+			copy(dAtA[i:], x.To)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.To)))
+			i--
+			dAtA[i] = 0x12
+		}
+		if len(x.From) > 0 {
+			i -= len(x.From)
+			copy(dAtA[i:], x.From)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.From)))
+			i--
+			dAtA[i] = 0xa
+		}
+		if input.Buf != nil {
+			input.Buf = append(input.Buf, dAtA...)
+		} else {
+			input.Buf = dAtA
+		}
+		return protoiface.MarshalOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Buf:               input.Buf,
+		}, nil
+	}
+	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
+		x := input.Message.Interface().(*Transfer)
+		if x == nil {
+			return protoiface.UnmarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Flags:             input.Flags,
+			}, nil
+		}
+		options := runtime.UnmarshalInputToOptions(input)
+		_ = options
+		dAtA := input.Buf
+		l := len(dAtA)
+		iNdEx := 0
+		for iNdEx < l {
+			preIndex := iNdEx
+			var wire uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				wire |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			fieldNum := int32(wire >> 3)
+			wireType := int(wire & 0x7)
+			if wireType == 4 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: Transfer: wiretype end group for non-group")
+			}
+			if fieldNum <= 0 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: Transfer: illegal tag %d (wire type %d)", fieldNum, wire)
+			}
+			switch fieldNum {
+			case 1:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field From", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.From = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 2:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field To", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.To = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 3:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Timestamp = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
 			default:
 				iNdEx = preIndex
 				skippy, err := runtime.Skip(dAtA[iNdEx:])
@@ -930,12 +1616,13 @@ type Property struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Index   string   `protobuf:"bytes,1,opt,name=index,proto3" json:"index,omitempty"` // auto-generated key; we'll use this as ID = address
-	Address string   `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
-	Region  string   `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
-	Value   uint64   `protobuf:"varint,4,opt,name=value,proto3" json:"value,omitempty"`
-	Owners  []string `protobuf:"bytes,5,rep,name=owners,proto3" json:"owners,omitempty"`         // list of owner addresses
-	Shares  []uint64 `protobuf:"varint,6,rep,packed,name=shares,proto3" json:"shares,omitempty"` // corresponding shares for each owner
+	Index     string      `protobuf:"bytes,1,opt,name=index,proto3" json:"index,omitempty"` // auto-generated key; we'll use this as ID = address
+	Address   string      `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
+	Region    string      `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
+	Value     uint64      `protobuf:"varint,4,opt,name=value,proto3" json:"value,omitempty"`
+	Owners    []string    `protobuf:"bytes,5,rep,name=owners,proto3" json:"owners,omitempty"`         // list of owner addresses
+	Shares    []uint64    `protobuf:"varint,6,rep,packed,name=shares,proto3" json:"shares,omitempty"` // corresponding shares for each owner
+	Transfers []*Transfer `protobuf:"bytes,7,rep,name=transfers,proto3" json:"transfers,omitempty"`   // historical transfers
 }
 
 func (x *Property) Reset() {
@@ -1000,13 +1687,71 @@ func (x *Property) GetShares() []uint64 {
 	return nil
 }
 
+func (x *Property) GetTransfers() []*Transfer {
+	if x != nil {
+		return x.Transfers
+	}
+	return nil
+}
+
+type Transfer struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	From      string `protobuf:"bytes,1,opt,name=from,proto3" json:"from,omitempty"`
+	To        string `protobuf:"bytes,2,opt,name=to,proto3" json:"to,omitempty"`
+	Timestamp string `protobuf:"bytes,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"` // unix timestamp or RFC3339 string
+}
+
+func (x *Transfer) Reset() {
+	*x = Transfer{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_ardapoc_property_property_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Transfer) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Transfer) ProtoMessage() {}
+
+// Deprecated: Use Transfer.ProtoReflect.Descriptor instead.
+func (*Transfer) Descriptor() ([]byte, []int) {
+	return file_ardapoc_property_property_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *Transfer) GetFrom() string {
+	if x != nil {
+		return x.From
+	}
+	return ""
+}
+
+func (x *Transfer) GetTo() string {
+	if x != nil {
+		return x.To
+	}
+	return ""
+}
+
+func (x *Transfer) GetTimestamp() string {
+	if x != nil {
+		return x.Timestamp
+	}
+	return ""
+}
+
 var File_ardapoc_property_property_proto protoreflect.FileDescriptor
 
 var file_ardapoc_property_property_proto_rawDesc = []byte{
 	0x0a, 0x1f, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2f, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72,
 	0x74, 0x79, 0x2f, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x2e, 0x70, 0x72, 0x6f, 0x74,
 	0x6f, 0x12, 0x10, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x70, 0x72, 0x6f, 0x70, 0x65,
-	0x72, 0x74, 0x79, 0x22, 0x98, 0x01, 0x0a, 0x08, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79,
+	0x72, 0x74, 0x79, 0x22, 0xd2, 0x01, 0x0a, 0x08, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79,
 	0x12, 0x14, 0x0a, 0x05, 0x69, 0x6e, 0x64, 0x65, 0x78, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
 	0x05, 0x69, 0x6e, 0x64, 0x65, 0x78, 0x12, 0x18, 0x0a, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73,
 	0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73,
@@ -1015,18 +1760,27 @@ var file_ardapoc_property_property_proto_rawDesc = []byte{
 	0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x04, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x12, 0x16,
 	0x0a, 0x06, 0x6f, 0x77, 0x6e, 0x65, 0x72, 0x73, 0x18, 0x05, 0x20, 0x03, 0x28, 0x09, 0x52, 0x06,
 	0x6f, 0x77, 0x6e, 0x65, 0x72, 0x73, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x68, 0x61, 0x72, 0x65, 0x73,
-	0x18, 0x06, 0x20, 0x03, 0x28, 0x04, 0x52, 0x06, 0x73, 0x68, 0x61, 0x72, 0x65, 0x73, 0x42, 0xa4,
-	0x01, 0x0a, 0x14, 0x63, 0x6f, 0x6d, 0x2e, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x70,
-	0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x42, 0x0d, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74,
-	0x79, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x1c, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f,
-	0x63, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2f, 0x70, 0x72,
-	0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0xa2, 0x02, 0x03, 0x41, 0x50, 0x58, 0xaa, 0x02, 0x10, 0x41,
-	0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0xca,
-	0x02, 0x10, 0x41, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x5c, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72,
-	0x74, 0x79, 0xe2, 0x02, 0x1c, 0x41, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x5c, 0x50, 0x72, 0x6f,
-	0x70, 0x65, 0x72, 0x74, 0x79, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74,
-	0x61, 0xea, 0x02, 0x11, 0x41, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x3a, 0x3a, 0x50, 0x72, 0x6f,
-	0x70, 0x65, 0x72, 0x74, 0x79, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x18, 0x06, 0x20, 0x03, 0x28, 0x04, 0x52, 0x06, 0x73, 0x68, 0x61, 0x72, 0x65, 0x73, 0x12, 0x38,
+	0x0a, 0x09, 0x74, 0x72, 0x61, 0x6e, 0x73, 0x66, 0x65, 0x72, 0x73, 0x18, 0x07, 0x20, 0x03, 0x28,
+	0x0b, 0x32, 0x1a, 0x2e, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x70, 0x72, 0x6f, 0x70,
+	0x65, 0x72, 0x74, 0x79, 0x2e, 0x54, 0x72, 0x61, 0x6e, 0x73, 0x66, 0x65, 0x72, 0x52, 0x09, 0x74,
+	0x72, 0x61, 0x6e, 0x73, 0x66, 0x65, 0x72, 0x73, 0x22, 0x4c, 0x0a, 0x08, 0x54, 0x72, 0x61, 0x6e,
+	0x73, 0x66, 0x65, 0x72, 0x12, 0x12, 0x0a, 0x04, 0x66, 0x72, 0x6f, 0x6d, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x04, 0x66, 0x72, 0x6f, 0x6d, 0x12, 0x0e, 0x0a, 0x02, 0x74, 0x6f, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x74, 0x6f, 0x12, 0x1c, 0x0a, 0x09, 0x74, 0x69, 0x6d, 0x65,
+	0x73, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x74, 0x69, 0x6d,
+	0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x42, 0xa4, 0x01, 0x0a, 0x14, 0x63, 0x6f, 0x6d, 0x2e, 0x61,
+	0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x42,
+	0x0d, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01,
+	0x5a, 0x1c, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x61, 0x72,
+	0x64, 0x61, 0x70, 0x6f, 0x63, 0x2f, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0xa2, 0x02,
+	0x03, 0x41, 0x50, 0x58, 0xaa, 0x02, 0x10, 0x41, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x50,
+	0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0xca, 0x02, 0x10, 0x41, 0x72, 0x64, 0x61, 0x70, 0x6f,
+	0x63, 0x5c, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0xe2, 0x02, 0x1c, 0x41, 0x72, 0x64,
+	0x61, 0x70, 0x6f, 0x63, 0x5c, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x5c, 0x47, 0x50,
+	0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x11, 0x41, 0x72, 0x64, 0x61,
+	0x70, 0x6f, 0x63, 0x3a, 0x3a, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x62, 0x06, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1041,16 +1795,18 @@ func file_ardapoc_property_property_proto_rawDescGZIP() []byte {
 	return file_ardapoc_property_property_proto_rawDescData
 }
 
-var file_ardapoc_property_property_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_ardapoc_property_property_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_ardapoc_property_property_proto_goTypes = []interface{}{
 	(*Property)(nil), // 0: ardapoc.property.Property
+	(*Transfer)(nil), // 1: ardapoc.property.Transfer
 }
 var file_ardapoc_property_property_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	1, // 0: ardapoc.property.Property.transfers:type_name -> ardapoc.property.Transfer
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_ardapoc_property_property_proto_init() }
@@ -1071,6 +1827,18 @@ func file_ardapoc_property_property_proto_init() {
 				return nil
 			}
 		}
+		file_ardapoc_property_property_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Transfer); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -1078,7 +1846,7 @@ func file_ardapoc_property_property_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_ardapoc_property_property_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   1,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

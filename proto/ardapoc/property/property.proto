@@ -10,4 +10,11 @@ message Property {
   uint64 value = 4;
   repeated string owners = 5; // list of owner addresses
   repeated uint64 shares = 6; // corresponding shares for each owner
+  repeated Transfer transfers = 7; // historical transfers
+}
+
+message Transfer {
+  string from = 1;
+  string to = 2;
+  string timestamp = 3; // unix timestamp or RFC3339 string
 }
