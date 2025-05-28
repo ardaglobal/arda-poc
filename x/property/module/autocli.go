@@ -116,7 +116,7 @@ func GetCmdQueryProperties() *cobra.Command {
 			// Custom formatted output
 			fmt.Fprintln(cmd.OutOrStdout(), "Properties:")
 			for _, prop := range res.Properties {
-				printProperty(prop)
+				printProperty(clientCtx, prop)
 
 				fmt.Fprintln(cmd.OutOrStdout(), "") // Empty line between properties
 			}
@@ -153,7 +153,7 @@ func GetCmdQueryProperty() *cobra.Command {
 				return err
 			}
 
-			printProperty(res.Property)
+			printProperty(clientCtx, res.Property)
 
 			return nil
 		},
@@ -164,7 +164,7 @@ func GetCmdQueryProperty() *cobra.Command {
 	return cmd
 }
 
-func printProperty(prop *types.Property) {
+func printProperty(clientCtx client.Context, prop *types.Property) {
 	fmt.Printf("Property:\n")
 	fmt.Printf("  Index: %s\n", prop.Index)
 	fmt.Printf("  Address: %s\n", prop.Address)
@@ -178,13 +178,31 @@ func printProperty(prop *types.Property) {
 		if i < len(prop.Shares) {
 			ownerShare = fmt.Sprintf("%d", prop.Shares[i])
 		}
-		fmt.Printf("    - %s / %s\n", prop.Owners[i], ownerShare)
+
+		// Try to get human-readable name for the address
+		ownerName, err := getNameFromAddress(clientCtx, prop.Owners[i])
+		if err != nil {
+			ownerName = prop.Owners[i] // Use address if name not found
+		}
+
+		fmt.Printf("    - %s (%s) / %s\n", ownerName, prop.Owners[i], ownerShare)
 	}
 
 	fmt.Println("  Transfers:")
 	for _, transfer := range prop.Transfers {
-		fmt.Printf("    - From: %s; To: %s; Timestamp: %s\n",
-			transfer.From, transfer.To, transfer.Timestamp)
+		// Try to get human-readable names for the addresses
+		fromName, err := getNameFromAddress(clientCtx, transfer.From)
+		if err != nil {
+			fromName = transfer.From
+		}
+
+		toName, err := getNameFromAddress(clientCtx, transfer.To)
+		if err != nil {
+			toName = transfer.To
+		}
+
+		fmt.Printf("    - From: %s (%s); To: %s (%s); Timestamp: %s\n",
+			fromName, transfer.From, toName, transfer.To, transfer.Timestamp)
 	}
 }
 
@@ -206,6 +224,43 @@ func (AppModuleBasic) GetTxCmd() *cobra.Command {
 	return cmd
 }
 
+// getAddressFromName converts a keyring name to its address
+func getAddressFromName(clientCtx client.Context, name string) (string, error) {
+	// If input is the length of an address and starts with "arda", assume it's already an address
+	if len(name) == 44 && strings.HasPrefix(name, "arda") {
+		return name, nil
+	}
+	record, err := clientCtx.Keyring.Key(name)
+	if err != nil {
+		return "", fmt.Errorf("failed to get address for %s: %s", name, err)
+	}
+	addr, err := record.GetAddress()
+	if err != nil {
+		return "", fmt.Errorf("failed to get address for %s: %s", name, err)
+	}
+	return addr.String(), nil
+}
+
+// getNameFromAddress attempts to find a key name in the keyring given an address
+func getNameFromAddress(clientCtx client.Context, address string) (string, error) {
+	records, err := clientCtx.Keyring.List()
+	if err != nil {
+		return "", fmt.Errorf("failed to list keyring entries: %s", err)
+	}
+
+	for _, record := range records {
+		addr, err := record.GetAddress()
+		if err != nil {
+			continue // Skip records that can't get address
+		}
+		if addr.String() == address {
+			return record.Name, nil
+		}
+	}
+
+	return "", fmt.Errorf("no key found for address %s", address)
+}
+
 // GetCmdRegisterProperty implements a custom-formatted register-property command
 func GetCmdRegisterProperty() *cobra.Command {
 	cmd := &cobra.Command{
@@ -225,7 +280,7 @@ func GetCmdRegisterProperty() *cobra.Command {
 			}
 
 			// Get owners and shares from flags
-			owners, err := cmd.Flags().GetStringSlice("owners")
+			ownerNames, err := cmd.Flags().GetStringSlice("owners")
 			if err != nil {
 				return err
 			}
@@ -246,8 +301,18 @@ func GetCmdRegisterProperty() *cobra.Command {
 			}
 
 			// Validate owners and shares have same length
-			if len(owners) != len(shares) {
-				return fmt.Errorf("number of owners (%d) must match number of shares (%d)", len(owners), len(shares))
+			if len(ownerNames) != len(shares) {
+				return fmt.Errorf("number of owners (%d) must match number of shares (%d)", len(ownerNames), len(shares))
+			}
+
+			// Convert owner names to addresses
+			ownerAddresses := make([]string, len(ownerNames))
+			for i, name := range ownerNames {
+				addr, err := getAddressFromName(clientCtx, name)
+				if err != nil {
+					return err
+				}
+				ownerAddresses[i] = addr
 			}
 
 			msg := types.NewMsgRegisterProperty(
@@ -255,7 +320,7 @@ func GetCmdRegisterProperty() *cobra.Command {
 				strings.TrimSpace(args[0]), // address
 				strings.TrimSpace(args[1]), // region
 				value,
-				owners,
+				ownerAddresses,
 				shares,
 			)
 
@@ -263,7 +328,7 @@ func GetCmdRegisterProperty() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringSlice("owners", []string{}, "Comma-separated list of property owners")
+	cmd.Flags().StringSlice("owners", []string{}, "Comma-separated list of owner names from the keyring")
 	cmd.Flags().StringSlice("shares", []string{}, "Comma-separated list of shares (must match number of owners)")
 	flags.AddTxFlagsToCmd(cmd)
 	return cmd
@@ -282,9 +347,9 @@ func GetCmdTransferShares() *cobra.Command {
 			}
 
 			// Parse from-owners and from-shares as arrays
-			fromOwners := strings.Split(args[1], ",")
+			fromOwnerNames := strings.Split(args[1], ",")
 			fromShares := strings.Split(args[2], ",")
-			toOwners := strings.Split(args[3], ",")
+			toOwnerNames := strings.Split(args[3], ",")
 			toShares := strings.Split(args[4], ",")
 
 			// Convert share strings to uint64 slices
@@ -306,12 +371,32 @@ func GetCmdTransferShares() *cobra.Command {
 				toSharesUint[i] = shareUint
 			}
 
+			// Convert from-owner names to addresses
+			fromOwnerAddresses := make([]string, len(fromOwnerNames))
+			for i, name := range fromOwnerNames {
+				addr, err := getAddressFromName(clientCtx, name)
+				if err != nil {
+					return fmt.Errorf("failed to get address for from-owner: %s", err)
+				}
+				fromOwnerAddresses[i] = addr
+			}
+
+			// Convert to-owner names to addresses
+			toOwnerAddresses := make([]string, len(toOwnerNames))
+			for i, name := range toOwnerNames {
+				addr, err := getAddressFromName(clientCtx, name)
+				if err != nil {
+					return fmt.Errorf("failed to get address for to-owner: %s", err)
+				}
+				toOwnerAddresses[i] = addr
+			}
+
 			msg := types.NewMsgTransferShares(
 				clientCtx.GetFromAddress().String(),
 				strings.TrimSpace(args[0]), // property-id
-				fromOwners,
+				fromOwnerAddresses,
 				fromSharesUint,
-				toOwners,
+				toOwnerAddresses,
 				toSharesUint,
 			)
 

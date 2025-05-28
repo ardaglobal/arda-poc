@@ -26,6 +26,7 @@ func KeyPrefix(p string) []byte {
 }
 
 // PropertyShareDenom returns the bank denom used for the given property ID.
-func PropertyShareDenom(id string) string {
-	return PropertyShareDenomPrefix + id
+func PropertyShareDenom(_ string) string {
+	// return PropertyShareDenomPrefix + id
+	return PropertyShareDenomPrefix
 }
