@@ -12,6 +12,9 @@ const (
 
 	// KeyPrefixProperty is the prefix used to store properties by ID
 	KeyPrefixProperty = "Property/value/"
+
+	// PropertyShareDenomPrefix defines the prefix for property share denoms
+	PropertyShareDenomPrefix = "property_"
 )
 
 var (
@@ -20,4 +23,10 @@ var (
 
 func KeyPrefix(p string) []byte {
 	return []byte(p)
+}
+
+// PropertyShareDenom returns the bank denom used for the given property ID.
+func PropertyShareDenom(_ string) string {
+	// return PropertyShareDenomPrefix + id
+	return PropertyShareDenomPrefix
 }

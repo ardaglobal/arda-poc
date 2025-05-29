@@ -2,6 +2,7 @@ package property
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
@@ -11,6 +12,7 @@ import (
 
 	modulev1 "github.com/ardaglobal/arda-poc/api/ardapoc/property"
 	"github.com/ardaglobal/arda-poc/x/property/types"
+	"github.com/cosmos/cosmos-sdk/client/tx"
 )
 
 // AutoCLIOptions implements the autocli.HasAutoCLIConfig interface.
@@ -111,11 +113,13 @@ func GetCmdQueryProperties() *cobra.Command {
 				return err
 			}
 
+			// Create a cache map for address to name lookups
+			addressToName := make(map[string]string)
+
 			// Custom formatted output
 			fmt.Fprintln(cmd.OutOrStdout(), "Properties:")
 			for _, prop := range res.Properties {
-				printProperty(prop)
-
+				printProperty(clientCtx, prop, addressToName)
 				fmt.Fprintln(cmd.OutOrStdout(), "") // Empty line between properties
 			}
 
@@ -151,7 +155,9 @@ func GetCmdQueryProperty() *cobra.Command {
 				return err
 			}
 
-			printProperty(res.Property)
+			// Create a cache map for address to name lookups
+			addressToName := make(map[string]string)
+			printProperty(clientCtx, res.Property, addressToName)
 
 			return nil
 		},
@@ -162,7 +168,7 @@ func GetCmdQueryProperty() *cobra.Command {
 	return cmd
 }
 
-func printProperty(prop *types.Property) {
+func printProperty(clientCtx client.Context, prop *types.Property, addressToName map[string]string) {
 	fmt.Printf("Property:\n")
 	fmt.Printf("  Index: %s\n", prop.Index)
 	fmt.Printf("  Address: %s\n", prop.Address)
@@ -176,12 +182,265 @@ func printProperty(prop *types.Property) {
 		if i < len(prop.Shares) {
 			ownerShare = fmt.Sprintf("%d", prop.Shares[i])
 		}
-		fmt.Printf("    - %s / %s\n", prop.Owners[i], ownerShare)
+
+		// Check cache first, then try to get human-readable name for the address
+		ownerName, exists := addressToName[prop.Owners[i]]
+		if !exists {
+			name, err := getNameFromAddress(clientCtx, prop.Owners[i])
+			if err != nil {
+				ownerName = prop.Owners[i] // Use address if name not found
+			} else {
+				ownerName = name
+				addressToName[prop.Owners[i]] = name // Cache the result
+			}
+		}
+
+		fmt.Printf("    - %s (%s) / %s\n", ownerName, prop.Owners[i], ownerShare)
+	}
+
+	// Helper function to print details
+	genPrintDetails := func(entries, details []string) []string {
+		for _, entry := range entries {
+			// Split into address and share
+			parts := strings.Split(strings.TrimSpace(entry), ":")
+			addr := parts[0]
+			share := parts[1]
+
+			// Get name from cache or lookup
+			var err error
+			name, exists := addressToName[addr]
+			if !exists {
+				name, err = getNameFromAddress(clientCtx, addr)
+				if err != nil {
+					name = addr
+				} else {
+					addressToName[addr] = name
+				}
+			}
+
+			details = append(details, fmt.Sprintf("%s (%s): %s", name, addr, share))
+		}
+		return details
 	}
 
 	fmt.Println("  Transfers:")
 	for _, transfer := range prop.Transfers {
+		// Split From entries by comma
+		fromEntries := strings.Split(transfer.From, ",")
+		var fromDetails []string
+		fromDetails = genPrintDetails(fromEntries, fromDetails)
+
+		// Split To entries by comma
+		toEntries := strings.Split(transfer.To, ",")
+		var toDetails []string
+		toDetails = genPrintDetails(toEntries, toDetails)
+
+		// Print combined details
 		fmt.Printf("    - From: %s; To: %s; Timestamp: %s\n",
-			transfer.From, transfer.To, transfer.Timestamp)
+			strings.Join(fromDetails, ", "),
+			strings.Join(toDetails, ", "),
+			transfer.Timestamp)
 	}
+}
+
+// GetTxCmd returns the custom-formatted property transaction commands
+func (AppModuleBasic) GetTxCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:                        "property",
+		Short:                      "Transaction commands for the property module",
+		DisableFlagParsing:         true,
+		SuggestionsMinimumDistance: 2,
+		RunE:                       client.ValidateCmd,
+	}
+
+	cmd.AddCommand(
+		GetCmdRegisterProperty(),
+		GetCmdTransferShares(),
+	)
+
+	return cmd
+}
+
+// getAddressFromName converts a keyring name to its address
+func getAddressFromName(clientCtx client.Context, name string) (string, error) {
+	// If input is the length of an address and starts with "arda", assume it's already an address
+	if len(name) == 44 && strings.HasPrefix(name, "arda") {
+		return name, nil
+	}
+	record, err := clientCtx.Keyring.Key(name)
+	if err != nil {
+		return "", fmt.Errorf("failed to get address for %s: %s", name, err)
+	}
+	addr, err := record.GetAddress()
+	if err != nil {
+		return "", fmt.Errorf("failed to get address for %s: %s", name, err)
+	}
+	return addr.String(), nil
+}
+
+// getNameFromAddress attempts to find a key name in the keyring given an address
+func getNameFromAddress(clientCtx client.Context, address string) (string, error) {
+	records, err := clientCtx.Keyring.List()
+	if err != nil {
+		return "", fmt.Errorf("failed to list keyring entries: %s", err)
+	}
+
+	for _, record := range records {
+		addr, err := record.GetAddress()
+		if err != nil {
+			continue // Skip records that can't get address
+		}
+		if addr.String() == address {
+			return record.Name, nil
+		}
+	}
+
+	return "", fmt.Errorf("no key found for address %s", address)
+}
+
+// GetCmdRegisterProperty implements a custom-formatted register-property command
+func GetCmdRegisterProperty() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "register-property [address] [region] [value]",
+		Short: "Register a new property with address, region, and value",
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			// Parse value as uint64
+			value, err := strconv.ParseUint(args[2], 10, 64)
+			if err != nil {
+				return fmt.Errorf("invalid value: %s", err)
+			}
+
+			// Get owners and shares from flags
+			ownerNames, err := cmd.Flags().GetStringSlice("owners")
+			if err != nil {
+				return err
+			}
+
+			sharesStr, err := cmd.Flags().GetStringSlice("shares")
+			if err != nil {
+				return err
+			}
+
+			// Convert shares to uint64
+			shares := make([]uint64, len(sharesStr))
+			for i, share := range sharesStr {
+				shareUint, err := strconv.ParseUint(share, 10, 64)
+				if err != nil {
+					return fmt.Errorf("invalid share value at position %d: %s", i, err)
+				}
+				shares[i] = shareUint
+			}
+
+			// Validate owners and shares have same length
+			if len(ownerNames) != len(shares) {
+				return fmt.Errorf("number of owners (%d) must match number of shares (%d)", len(ownerNames), len(shares))
+			}
+
+			// Convert owner names to addresses
+			ownerAddresses := make([]string, len(ownerNames))
+			for i, name := range ownerNames {
+				addr, err := getAddressFromName(clientCtx, name)
+				if err != nil {
+					return err
+				}
+				ownerAddresses[i] = addr
+			}
+
+			msg := types.NewMsgRegisterProperty(
+				clientCtx.GetFromAddress().String(),
+				strings.TrimSpace(args[0]), // address
+				strings.TrimSpace(args[1]), // region
+				value,
+				ownerAddresses,
+				shares,
+			)
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	cmd.Flags().StringSlice("owners", []string{}, "Comma-separated list of owner names from the keyring")
+	cmd.Flags().StringSlice("shares", []string{}, "Comma-separated list of shares (must match number of owners)")
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+// GetCmdTransferShares implements a custom-formatted transfer-shares command
+func GetCmdTransferShares() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "transfer-shares [property-id] [from-owners] [from-shares] [to-owners] [to-shares]",
+		Short: "Transfer property shares between owners",
+		Args:  cobra.ExactArgs(5),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			// Parse from-owners and from-shares as arrays
+			fromOwnerNames := strings.Split(args[1], ",")
+			fromShares := strings.Split(args[2], ",")
+			toOwnerNames := strings.Split(args[3], ",")
+			toShares := strings.Split(args[4], ",")
+
+			// Convert share strings to uint64 slices
+			fromSharesUint := make([]uint64, len(fromShares))
+			for i, share := range fromShares {
+				shareUint, err := strconv.ParseUint(share, 10, 64)
+				if err != nil {
+					return fmt.Errorf("invalid from-share value at position %d: %s", i, err)
+				}
+				fromSharesUint[i] = shareUint
+			}
+
+			toSharesUint := make([]uint64, len(toShares))
+			for i, share := range toShares {
+				shareUint, err := strconv.ParseUint(share, 10, 64)
+				if err != nil {
+					return fmt.Errorf("invalid to-share value at position %d: %s", i, err)
+				}
+				toSharesUint[i] = shareUint
+			}
+
+			// Convert from-owner names to addresses
+			fromOwnerAddresses := make([]string, len(fromOwnerNames))
+			for i, name := range fromOwnerNames {
+				addr, err := getAddressFromName(clientCtx, name)
+				if err != nil {
+					return fmt.Errorf("failed to get address for from-owner: %s", err)
+				}
+				fromOwnerAddresses[i] = addr
+			}
+
+			// Convert to-owner names to addresses
+			toOwnerAddresses := make([]string, len(toOwnerNames))
+			for i, name := range toOwnerNames {
+				addr, err := getAddressFromName(clientCtx, name)
+				if err != nil {
+					return fmt.Errorf("failed to get address for to-owner: %s", err)
+				}
+				toOwnerAddresses[i] = addr
+			}
+
+			msg := types.NewMsgTransferShares(
+				clientCtx.GetFromAddress().String(),
+				strings.TrimSpace(args[0]), // property-id
+				fromOwnerAddresses,
+				fromSharesUint,
+				toOwnerAddresses,
+				toSharesUint,
+			)
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
 }

@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"cosmossdk.io/math"
 	"github.com/ardaglobal/arda-poc/pkg/utils"
 	ardatypes "github.com/ardaglobal/arda-poc/x/arda/types"
 	"github.com/ardaglobal/arda-poc/x/property/types"
@@ -54,9 +55,11 @@ func (k msgServer) TransferShares(goCtx context.Context, msg *types.MsgTransferS
 	}
 
 	ownerMap := k.ConvertPropertyOwnersToMap(property)
+	denom := types.PropertyShareDenom(property.Index)
 
-	// Deduct shares from from_owners
+	// Deduct shares from from_owners and move tokens to module account
 	fromSharesAndOwners := make([]string, 0, len(msg.FromOwners))
+	// NOTE: this is not atomic
 	for i, owner := range msg.FromOwners {
 		fromSharesAndOwners = append(fromSharesAndOwners, fmt.Sprintf("%s:%d", owner, msg.FromShares[i]))
 		currentShare := ownerMap[owner]
@@ -67,13 +70,32 @@ func (k msgServer) TransferShares(goCtx context.Context, msg *types.MsgTransferS
 		if ownerMap[owner] == 0 {
 			delete(ownerMap, owner)
 		}
+
+		addr, err := sdk.AccAddressFromBech32(owner)
+		if err != nil {
+			return nil, err
+		}
+		coin := sdk.NewCoin(denom, math.NewInt(int64(msg.FromShares[i])))
+		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, addr, types.ModuleName, sdk.NewCoins(coin)); err != nil {
+			return nil, err
+		}
 	}
 
-	// Add shares to to_owners
+	// Add shares to to_owners and distribute tokens from module account
 	toSharesAndOwners := make([]string, 0, len(msg.ToOwners))
+	// NOTE: this is not atomic
 	for i, newOwner := range msg.ToOwners {
 		toSharesAndOwners = append(toSharesAndOwners, fmt.Sprintf("%s:%d", newOwner, msg.ToShares[i]))
 		ownerMap[newOwner] += msg.ToShares[i]
+
+		addr, err := sdk.AccAddressFromBech32(newOwner)
+		if err != nil {
+			return nil, err
+		}
+		coin := sdk.NewCoin(denom, math.NewInt(int64(msg.ToShares[i])))
+		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, addr, sdk.NewCoins(coin)); err != nil {
+			return nil, err
+		}
 	}
 
 	k.UpdatePropertyFromOwnerMap(&property, ownerMap)
