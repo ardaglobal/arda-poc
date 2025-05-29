@@ -39,6 +39,9 @@ import (
 	"cosmossdk.io/x/feegrant"
 	"cosmossdk.io/x/nft"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
+	usdardamodulev1 "github.com/ardaglobal/arda-poc/api/ardapoc/usdarda/module"
+	_ "github.com/ardaglobal/arda-poc/x/usdarda/module" // import for side-effects
+	usdardamoduletypes "github.com/ardaglobal/arda-poc/x/usdarda/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
@@ -99,6 +102,7 @@ var (
 		// chain modules
 		ardamoduletypes.ModuleName,
 		propertymoduletypes.ModuleName,
+		usdardamoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 
@@ -125,6 +129,7 @@ var (
 		// chain modules
 		ardamoduletypes.ModuleName,
 		propertymoduletypes.ModuleName,
+		usdardamoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	}
 
@@ -145,6 +150,7 @@ var (
 		// chain modules
 		ardamoduletypes.ModuleName,
 		propertymoduletypes.ModuleName,
+		usdardamoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	}
 
@@ -308,6 +314,10 @@ var (
 			{
 				Name:   propertymoduletypes.ModuleName,
 				Config: appconfig.WrapAny(&propertymodulev1.Module{}),
+			},
+			{
+				Name:   usdardamoduletypes.ModuleName,
+				Config: appconfig.WrapAny(&usdardamodulev1.Module{}),
 			},
 			// this line is used by starport scaffolding # stargate/app/moduleConfig
 		},

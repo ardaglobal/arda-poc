@@ -1,0 +1,17 @@
+syntax = "proto3";
+package ardapoc.usdarda;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+import "ardapoc/usdarda/params.proto";
+
+option go_package = "github.com/ardaglobal/arda-poc/x/usdarda/types";
+
+// GenesisState defines the usdarda module's genesis state.
+message GenesisState {
+  // params defines all the parameters of the module.
+  Params params = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}
