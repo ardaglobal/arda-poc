@@ -113,11 +113,13 @@ func GetCmdQueryProperties() *cobra.Command {
 				return err
 			}
 
+			// Create a cache map for address to name lookups
+			addressToName := make(map[string]string)
+
 			// Custom formatted output
 			fmt.Fprintln(cmd.OutOrStdout(), "Properties:")
 			for _, prop := range res.Properties {
-				printProperty(clientCtx, prop)
-
+				printProperty(clientCtx, prop, addressToName)
 				fmt.Fprintln(cmd.OutOrStdout(), "") // Empty line between properties
 			}
 
@@ -153,7 +155,9 @@ func GetCmdQueryProperty() *cobra.Command {
 				return err
 			}
 
-			printProperty(clientCtx, res.Property)
+			// Create a cache map for address to name lookups
+			addressToName := make(map[string]string)
+			printProperty(clientCtx, res.Property, addressToName)
 
 			return nil
 		},
@@ -164,7 +168,7 @@ func GetCmdQueryProperty() *cobra.Command {
 	return cmd
 }
 
-func printProperty(clientCtx client.Context, prop *types.Property) {
+func printProperty(clientCtx client.Context, prop *types.Property, addressToName map[string]string) {
 	fmt.Printf("Property:\n")
 	fmt.Printf("  Index: %s\n", prop.Index)
 	fmt.Printf("  Address: %s\n", prop.Address)
@@ -179,30 +183,63 @@ func printProperty(clientCtx client.Context, prop *types.Property) {
 			ownerShare = fmt.Sprintf("%d", prop.Shares[i])
 		}
 
-		// Try to get human-readable name for the address
-		ownerName, err := getNameFromAddress(clientCtx, prop.Owners[i])
-		if err != nil {
-			ownerName = prop.Owners[i] // Use address if name not found
+		// Check cache first, then try to get human-readable name for the address
+		ownerName, exists := addressToName[prop.Owners[i]]
+		if !exists {
+			name, err := getNameFromAddress(clientCtx, prop.Owners[i])
+			if err != nil {
+				ownerName = prop.Owners[i] // Use address if name not found
+			} else {
+				ownerName = name
+				addressToName[prop.Owners[i]] = name // Cache the result
+			}
 		}
 
 		fmt.Printf("    - %s (%s) / %s\n", ownerName, prop.Owners[i], ownerShare)
 	}
 
+	// Helper function to print details
+	genPrintDetails := func(entries, details []string) []string {
+		for _, entry := range entries {
+			// Split into address and share
+			parts := strings.Split(strings.TrimSpace(entry), ":")
+			addr := parts[0]
+			share := parts[1]
+
+			// Get name from cache or lookup
+			var err error
+			name, exists := addressToName[addr]
+			if !exists {
+				name, err = getNameFromAddress(clientCtx, addr)
+				if err != nil {
+					name = addr
+				} else {
+					addressToName[addr] = name
+				}
+			}
+
+			details = append(details, fmt.Sprintf("%s (%s): %s", name, addr, share))
+		}
+		return details
+	}
+
 	fmt.Println("  Transfers:")
 	for _, transfer := range prop.Transfers {
-		// Try to get human-readable names for the addresses
-		fromName, err := getNameFromAddress(clientCtx, transfer.From)
-		if err != nil {
-			fromName = transfer.From
-		}
+		// Split From entries by comma
+		fromEntries := strings.Split(transfer.From, ",")
+		var fromDetails []string
+		fromDetails = genPrintDetails(fromEntries, fromDetails)
 
-		toName, err := getNameFromAddress(clientCtx, transfer.To)
-		if err != nil {
-			toName = transfer.To
-		}
+		// Split To entries by comma
+		toEntries := strings.Split(transfer.To, ",")
+		var toDetails []string
+		toDetails = genPrintDetails(toEntries, toDetails)
 
-		fmt.Printf("    - From: %s (%s); To: %s (%s); Timestamp: %s\n",
-			fromName, transfer.From, toName, transfer.To, transfer.Timestamp)
+		// Print combined details
+		fmt.Printf("    - From: %s; To: %s; Timestamp: %s\n",
+			strings.Join(fromDetails, ", "),
+			strings.Join(toDetails, ", "),
+			transfer.Timestamp)
 	}
 }
 
