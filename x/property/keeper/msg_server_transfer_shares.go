@@ -10,6 +10,7 @@ import (
 	"github.com/ardaglobal/arda-poc/pkg/utils"
 	ardatypes "github.com/ardaglobal/arda-poc/x/arda/types"
 	"github.com/ardaglobal/arda-poc/x/property/types"
+	usdkeeper "github.com/ardaglobal/arda-poc/x/usdarda/keeper"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -79,6 +80,11 @@ func (k msgServer) TransferShares(goCtx context.Context, msg *types.MsgTransferS
 		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, addr, types.ModuleName, sdk.NewCoins(coin)); err != nil {
 			return nil, err
 		}
+		// Burn USDArda equivalent to the transferred shares from the sender
+		usdAmount := property.Value * msg.FromShares[i] / 100
+		if err := k.usdKeeper.Burn(ctx, property.Index, usdAmount, addr); err != nil {
+			return nil, err
+		}
 	}
 
 	// Add shares to to_owners and distribute tokens from module account
@@ -94,6 +100,11 @@ func (k msgServer) TransferShares(goCtx context.Context, msg *types.MsgTransferS
 		}
 		coin := sdk.NewCoin(denom, math.NewInt(int64(msg.ToShares[i])))
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, addr, sdk.NewCoins(coin)); err != nil {
+			return nil, err
+		}
+		// Mint USDArda for the recipient based on transferred shares
+		usdAmount := property.Value * msg.ToShares[i] / 100
+		if err := k.usdKeeper.Mint(ctx, property.Index, usdAmount, addr); err != nil {
 			return nil, err
 		}
 	}

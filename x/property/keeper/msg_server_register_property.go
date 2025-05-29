@@ -9,6 +9,7 @@ import (
 	"github.com/ardaglobal/arda-poc/pkg/utils"
 	ardatypes "github.com/ardaglobal/arda-poc/x/arda/types"
 	"github.com/ardaglobal/arda-poc/x/property/types"
+	usdkeeper "github.com/ardaglobal/arda-poc/x/usdarda/keeper"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -99,6 +100,11 @@ func (k msgServer) RegisterProperty(goCtx context.Context, msg *types.MsgRegiste
 			return nil, err
 		}
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, addr, sdk.NewCoins(coin)); err != nil {
+			return nil, err
+		}
+		// Mint equivalent USDArda to owner based on property value and ownership share
+		usdAmount := msg.Value * share / 100
+		if err := k.usdKeeper.Mint(ctx, id, usdAmount, addr); err != nil {
 			return nil, err
 		}
 	}
