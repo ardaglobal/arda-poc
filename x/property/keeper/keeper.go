@@ -109,7 +109,9 @@ func (k Keeper) SetProperty(ctx sdk.Context, property types.Property) {
 	propertyKey := types.KeyPrefix(types.KeyPrefixProperty)
 	propertyKey = append(propertyKey, []byte(property.Index)...)
 
-	kvStore.Set(propertyKey, k.cdc.MustMarshal(&property))
+	if err := kvStore.Set(propertyKey, k.cdc.MustMarshal(&property)); err != nil {
+		panic(fmt.Errorf("failed to set property: %w", err))
+	}
 }
 
 // GetAllProperties returns all properties in the store

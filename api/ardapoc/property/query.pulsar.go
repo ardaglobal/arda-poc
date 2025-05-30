@@ -206,7 +206,7 @@ func (x *fastReflection_QueryParamsRequest) WhichOneof(d protoreflect.OneofDescr
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in ardapoc.property.QueryParamsRequest", d.FullName()))
 	}
-	panic("unreachable")
+
 }
 
 // GetUnknown retrieves the entire list of unknown fields.
@@ -587,7 +587,7 @@ func (x *fastReflection_QueryParamsResponse) WhichOneof(d protoreflect.OneofDesc
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in ardapoc.property.QueryParamsResponse", d.FullName()))
 	}
-	panic("unreachable")
+
 }
 
 // GetUnknown retrieves the entire list of unknown fields.
@@ -1022,7 +1022,7 @@ func (x *fastReflection_QueryAllPropertyRequest) WhichOneof(d protoreflect.Oneof
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in ardapoc.property.QueryAllPropertyRequest", d.FullName()))
 	}
-	panic("unreachable")
+
 }
 
 // GetUnknown retrieves the entire list of unknown fields.
@@ -1539,7 +1539,7 @@ func (x *fastReflection_QueryAllPropertyResponse) WhichOneof(d protoreflect.Oneo
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in ardapoc.property.QueryAllPropertyResponse", d.FullName()))
 	}
-	panic("unreachable")
+
 }
 
 // GetUnknown retrieves the entire list of unknown fields.
@@ -2026,7 +2026,7 @@ func (x *fastReflection_QueryGetPropertyRequest) WhichOneof(d protoreflect.Oneof
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in ardapoc.property.QueryGetPropertyRequest", d.FullName()))
 	}
-	panic("unreachable")
+
 }
 
 // GetUnknown retrieves the entire list of unknown fields.
@@ -2450,7 +2450,7 @@ func (x *fastReflection_QueryGetPropertyResponse) WhichOneof(d protoreflect.Oneo
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in ardapoc.property.QueryGetPropertyResponse", d.FullName()))
 	}
-	panic("unreachable")
+
 }
 
 // GetUnknown retrieves the entire list of unknown fields.

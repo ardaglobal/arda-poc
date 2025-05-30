@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-var users = []string{"alice", "bob", "charlie", "dan", "eve", "fred", "george", "harry"}
+var users = []string{"alice", "bob", "charlie", "dan", "eve", "fred", "george", "harry"} //nolint:unused
 
 // Property tracks current owners and their shares
 // Shares are represented as percentages and should sum to 100
@@ -21,7 +21,7 @@ type Property struct {
 }
 
 // randomShares generates n positive share percentages that sum to 100
-func randomShares(n int) []int {
+func randomShares(n int) []int { //nolint:unused
 	shares := make([]int, n)
 	remaining := 100
 	for i := 0; i < n; i++ {
@@ -39,7 +39,7 @@ func randomShares(n int) []int {
 }
 
 // intSliceToString converts []int to comma separated string
-func intSliceToString(v []int) string {
+func intSliceToString(v []int) string { //nolint:unused
 	parts := make([]string, len(v))
 	for i, s := range v {
 		parts[i] = fmt.Sprintf("%d", s)
@@ -48,7 +48,7 @@ func intSliceToString(v []int) string {
 }
 
 // registerProperty creates a new property with random data and sends the CLI command.
-func registerProperty() Property {
+func registerProperty() Property { //nolint:unused
 	address := fmt.Sprintf("%d Main St", rand.Intn(9000)+100)
 	value := rand.Intn(900000) + 100000
 
@@ -81,7 +81,7 @@ func registerProperty() Property {
 }
 
 // transferShares performs a random share transfer between owners of the property.
-func transferShares(p *Property) {
+func transferShares(p *Property) { //nolint:unused
 	if len(p.Owners) < 2 {
 		return
 	}
@@ -120,7 +120,7 @@ func transferShares(p *Property) {
 }
 
 // AutoProperty registers properties and continuously transfers shares.
-func main() {
+func main() { //nolint:unused
 	var properties []Property
 	for {
 		fmt.Println("Registering property..")

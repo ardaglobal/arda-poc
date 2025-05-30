@@ -66,7 +66,7 @@ func signHash(keyFile string, hash []byte) (sigHex string, err error) {
 }
 
 // Helper function for command line usage
-func generateAndPrintSubmitCommand() {
+func generateAndPrintSubmitCommand() { //nolint:unused
 	message := "Hello Dubai!"
 
 	hashHex, sigHex, err := generateHashAndSignature(defaultKeyFile, message)

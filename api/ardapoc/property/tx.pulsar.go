@@ -253,7 +253,7 @@ func (x *fastReflection_MsgUpdateParams) WhichOneof(d protoreflect.OneofDescript
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in ardapoc.property.MsgUpdateParams", d.FullName()))
 	}
-	panic("unreachable")
+
 }
 
 // GetUnknown retrieves the entire list of unknown fields.
@@ -706,7 +706,7 @@ func (x *fastReflection_MsgUpdateParamsResponse) WhichOneof(d protoreflect.Oneof
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in ardapoc.property.MsgUpdateParamsResponse", d.FullName()))
 	}
-	panic("unreachable")
+
 }
 
 // GetUnknown retrieves the entire list of unknown fields.
@@ -1300,7 +1300,7 @@ func (x *fastReflection_MsgRegisterProperty) WhichOneof(d protoreflect.OneofDesc
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in ardapoc.property.MsgRegisterProperty", d.FullName()))
 	}
-	panic("unreachable")
+
 }
 
 // GetUnknown retrieves the entire list of unknown fields.
@@ -1962,7 +1962,7 @@ func (x *fastReflection_MsgRegisterPropertyResponse) WhichOneof(d protoreflect.O
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in ardapoc.property.MsgRegisterPropertyResponse", d.FullName()))
 	}
-	panic("unreachable")
+
 }
 
 // GetUnknown retrieves the entire list of unknown fields.
@@ -2668,7 +2668,7 @@ func (x *fastReflection_MsgTransferShares) WhichOneof(d protoreflect.OneofDescri
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in ardapoc.property.MsgTransferShares", d.FullName()))
 	}
-	panic("unreachable")
+
 }
 
 // GetUnknown retrieves the entire list of unknown fields.
@@ -3410,7 +3410,7 @@ func (x *fastReflection_MsgTransferSharesResponse) WhichOneof(d protoreflect.One
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in ardapoc.property.MsgTransferSharesResponse", d.FullName()))
 	}
-	panic("unreachable")
+
 }
 
 // GetUnknown retrieves the entire list of unknown fields.

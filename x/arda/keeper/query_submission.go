@@ -45,7 +45,7 @@ func (k Keeper) SubmissionAll(goCtx context.Context, req *ardaTypes.QueryAllSubm
 	}
 
 	// Slice the submissions based on pagination
-	paginatedSubmissions := submissionPtrs
+	var paginatedSubmissions []*ardaTypes.Submission
 	if start < end {
 		paginatedSubmissions = submissionPtrs[start:end]
 	} else {

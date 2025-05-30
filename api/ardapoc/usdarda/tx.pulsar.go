@@ -252,7 +252,7 @@ func (x *fastReflection_MsgUpdateParams) WhichOneof(d protoreflect.OneofDescript
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in ardapoc.usdarda.MsgUpdateParams", d.FullName()))
 	}
-	panic("unreachable")
+
 }
 
 // GetUnknown retrieves the entire list of unknown fields.
@@ -705,7 +705,7 @@ func (x *fastReflection_MsgUpdateParamsResponse) WhichOneof(d protoreflect.Oneof
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in ardapoc.usdarda.MsgUpdateParamsResponse", d.FullName()))
 	}
-	panic("unreachable")
+
 }
 
 // GetUnknown retrieves the entire list of unknown fields.

@@ -229,7 +229,7 @@ func (x *fastReflection_GenesisState) WhichOneof(d protoreflect.OneofDescriptor)
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in ardapoc.usdarda.GenesisState", d.FullName()))
 	}
-	panic("unreachable")
+
 }
 
 // GetUnknown retrieves the entire list of unknown fields.

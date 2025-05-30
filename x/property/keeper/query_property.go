@@ -45,7 +45,7 @@ func (k Keeper) PropertyAll(goCtx context.Context, req *propertyTypes.QueryAllPr
 	}
 
 	// Slice the submissions based on pagination
-	paginatedProperties := propertyPtrs
+	var paginatedProperties []*propertyTypes.Property
 	if start < end {
 		paginatedProperties = propertyPtrs[start:end]
 	} else {

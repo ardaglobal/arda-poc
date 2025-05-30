@@ -206,7 +206,7 @@ func (x *fastReflection_QueryParamsRequest) WhichOneof(d protoreflect.OneofDescr
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in ardapoc.arda.QueryParamsRequest", d.FullName()))
 	}
-	panic("unreachable")
+
 }
 
 // GetUnknown retrieves the entire list of unknown fields.
@@ -587,7 +587,7 @@ func (x *fastReflection_QueryParamsResponse) WhichOneof(d protoreflect.OneofDesc
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in ardapoc.arda.QueryParamsResponse", d.FullName()))
 	}
-	panic("unreachable")
+
 }
 
 // GetUnknown retrieves the entire list of unknown fields.
@@ -1018,7 +1018,7 @@ func (x *fastReflection_QueryGetSubmissionRequest) WhichOneof(d protoreflect.One
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in ardapoc.arda.QueryGetSubmissionRequest", d.FullName()))
 	}
-	panic("unreachable")
+
 }
 
 // GetUnknown retrieves the entire list of unknown fields.
@@ -1426,7 +1426,7 @@ func (x *fastReflection_QueryGetSubmissionResponse) WhichOneof(d protoreflect.On
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in ardapoc.arda.QueryGetSubmissionResponse", d.FullName()))
 	}
-	panic("unreachable")
+
 }
 
 // GetUnknown retrieves the entire list of unknown fields.
@@ -1861,7 +1861,7 @@ func (x *fastReflection_QueryAllSubmissionRequest) WhichOneof(d protoreflect.One
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in ardapoc.arda.QueryAllSubmissionRequest", d.FullName()))
 	}
-	panic("unreachable")
+
 }
 
 // GetUnknown retrieves the entire list of unknown fields.
@@ -2378,7 +2378,7 @@ func (x *fastReflection_QueryAllSubmissionResponse) WhichOneof(d protoreflect.On
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in ardapoc.arda.QueryAllSubmissionResponse", d.FullName()))
 	}
-	panic("unreachable")
+
 }
 
 // GetUnknown retrieves the entire list of unknown fields.

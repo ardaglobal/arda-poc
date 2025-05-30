@@ -307,7 +307,7 @@ func (x *fastReflection_Submission) WhichOneof(d protoreflect.OneofDescriptor) p
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in ardapoc.arda.Submission", d.FullName()))
 	}
-	panic("unreachable")
+
 }
 
 // GetUnknown retrieves the entire list of unknown fields.

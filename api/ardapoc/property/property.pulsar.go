@@ -522,7 +522,7 @@ func (x *fastReflection_Property) WhichOneof(d protoreflect.OneofDescriptor) pro
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in ardapoc.property.Property", d.FullName()))
 	}
-	panic("unreachable")
+
 }
 
 // GetUnknown retrieves the entire list of unknown fields.
@@ -1303,7 +1303,7 @@ func (x *fastReflection_Transfer) WhichOneof(d protoreflect.OneofDescriptor) pro
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in ardapoc.property.Transfer", d.FullName()))
 	}
-	panic("unreachable")
+
 }
 
 // GetUnknown retrieves the entire list of unknown fields.

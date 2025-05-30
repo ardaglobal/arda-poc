@@ -19,7 +19,9 @@ func GlobalNode() {
 	if err != nil {
 		panic(err)
 	}
-	defer c.Stop()
+	defer func() {
+		_ = c.Stop()
+	}()
 
 	// Build the query: listen for Tx events where submission.valid = 'true'
 	query, err := query.New("tm.event='Tx' AND submission.valid='true'")

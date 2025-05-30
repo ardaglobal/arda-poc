@@ -206,7 +206,7 @@ func (x *fastReflection_QueryParamsRequest) WhichOneof(d protoreflect.OneofDescr
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in ardapoc.usdarda.QueryParamsRequest", d.FullName()))
 	}
-	panic("unreachable")
+
 }
 
 // GetUnknown retrieves the entire list of unknown fields.
@@ -587,7 +587,7 @@ func (x *fastReflection_QueryParamsResponse) WhichOneof(d protoreflect.OneofDesc
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in ardapoc.usdarda.QueryParamsResponse", d.FullName()))
 	}
-	panic("unreachable")
+
 }
 
 // GetUnknown retrieves the entire list of unknown fields.

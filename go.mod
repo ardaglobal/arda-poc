@@ -2,8 +2,6 @@ module github.com/ardaglobal/arda-poc
 
 go 1.23.0
 
-toolchain go1.24.0
-
 replace (
 	// fix upstream GHSA-h395-qcrw-5vmq vulnerability.
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.7.0
