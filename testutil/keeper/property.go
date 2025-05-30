@@ -20,6 +20,7 @@ import (
 
 	"github.com/ardaglobal/arda-poc/x/property/keeper"
 	"github.com/ardaglobal/arda-poc/x/property/types"
+	usdardakeeper "github.com/ardaglobal/arda-poc/x/usdarda/keeper"
 )
 
 func PropertyKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
@@ -61,6 +62,7 @@ func (BankKeeperMock) SpendableCoins(ctx context.Context, addr sdk.AccAddress) s
 	return sdk.Coins{}
 }
 func (BankKeeperMock) MintCoins(ctx context.Context, module string, amt sdk.Coins) error { return nil }
+func (BankKeeperMock) BurnCoins(ctx context.Context, module string, amt sdk.Coins) error { return nil }
 func (BankKeeperMock) SendCoinsFromModuleToAccount(ctx context.Context, sender string, recipient sdk.AccAddress, amt sdk.Coins) error {
 	return nil
 }

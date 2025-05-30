@@ -17,7 +17,8 @@ func setupMsgServer(t testing.TB) (keeper.Keeper, types.MsgServer, context.Conte
 	pk, ctx := keepertest.PropertyKeeper(t)
 	ak, _ := keepertest.ArdaKeeper(t)
 	bk := keepertest.BankKeeperMock{}
-	return pk, keeper.NewMsgServerImpl(pk, ak, bk), ctx
+	uk, _ := keepertest.UsdardaKeeper(t)
+	return pk, keeper.NewMsgServerImpl(pk, ak, bk, uk), ctx
 }
 
 func TestMsgServer(t *testing.T) {

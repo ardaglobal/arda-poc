@@ -9,6 +9,12 @@ const (
 
 	// MemStoreKey defines the in-memory store key
 	MemStoreKey = "mem_usdarda"
+
+	// USDArdaDenom defines the bank denom for USDArda tokens
+	USDArdaDenom = "usdarda"
+
+	// MintInfoKeyPrefix stores mint info by property id
+	MintInfoKeyPrefix = "MintInfo/value/"
 )
 
 var (
