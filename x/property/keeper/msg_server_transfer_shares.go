@@ -57,7 +57,7 @@ func (k msgServer) TransferShares(goCtx context.Context, msg *types.MsgTransferS
 	ownerMap := k.ConvertPropertyOwnersToMap(property)
 	denom := types.PropertyShareDenom(property.Index)
 
-	// Deduct shares from from_owners and move tokens to module account
+	// Deduct shares from from_owners, move tokens to module account and burn USDArda
 	fromSharesAndOwners := make([]string, 0, len(msg.FromOwners))
 	// NOTE: this is not atomic
 	for i, owner := range msg.FromOwners {
@@ -79,9 +79,13 @@ func (k msgServer) TransferShares(goCtx context.Context, msg *types.MsgTransferS
 		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, addr, types.ModuleName, sdk.NewCoins(coin)); err != nil {
 			return nil, err
 		}
+		usdAmt := property.Value * msg.FromShares[i] / 100
+		if err := k.usdardaKeeper.BurnFromAddress(ctx, addr, usdAmt); err != nil {
+			return nil, err
+		}
 	}
 
-	// Add shares to to_owners and distribute tokens from module account
+	// Add shares to to_owners, distribute tokens from module account and mint USDArda
 	toSharesAndOwners := make([]string, 0, len(msg.ToOwners))
 	// NOTE: this is not atomic
 	for i, newOwner := range msg.ToOwners {
@@ -94,6 +98,10 @@ func (k msgServer) TransferShares(goCtx context.Context, msg *types.MsgTransferS
 		}
 		coin := sdk.NewCoin(denom, math.NewInt(int64(msg.ToShares[i])))
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, addr, sdk.NewCoins(coin)); err != nil {
+			return nil, err
+		}
+		usdAmt := property.Value * msg.ToShares[i] / 100
+		if err := k.usdardaKeeper.MintToAddress(ctx, addr, usdAmt); err != nil {
 			return nil, err
 		}
 	}

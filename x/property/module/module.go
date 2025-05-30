@@ -22,6 +22,7 @@ import (
 
 	modulev1 "github.com/ardaglobal/arda-poc/api/ardapoc/property/module"
 	ardamodulekeeper "github.com/ardaglobal/arda-poc/x/arda/keeper"
+	usdardakeeper "github.com/ardaglobal/arda-poc/x/usdarda/keeper"
 
 	"github.com/ardaglobal/arda-poc/x/property/keeper"
 
@@ -102,6 +103,7 @@ type AppModule struct {
 	ardaKeeper    ardamodulekeeper.Keeper
 	accountKeeper types.AccountKeeper
 	bankKeeper    types.BankKeeper
+	usdardaKeeper usdardakeeper.Keeper
 }
 
 func NewAppModule(
@@ -110,6 +112,7 @@ func NewAppModule(
 	ardaKeeper ardamodulekeeper.Keeper,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
+	usdardaKeeper usdardakeeper.Keeper,
 ) AppModule {
 	return AppModule{
 		AppModuleBasic: NewAppModuleBasic(cdc),
@@ -117,12 +120,13 @@ func NewAppModule(
 		ardaKeeper:     ardaKeeper,
 		accountKeeper:  accountKeeper,
 		bankKeeper:     bankKeeper,
+		usdardaKeeper:  usdardaKeeper,
 	}
 }
 
 // RegisterServices registers a gRPC query service to respond to the module-specific gRPC queries
 func (am AppModule) RegisterServices(cfg module.Configurator) {
-	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper, am.ardaKeeper, am.bankKeeper))
+	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper, am.ardaKeeper, am.bankKeeper, am.usdardaKeeper))
 	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
 }
 
@@ -189,6 +193,7 @@ type ModuleInputs struct {
 	AccountKeeper types.AccountKeeper
 	BankKeeper    types.BankKeeper
 	ArdaKeeper    ardamodulekeeper.Keeper
+	UsdardaKeeper usdardakeeper.Keeper
 }
 
 type ModuleOutputs struct {
@@ -217,6 +222,7 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		in.ArdaKeeper,
 		in.AccountKeeper,
 		in.BankKeeper,
+		in.UsdardaKeeper,
 	)
 
 	return ModuleOutputs{PropertyKeeper: k, Module: m}

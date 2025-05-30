@@ -1,54 +1,43 @@
 version: 1
 validation: sovereign
-accounts: 
-- name: ERES
-  coins:
-  - 20000token
-  - 200000000uarda
-- name: bob
-  coins:
-  - 10000token
-  - 100000000uarda
-- name: alice
-  coins:
-  - 10000token
-  - 100000000uarda
-- name: charlie
-  coins:
-  - 10000token
-  - 100000000uarda
-- name: dan
-  coins:
-  - 10000token
-  - 100000000uarda
-- name: eve
-  coins:
-  - 10000token
-  - 100000000uarda
-- name: fred
-  coins:
-  - 10000token
-  - 100000000uarda
-- name: george
-  coins:
-  - 10000token
-  - 100000000uarda
-- name: harry
-  coins:
-  - 10000token
-  - 100000000uarda
+accounts:
+  - name: ERES
+    coins:
+      - 200000000uarda
+  - name: bob
+    coins:
+  - name: alice
+    coins:
+      - 100000000uarda
+  - name: charlie
+    coins:
+      - 100000000uarda
+  - name: dan
+    coins:
+      - 100000000uarda
+  - name: eve
+    coins:
+      - 100000000uarda
+  - name: fred
+    coins:
+      - 100000000uarda
+  - name: george
+    coins:
+      - 100000000uarda
+  - name: harry
+    coins:
+      - 100000000uarda
 client:
   openapi:
     path: docs/static/openapi.yml
 faucet:
   name: bob
   coins:
-  - 5token
-  - 100000uarda
+    - 100000uarda
 validators:
-- name: ERES
-  bonded: 100000000uarda
-  config:
-    moniker: "ERES Validator"
-  client:
-    output: "json"
+  - name: ERES
+    bonded: 100000000uarda
+    config:
+      moniker: "ERES Validator"
+    client:
+      output: "json"
