@@ -93,12 +93,10 @@ golangci_version=v1.61.0
 
 lint: lint-fix govet govulncheck
 	@echo "--> Running linter"
-	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(golangci_version)
 	@$(golangci_lint_cmd) run ./... --timeout 15m
 
 lint-fix:
 	@echo "--> Running linter and fixing issues"
-	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(golangci_version)
 	@$(golangci_lint_cmd) run ./... --fix --timeout 15m
 
 .PHONY: lint lint-fix
@@ -145,7 +143,6 @@ govet:
 
 govulncheck:
 	@echo Running govulncheck...
-	@go install golang.org/x/vuln/cmd/govulncheck@latest
 	@govulncheck ./...
 
 .PHONY: govet govulncheck
