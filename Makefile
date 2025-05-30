@@ -122,6 +122,9 @@ setup-script:
 
 
 setup-dev: setup-script proto-deps
+	@echo "--> Running go mod tidy and go mod download"
+	@go mod tidy
+	@go mod download
 	@echo "--> Installing lint and security tools"
 	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(golangci_version)
 	@go install golang.org/x/vuln/cmd/govulncheck@latest
