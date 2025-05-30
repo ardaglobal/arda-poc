@@ -20,7 +20,6 @@ import (
 
 	"github.com/ardaglobal/arda-poc/x/property/keeper"
 	"github.com/ardaglobal/arda-poc/x/property/types"
-	usdardakeeper "github.com/ardaglobal/arda-poc/x/usdarda/keeper"
 )
 
 func PropertyKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {

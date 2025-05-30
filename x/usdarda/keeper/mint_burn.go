@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"cosmossdk.io/math"
@@ -18,7 +19,9 @@ func (k Keeper) GetMintInfo(ctx sdk.Context, propertyId string) (usdtypes.MintIn
 		return usdtypes.MintInfo{}, false
 	}
 	var info usdtypes.MintInfo
-	k.cdc.MustUnmarshal(bz, &info)
+	if err := json.Unmarshal(bz, &info); err != nil {
+		panic(err)
+	}
 	return info, true
 }
 
@@ -26,7 +29,10 @@ func (k Keeper) GetMintInfo(ctx sdk.Context, propertyId string) (usdtypes.MintIn
 func (k Keeper) setMintInfo(ctx sdk.Context, info usdtypes.MintInfo) {
 	store := k.storeService.OpenKVStore(ctx)
 	key := append([]byte(usdtypes.MintInfoKeyPrefix), []byte(info.PropertyId)...)
-	bz := k.cdc.MustMarshal(&info)
+	bz, err := json.Marshal(&info)
+	if err != nil {
+		panic(err)
+	}
 	store.Set(key, bz)
 }
 
@@ -40,7 +46,7 @@ func (k Keeper) deleteMintInfo(ctx sdk.Context, propertyId string) {
 // Mint mints usdarda for the given property and amount, distributing to owners by share
 func (k Keeper) Mint(ctx sdk.Context, property propertytypes.Property, amount uint64) error {
 	info, _ := k.GetMintInfo(ctx, property.Index)
-	if info.Minted-info.Burned+amount > property.Value*80/100 {
+	if info.Minted-info.Burned+amount > property.Value {
 		return fmt.Errorf("mint exceeds allowed limit")
 	}
 	denom := usdtypes.USDArdaDenom
