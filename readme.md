@@ -24,6 +24,7 @@ protoc generators.
 
 ### Functionality
 
+[demo](https://www.loom.com/share/7af628783a494d54bee0d8c6c8091041?sid=1a920879-d080-43d2-aea2-b6cc9986c705)
 
 #### Submit Hash
 Currently the blockchain is setup to submit a hash and a signature. This hash can represent any off chain data.
@@ -42,7 +43,20 @@ It is used to register properties and their owners and shares.
 
 #### Transfer Property
 
-WIP
+The property module is used to transfer property shares between owners.
+
+#### USDArda
+
+The USDArda module is used to mint and burn USDArda tokens.
+
+### TODO
+
+- integrate Keplr locally
+- USDArda Minting from property registration
+- USDArda transfers
+- Update global node to track all successful events
+- Deploy - dockerize to run both blockchain and ui together
+- lazy block production? lazy block time like rollkit to reduce empty block spam?
 
 ### Configure
 
