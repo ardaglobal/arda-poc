@@ -179,6 +179,7 @@ var (
 		{Account: icatypes.ModuleName},
 		{Account: propertymoduletypes.ModuleName, Permissions: []string{authtypes.Minter}},
 		{Account: usdardamoduletypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
+		{Account: mortgagemoduletypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 

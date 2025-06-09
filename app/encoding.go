@@ -23,6 +23,7 @@ import (
 	ibc "github.com/cosmos/ibc-go/v8/modules/core"
 
 	ardamodule "github.com/ardaglobal/arda-poc/x/arda/module"
+	mortgagemodule "github.com/ardaglobal/arda-poc/x/mortgage/module"
 	propertymodule "github.com/ardaglobal/arda-poc/x/property/module"
 	usdardamodule "github.com/ardaglobal/arda-poc/x/usdarda/module"
 )
@@ -54,6 +55,7 @@ var (
 		ardamodule.AppModuleBasic{},
 		propertymodule.AppModuleBasic{},
 		usdardamodule.AppModuleBasic{},
+		mortgagemodule.AppModuleBasic{},
 	)
 )
 
