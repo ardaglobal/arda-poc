@@ -137,6 +137,10 @@ dev:
 	@echo "--> Running dev"
 	@ignite chain serve 
 
+dev-sidecar:
+	@echo "--> Running dev-sidecar"
+	@go run cmd/tx-sidecar/main.go
+
 govet:
 	@echo Running go vet...
 	@go vet ./...

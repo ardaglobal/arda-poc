@@ -8,9 +8,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 )
 
-const DefaultKeyFile = "/Users/matt/.arda-poc/config/priv_validator_key.json"
+var DefaultKeyFile = defaultKeyFile()
+
+func defaultKeyFile() string {
+	if home, err := os.UserHomeDir(); err == nil {
+		return filepath.Join(home, ".arda-poc", "config", "priv_validator_key.json")
+	}
+	// fallback to relative path
+	return filepath.Join(".arda-poc", "config", "priv_validator_key.json")
+}
 
 type KeyJSON struct {
 	PrivKey struct {
