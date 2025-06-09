@@ -22,6 +22,7 @@ service Msg {
   rpc UpdateMortgage    (MsgUpdateMortgage   ) returns (MsgUpdateMortgageResponse   );
   rpc DeleteMortgage    (MsgDeleteMortgage   ) returns (MsgDeleteMortgageResponse   );
   rpc MintMortgageToken (MsgMintMortgageToken) returns (MsgMintMortgageTokenResponse);
+  rpc BurnMortgageToken (MsgBurnMortgageToken) returns (MsgBurnMortgageTokenResponse);
 }
 // MsgUpdateParams is the Msg/UpdateParams request type.
 message MsgUpdateParams {
@@ -86,4 +87,14 @@ message MsgMintMortgageToken {
 }
 
 message MsgMintMortgageTokenResponse {}
+
+message MsgBurnMortgageToken {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator  = 1;
+  string usdToken = 2;
+  uint64 amount   = 3;
+  string owner    = 4;
+}
+
+message MsgBurnMortgageTokenResponse {}
 

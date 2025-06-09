@@ -24,6 +24,7 @@ const (
 	Msg_UpdateMortgage_FullMethodName    = "/ardapoc.mortgage.Msg/UpdateMortgage"
 	Msg_DeleteMortgage_FullMethodName    = "/ardapoc.mortgage.Msg/DeleteMortgage"
 	Msg_MintMortgageToken_FullMethodName = "/ardapoc.mortgage.Msg/MintMortgageToken"
+	Msg_BurnMortgageToken_FullMethodName = "/ardapoc.mortgage.Msg/BurnMortgageToken"
 )
 
 // MsgClient is the client API for Msg service.
@@ -37,6 +38,7 @@ type MsgClient interface {
 	UpdateMortgage(ctx context.Context, in *MsgUpdateMortgage, opts ...grpc.CallOption) (*MsgUpdateMortgageResponse, error)
 	DeleteMortgage(ctx context.Context, in *MsgDeleteMortgage, opts ...grpc.CallOption) (*MsgDeleteMortgageResponse, error)
 	MintMortgageToken(ctx context.Context, in *MsgMintMortgageToken, opts ...grpc.CallOption) (*MsgMintMortgageTokenResponse, error)
+	BurnMortgageToken(ctx context.Context, in *MsgBurnMortgageToken, opts ...grpc.CallOption) (*MsgBurnMortgageTokenResponse, error)
 }
 
 type msgClient struct {
@@ -92,6 +94,15 @@ func (c *msgClient) MintMortgageToken(ctx context.Context, in *MsgMintMortgageTo
 	return out, nil
 }
 
+func (c *msgClient) BurnMortgageToken(ctx context.Context, in *MsgBurnMortgageToken, opts ...grpc.CallOption) (*MsgBurnMortgageTokenResponse, error) {
+	out := new(MsgBurnMortgageTokenResponse)
+	err := c.cc.Invoke(ctx, Msg_BurnMortgageToken_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility
@@ -103,6 +114,7 @@ type MsgServer interface {
 	UpdateMortgage(context.Context, *MsgUpdateMortgage) (*MsgUpdateMortgageResponse, error)
 	DeleteMortgage(context.Context, *MsgDeleteMortgage) (*MsgDeleteMortgageResponse, error)
 	MintMortgageToken(context.Context, *MsgMintMortgageToken) (*MsgMintMortgageTokenResponse, error)
+	BurnMortgageToken(context.Context, *MsgBurnMortgageToken) (*MsgBurnMortgageTokenResponse, error)
 	mustEmbedUnimplementedMsgServer()
 }
 
@@ -124,6 +136,9 @@ func (UnimplementedMsgServer) DeleteMortgage(context.Context, *MsgDeleteMortgage
 }
 func (UnimplementedMsgServer) MintMortgageToken(context.Context, *MsgMintMortgageToken) (*MsgMintMortgageTokenResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method MintMortgageToken not implemented")
+}
+func (UnimplementedMsgServer) BurnMortgageToken(context.Context, *MsgBurnMortgageToken) (*MsgBurnMortgageTokenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BurnMortgageToken not implemented")
 }
 func (UnimplementedMsgServer) mustEmbedUnimplementedMsgServer() {}
 
@@ -228,6 +243,24 @@ func _Msg_MintMortgageToken_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_BurnMortgageToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgBurnMortgageToken)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).BurnMortgageToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_BurnMortgageToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).BurnMortgageToken(ctx, req.(*MsgBurnMortgageToken))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Msg_ServiceDesc is the grpc.ServiceDesc for Msg service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -254,6 +287,10 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "MintMortgageToken",
 			Handler:    _Msg_MintMortgageToken_Handler,
+		},
+		{
+			MethodName: "BurnMortgageToken",
+			Handler:    _Msg_BurnMortgageToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
