@@ -54,6 +54,15 @@ type RegisterPropertyRequest struct {
 	Shares  []uint64 `json:"shares"`
 }
 
+// TransferSharesRequest defines the request body for transferring property shares.
+type TransferSharesRequest struct {
+	PropertyID string   `json:"property_id"`
+	FromOwners []string `json:"from_owners"`
+	FromShares []uint64 `json:"from_shares"`
+	ToOwners   []string `json:"to_owners"`
+	ToShares   []uint64 `json:"to_shares"`
+}
+
 func main() {
 	// This context is for the main application, not for individual requests.
 	clientCtx, err := sidecarclient.NewClientContext()
@@ -75,6 +84,7 @@ func main() {
 	defer server.Close()
 
 	http.HandleFunc("/register-property", server.registerPropertyHandler)
+	http.HandleFunc("/transfer-shares", server.transferSharesHandler)
 
 	fmt.Println("Starting transaction sidecar server on :8080...")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
@@ -182,6 +192,113 @@ func (s *Server) registerPropertyHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	// 5. Return the transaction hash
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{
+		"tx_hash": res.TxResponse.TxHash,
+	})
+	fmt.Printf("Successfully broadcasted tx with hash: %s\n", res.TxResponse.TxHash)
+}
+
+func (s *Server) transferSharesHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req TransferSharesRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	clientCtx := s.clientCtx
+	// In a real app, this might come from the request or config
+	fromName := "ERES"
+	fromAddr, err := clientCtx.Keyring.Key(fromName)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to get key for '%s'", fromName), http.StatusInternalServerError)
+		return
+	}
+
+	fromAddress, err := fromAddr.GetAddress()
+	if err != nil {
+		http.Error(w, "Failed to get address from key", http.StatusInternalServerError)
+		return
+	}
+	clientCtx = clientCtx.WithFrom(fromName).WithFromAddress(fromAddress)
+
+	// Create the message
+	msg := propertytypes.NewMsgTransferShares(
+		clientCtx.GetFromAddress().String(),
+		req.PropertyID,
+		req.FromOwners,
+		req.FromShares,
+		req.ToOwners,
+		req.ToShares,
+	)
+	if err := msg.ValidateBasic(); err != nil {
+		http.Error(w, fmt.Sprintf("Message validation failed: %v", err), http.StatusBadRequest)
+		return
+	}
+
+	// Build, sign, and broadcast
+	txf := tx.Factory{}.
+		WithChainID(clientCtx.ChainID).
+		WithKeybase(clientCtx.Keyring).
+		WithGas(200000).
+		WithTxConfig(clientCtx.TxConfig)
+
+	acc, err := s.authClient.Account(context.Background(), &authtypes.QueryAccountRequest{Address: fromAddress.String()})
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to get account: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	var accI authtypes.AccountI
+	if err := clientCtx.InterfaceRegistry.UnpackAny(acc.Account, &accI); err != nil {
+		http.Error(w, fmt.Sprintf("Failed to unpack account into interface: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	baseAcc, ok := accI.(*authtypes.BaseAccount)
+	if !ok {
+		http.Error(w, "account is not a BaseAccount", http.StatusInternalServerError)
+		return
+	}
+
+	txf = txf.WithAccountNumber(baseAcc.AccountNumber).WithSequence(baseAcc.Sequence)
+
+	txb, err := txf.BuildUnsignedTx(msg)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to build unsigned tx: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	err = tx.Sign(r.Context(), txf, fromName, txb, true)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to sign tx: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	txBytes, err := clientCtx.TxConfig.TxEncoder()(txb.GetTx())
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to encode tx: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	res, err := s.txClient.BroadcastTx(
+		context.Background(),
+		&txtypes.BroadcastTxRequest{
+			Mode:    txtypes.BroadcastMode_BROADCAST_MODE_SYNC,
+			TxBytes: txBytes,
+		},
+	)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to broadcast tx: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	// Return the transaction hash
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
 		"tx_hash": res.TxResponse.TxHash,

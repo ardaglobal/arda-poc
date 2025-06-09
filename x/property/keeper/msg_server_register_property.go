@@ -77,8 +77,7 @@ func (k msgServer) RegisterProperty(goCtx context.Context, msg *types.MsgRegiste
 	}
 	_, err = k.ardaKeeper.SubmitHash(goCtx, ardatypes.NewMsgSubmitHash(msg.Creator, msg.Region, hashHex, sigHex))
 	if err != nil {
-		fmt.Println("error submitting hash", err)
-		// return nil, err
+		return nil, err
 	}
 
 	// Mint property share tokens to owners using x/bank
