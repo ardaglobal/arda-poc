@@ -8,6 +8,8 @@ release/
 *.log
 *.ign
 
+users.json
+
 .arda_data/
 
 **/.claude/settings.local.json

@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 
 	"google.golang.org/grpc"
@@ -14,6 +15,9 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	"github.com/cosmos/cosmos-sdk/crypto/hd"
+	"github.com/cosmos/cosmos-sdk/crypto/keyring"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
@@ -26,6 +30,15 @@ type Server struct {
 	clientCtx  client.Context
 	authClient authtypes.QueryClient
 	txClient   txtypes.ServiceClient
+	users      map[string]UserData
+	usersFile  string
+}
+
+// UserData holds the information for a created user.
+type UserData struct {
+	Name     string `json:"name"`
+	Address  string `json:"address"`
+	Mnemonic string `json:"mnemonic"`
 }
 
 // NewServer creates a new instance of the Server with all its dependencies.
@@ -35,10 +48,24 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		return nil, fmt.Errorf("failed to connect to gRPC server at %s: %w", grpcAddr, err)
 	}
 
+	usersFile := "users.json"
+	users := make(map[string]UserData)
+
+	file, err := os.ReadFile(usersFile)
+	if err == nil {
+		if err := json.Unmarshal(file, &users); err != nil {
+			log.Printf("Warning: failed to unmarshal users file, starting with empty user map: %v", err)
+		}
+	} else if !os.IsNotExist(err) {
+		return nil, fmt.Errorf("failed to read users file: %w", err)
+	}
+
 	return &Server{
 		clientCtx:  clientCtx,
 		authClient: authtypes.NewQueryClient(grpcConn),
 		txClient:   txtypes.NewServiceClient(grpcConn),
+		users:      users,
+		usersFile:  usersFile,
 	}, nil
 }
 
@@ -52,6 +79,11 @@ type RegisterPropertyRequest struct {
 	Value   uint64   `json:"value"`
 	Owners  []string `json:"owners"`
 	Shares  []uint64 `json:"shares"`
+}
+
+// CreateUserRequest defines the request body for creating a new user.
+type CreateUserRequest struct {
+	Name string `json:"name"`
 }
 
 // KeyInfo defines the structure for returning key information.
@@ -69,6 +101,23 @@ type TransferSharesRequest struct {
 	FromShares []uint64 `json:"from_shares"`
 	ToOwners   []string `json:"to_owners"`
 	ToShares   []uint64 `json:"to_shares"`
+}
+
+// corsHandler wraps a handler to include CORS headers.
+func corsHandler(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+		// Handle pre-flight requests
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		h.ServeHTTP(w, r)
+	})
 }
 
 func main() {
@@ -91,12 +140,14 @@ func main() {
 	}
 	defer server.Close()
 
-	http.HandleFunc("/register-property", server.registerPropertyHandler)
-	http.HandleFunc("/transfer-shares", server.transferSharesHandler)
-	http.HandleFunc("/keys", server.listKeysHandler)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/register-property", server.registerPropertyHandler)
+	mux.HandleFunc("/transfer-shares", server.transferSharesHandler)
+	mux.HandleFunc("/keys", server.listKeysHandler)
+	mux.HandleFunc("/create-user", server.createUserHandler)
 
 	fmt.Println("Starting transaction sidecar server on :8080...")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	if err := http.ListenAndServe(":8080", corsHandler(mux)); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 }
@@ -206,6 +257,73 @@ func (s *Server) registerPropertyHandler(w http.ResponseWriter, r *http.Request)
 		"tx_hash": res.TxResponse.TxHash,
 	})
 	fmt.Printf("Successfully broadcasted tx with hash: %s\n", res.TxResponse.TxHash)
+}
+
+func (s *Server) createUserHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req CreateUserRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+	if req.Name == "" {
+		http.Error(w, "Name cannot be empty", http.StatusBadRequest)
+		return
+	}
+
+	// Check if key with this name already exists in the keyring
+	if _, err := s.clientCtx.Keyring.Key(req.Name); err == nil {
+		http.Error(w, fmt.Sprintf("User with name '%s' already exists", req.Name), http.StatusConflict)
+		return
+	}
+
+	// Create a new key in the keyring
+	record, mnemonic, err := s.clientCtx.Keyring.NewMnemonic(
+		req.Name,
+		keyring.English,
+		sdk.GetConfig().GetFullBIP44Path(),
+		keyring.DefaultBIP39Passphrase,
+		hd.Secp256k1,
+	)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to create new key: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	addr, err := record.GetAddress()
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to get address from record: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	// Store user data in memory and save to file
+	userData := UserData{
+		Name:     req.Name,
+		Address:  addr.String(),
+		Mnemonic: mnemonic,
+	}
+	s.users[req.Name] = userData
+	if err := s.saveUsersToFile(); err != nil {
+		log.Printf("Warning: failed to save users to file: %v", err)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	if err := json.NewEncoder(w).Encode(userData); err != nil {
+		log.Printf("Failed to encode response: %v", err)
+	}
+}
+
+func (s *Server) saveUsersToFile() error {
+	data, err := json.MarshalIndent(s.users, "", "  ")
+	if err != nil {
+		return fmt.Errorf("failed to marshal users: %w", err)
+	}
+	return os.WriteFile(s.usersFile, data, 0644)
 }
 
 func (s *Server) listKeysHandler(w http.ResponseWriter, r *http.Request) {
