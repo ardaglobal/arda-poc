@@ -51,7 +51,7 @@ func (k msgServer) TransferShares(goCtx context.Context, msg *types.MsgTransferS
 	}
 
 	if totalFrom != totalTo {
-		return nil, fmt.Errorf("total shares out (%d) must match shares in (%d)", totalTo, totalFrom)
+		return nil, fmt.Errorf("total shares out (%d) must match shares in (%d)", totalFrom, totalTo)
 	}
 
 	ownerMap := k.ConvertPropertyOwnersToMap(property)
