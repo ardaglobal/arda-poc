@@ -96,7 +96,7 @@ func (s *Server) registerPropertyHandler(w http.ResponseWriter, r *http.Request)
 
 	clientCtx := s.clientCtx
 	// 2. Set the signer
-	fromName := "alice" // In a real app, this might come from the request or config
+	fromName := "ERES" // In a real app, this might come from the request or config
 	fromAddr, err := clientCtx.Keyring.Key(fromName)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Failed to get key for '%s'", fromName), http.StatusInternalServerError)
@@ -137,9 +137,15 @@ func (s *Server) registerPropertyHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	var baseAcc authtypes.BaseAccount
-	if err := clientCtx.Codec.UnpackAny(acc.Account, &baseAcc); err != nil {
-		http.Error(w, fmt.Sprintf("Failed to unpack account: %v", err), http.StatusInternalServerError)
+	var accI authtypes.AccountI
+	if err := clientCtx.InterfaceRegistry.UnpackAny(acc.Account, &accI); err != nil {
+		http.Error(w, fmt.Sprintf("Failed to unpack account into interface: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	baseAcc, ok := accI.(*authtypes.BaseAccount)
+	if !ok {
+		http.Error(w, "account is not a BaseAccount", http.StatusInternalServerError)
 		return
 	}
 

@@ -4,18 +4,16 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/ardaglobal/arda-poc/app"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
-
-	"github.com/ardaglobal/arda-poc/app"
 )
 
 // NewClientContext creates a new client context, reading configuration from the
 // application's home directory. This is a reusable function for creating
 // a consistent client environment for tools and services.
 func NewClientContext() (client.Context, error) {
-	// Use the new MakeEncodingConfig to get the necessary configs
 	encodingConfig := app.MakeEncodingConfig()
 	interfaceRegistry := encodingConfig.InterfaceRegistry
 	txConfig := encodingConfig.TxConfig
