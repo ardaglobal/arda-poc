@@ -11,6 +11,18 @@ message Property {
   repeated string owners = 5; // list of owner addresses
   repeated uint64 shares = 6; // corresponding shares for each owner
   repeated Transfer transfers = 7; // historical transfers
+
+  // additional metadata about the property
+  string property_id = 8;            // unique identifier for the asset
+  string property_name = 9;          // name or branding of the property
+  string property_type = 10;         // residential, commercial, mixed-use, etc.
+  string parcel_number = 11;         // government-issued land ID for tax/legal purposes
+  string size = 12;                  // total land and building area
+  string construction_information = 13; // year built or last renovated
+  string zoning_classification = 14; // usage type allowed by local government
+  string owner_information = 15;     // legal entity or individual that owns it
+  string tenant_id = 16;             // name of the occupying tenant and their ID
+  string unit_number = 17;           // unit number / apartment number
 }
 
 message Transfer {
