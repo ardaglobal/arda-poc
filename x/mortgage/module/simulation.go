@@ -35,6 +35,10 @@ const (
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgDeleteMortgage int = 100
 
+	opWeightMsgMintMortgageToken = "op_weight_msg_mint_mortgage_token"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgMintMortgageToken int = 100
+
 	// this line is used by starport scaffolding # simapp/module/const
 )
 
@@ -101,6 +105,17 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 		mortgagesimulation.SimulateMsgDeleteMortgage(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
+	var weightMsgMintMortgageToken int
+	simState.AppParams.GetOrGenerate(opWeightMsgMintMortgageToken, &weightMsgMintMortgageToken, nil,
+		func(_ *rand.Rand) {
+			weightMsgMintMortgageToken = defaultWeightMsgMintMortgageToken
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgMintMortgageToken,
+		mortgagesimulation.SimulateMsgMintMortgageToken(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
 	// this line is used by starport scaffolding # simapp/module/operation
 
 	return operations
@@ -130,6 +145,14 @@ func (am AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.Wei
 			defaultWeightMsgDeleteMortgage,
 			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
 				mortgagesimulation.SimulateMsgDeleteMortgage(am.accountKeeper, am.bankKeeper, am.keeper)
+				return nil
+			},
+		),
+		simulation.NewWeightedProposalMsg(
+			opWeightMsgMintMortgageToken,
+			defaultWeightMsgMintMortgageToken,
+			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+				mortgagesimulation.SimulateMsgMintMortgageToken(am.accountKeeper, am.bankKeeper, am.keeper)
 				return nil
 			},
 		),

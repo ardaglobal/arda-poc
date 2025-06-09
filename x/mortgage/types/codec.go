@@ -13,6 +13,9 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgUpdateMortgage{},
 		&MsgDeleteMortgage{},
 	)
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgMintMortgageToken{},
+	)
 	// this line is used by starport scaffolding # 3
 
 	registry.RegisterImplementations((*sdk.Msg)(nil),

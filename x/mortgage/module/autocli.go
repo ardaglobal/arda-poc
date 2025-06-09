@@ -57,6 +57,12 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Short:          "Delete mortgage",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "index"}},
 				},
+				{
+					RpcMethod:      "MintMortgageToken",
+					Use:            "mint-mortgage-token [property-type] [amount] [recipient]",
+					Short:          "Send a mintMortgageToken tx",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "propertyType"}, {ProtoField: "amount"}, {ProtoField: "recipient"}},
+				},
 				// this line is used by ignite scaffolding # autocli/tx
 			},
 		},
