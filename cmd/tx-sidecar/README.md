@@ -61,4 +61,42 @@ A successful broadcast will return a JSON object containing the transaction hash
 {
   "tx_hash": "A1B2C3D4E5F6..."
 }
+```
+
+### `POST /transfer-shares`
+
+Submits a transaction to transfer property shares between one or more owners.
+
+**Request Body:**
+
+```json
+{
+  "property_id": "123 main st, anytown, usa",
+  "from_owners": ["arda1qzy8mf8epnpaetctnnhr28vl5h3d34jma8ev5y"],
+  "from_shares": [25],
+  "to_owners": ["arda1un6a2k876hqwhe75zv0k369yqmwexfj6qkuzsk"],
+  "to_shares": [25]
+}
+```
+
+**Example `curl` Request:**
+
+```bash
+curl -X POST http://localhost:8080/transfer-shares -H "Content-Type: application/json" -d '{
+  "property_id": "123 main st, anytown, usa",
+  "from_owners": ["arda1qzy8mf8epnpaetctnnhr28vl5h3d34jma8ev5y"],
+  "from_shares": [25],
+  "to_owners": ["arda1un6a2k876hqwhe75zv0k369yqmwexfj6qkuzsk"],
+  "to_shares": [25]
+}'
+```
+
+**Success Response:**
+
+A successful broadcast will return a JSON object containing the transaction hash.
+
+```json
+{
+  "tx_hash": "A1B2C3D4E5F6..."
+}
 ``` 
