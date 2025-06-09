@@ -52,12 +52,14 @@ func getRegionPubKey(region string) (string, error) {
 	}
 
 	// Store the public key for dubai region and return it if requested.
-	regionPubKeys["dubai"] = keyFile.PubKey.Value
+	dubaiKey := keyFile.PubKey.Value
+	regionPubKeys["dubai"] = dubaiKey
 	if key, ok := regionPubKeys[region]; ok {
 		return key, nil
 	}
 
-	return "", errors.New("region not recognized")
+	fmt.Printf("Region %s doesn't exist, using dubai key: %s\n", region, dubaiKey)
+	return dubaiKey, nil
 }
 
 type (
