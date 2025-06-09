@@ -8,7 +8,7 @@ option go_package = "github.com/ardaglobal/arda-poc/x/usdarda/types";
 
 // Params defines the parameters for the module.
 message Params {
-  option (amino.name) = "ardapoc/x/usdarda/Params";
+  option (amino.name) = "arda/x/usdarda/Params";
   option (gogoproto.equal) = true;
 
   

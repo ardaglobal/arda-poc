@@ -8,7 +8,7 @@ option go_package = "github.com/ardaglobal/arda-poc/x/mortgage/types";
 
 // Params defines the parameters for the module.
 message Params {
-  option (amino.name) = "ardapoc/x/mortgage/Params";
+  option (amino.name) = "arda/x/mortgage/Params";
   option (gogoproto.equal) = true;
 
   
