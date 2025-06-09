@@ -156,14 +156,24 @@ func (x *_Property_7_list) IsValid() bool {
 }
 
 var (
-	md_Property           protoreflect.MessageDescriptor
-	fd_Property_index     protoreflect.FieldDescriptor
-	fd_Property_address   protoreflect.FieldDescriptor
-	fd_Property_region    protoreflect.FieldDescriptor
-	fd_Property_value     protoreflect.FieldDescriptor
-	fd_Property_owners    protoreflect.FieldDescriptor
-	fd_Property_shares    protoreflect.FieldDescriptor
-	fd_Property_transfers protoreflect.FieldDescriptor
+	md_Property                          protoreflect.MessageDescriptor
+	fd_Property_index                    protoreflect.FieldDescriptor
+	fd_Property_address                  protoreflect.FieldDescriptor
+	fd_Property_region                   protoreflect.FieldDescriptor
+	fd_Property_value                    protoreflect.FieldDescriptor
+	fd_Property_owners                   protoreflect.FieldDescriptor
+	fd_Property_shares                   protoreflect.FieldDescriptor
+	fd_Property_transfers                protoreflect.FieldDescriptor
+	fd_Property_property_id              protoreflect.FieldDescriptor
+	fd_Property_property_name            protoreflect.FieldDescriptor
+	fd_Property_property_type            protoreflect.FieldDescriptor
+	fd_Property_parcel_number            protoreflect.FieldDescriptor
+	fd_Property_size                     protoreflect.FieldDescriptor
+	fd_Property_construction_information protoreflect.FieldDescriptor
+	fd_Property_zoning_classification    protoreflect.FieldDescriptor
+	fd_Property_owner_information        protoreflect.FieldDescriptor
+	fd_Property_tenant_id                protoreflect.FieldDescriptor
+	fd_Property_unit_number              protoreflect.FieldDescriptor
 )
 
 func init() {
@@ -176,6 +186,16 @@ func init() {
 	fd_Property_owners = md_Property.Fields().ByName("owners")
 	fd_Property_shares = md_Property.Fields().ByName("shares")
 	fd_Property_transfers = md_Property.Fields().ByName("transfers")
+	fd_Property_property_id = md_Property.Fields().ByName("property_id")
+	fd_Property_property_name = md_Property.Fields().ByName("property_name")
+	fd_Property_property_type = md_Property.Fields().ByName("property_type")
+	fd_Property_parcel_number = md_Property.Fields().ByName("parcel_number")
+	fd_Property_size = md_Property.Fields().ByName("size")
+	fd_Property_construction_information = md_Property.Fields().ByName("construction_information")
+	fd_Property_zoning_classification = md_Property.Fields().ByName("zoning_classification")
+	fd_Property_owner_information = md_Property.Fields().ByName("owner_information")
+	fd_Property_tenant_id = md_Property.Fields().ByName("tenant_id")
+	fd_Property_unit_number = md_Property.Fields().ByName("unit_number")
 }
 
 var _ protoreflect.Message = (*fastReflection_Property)(nil)
@@ -285,6 +305,66 @@ func (x *fastReflection_Property) Range(f func(protoreflect.FieldDescriptor, pro
 			return
 		}
 	}
+	if x.PropertyId != "" {
+		value := protoreflect.ValueOfString(x.PropertyId)
+		if !f(fd_Property_property_id, value) {
+			return
+		}
+	}
+	if x.PropertyName != "" {
+		value := protoreflect.ValueOfString(x.PropertyName)
+		if !f(fd_Property_property_name, value) {
+			return
+		}
+	}
+	if x.PropertyType != "" {
+		value := protoreflect.ValueOfString(x.PropertyType)
+		if !f(fd_Property_property_type, value) {
+			return
+		}
+	}
+	if x.ParcelNumber != "" {
+		value := protoreflect.ValueOfString(x.ParcelNumber)
+		if !f(fd_Property_parcel_number, value) {
+			return
+		}
+	}
+	if x.Size != "" {
+		value := protoreflect.ValueOfString(x.Size)
+		if !f(fd_Property_size, value) {
+			return
+		}
+	}
+	if x.ConstructionInformation != "" {
+		value := protoreflect.ValueOfString(x.ConstructionInformation)
+		if !f(fd_Property_construction_information, value) {
+			return
+		}
+	}
+	if x.ZoningClassification != "" {
+		value := protoreflect.ValueOfString(x.ZoningClassification)
+		if !f(fd_Property_zoning_classification, value) {
+			return
+		}
+	}
+	if x.OwnerInformation != "" {
+		value := protoreflect.ValueOfString(x.OwnerInformation)
+		if !f(fd_Property_owner_information, value) {
+			return
+		}
+	}
+	if x.TenantId != "" {
+		value := protoreflect.ValueOfString(x.TenantId)
+		if !f(fd_Property_tenant_id, value) {
+			return
+		}
+	}
+	if x.UnitNumber != "" {
+		value := protoreflect.ValueOfString(x.UnitNumber)
+		if !f(fd_Property_unit_number, value) {
+			return
+		}
+	}
 }
 
 // Has reports whether a field is populated.
@@ -314,6 +394,26 @@ func (x *fastReflection_Property) Has(fd protoreflect.FieldDescriptor) bool {
 		return len(x.Shares) != 0
 	case "ardapoc.property.Property.transfers":
 		return len(x.Transfers) != 0
+	case "ardapoc.property.Property.property_id":
+		return x.PropertyId != ""
+	case "ardapoc.property.Property.property_name":
+		return x.PropertyName != ""
+	case "ardapoc.property.Property.property_type":
+		return x.PropertyType != ""
+	case "ardapoc.property.Property.parcel_number":
+		return x.ParcelNumber != ""
+	case "ardapoc.property.Property.size":
+		return x.Size != ""
+	case "ardapoc.property.Property.construction_information":
+		return x.ConstructionInformation != ""
+	case "ardapoc.property.Property.zoning_classification":
+		return x.ZoningClassification != ""
+	case "ardapoc.property.Property.owner_information":
+		return x.OwnerInformation != ""
+	case "ardapoc.property.Property.tenant_id":
+		return x.TenantId != ""
+	case "ardapoc.property.Property.unit_number":
+		return x.UnitNumber != ""
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.property.Property"))
@@ -344,6 +444,26 @@ func (x *fastReflection_Property) Clear(fd protoreflect.FieldDescriptor) {
 		x.Shares = nil
 	case "ardapoc.property.Property.transfers":
 		x.Transfers = nil
+	case "ardapoc.property.Property.property_id":
+		x.PropertyId = ""
+	case "ardapoc.property.Property.property_name":
+		x.PropertyName = ""
+	case "ardapoc.property.Property.property_type":
+		x.PropertyType = ""
+	case "ardapoc.property.Property.parcel_number":
+		x.ParcelNumber = ""
+	case "ardapoc.property.Property.size":
+		x.Size = ""
+	case "ardapoc.property.Property.construction_information":
+		x.ConstructionInformation = ""
+	case "ardapoc.property.Property.zoning_classification":
+		x.ZoningClassification = ""
+	case "ardapoc.property.Property.owner_information":
+		x.OwnerInformation = ""
+	case "ardapoc.property.Property.tenant_id":
+		x.TenantId = ""
+	case "ardapoc.property.Property.unit_number":
+		x.UnitNumber = ""
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.property.Property"))
@@ -390,6 +510,36 @@ func (x *fastReflection_Property) Get(descriptor protoreflect.FieldDescriptor) p
 		}
 		listValue := &_Property_7_list{list: &x.Transfers}
 		return protoreflect.ValueOfList(listValue)
+	case "ardapoc.property.Property.property_id":
+		value := x.PropertyId
+		return protoreflect.ValueOfString(value)
+	case "ardapoc.property.Property.property_name":
+		value := x.PropertyName
+		return protoreflect.ValueOfString(value)
+	case "ardapoc.property.Property.property_type":
+		value := x.PropertyType
+		return protoreflect.ValueOfString(value)
+	case "ardapoc.property.Property.parcel_number":
+		value := x.ParcelNumber
+		return protoreflect.ValueOfString(value)
+	case "ardapoc.property.Property.size":
+		value := x.Size
+		return protoreflect.ValueOfString(value)
+	case "ardapoc.property.Property.construction_information":
+		value := x.ConstructionInformation
+		return protoreflect.ValueOfString(value)
+	case "ardapoc.property.Property.zoning_classification":
+		value := x.ZoningClassification
+		return protoreflect.ValueOfString(value)
+	case "ardapoc.property.Property.owner_information":
+		value := x.OwnerInformation
+		return protoreflect.ValueOfString(value)
+	case "ardapoc.property.Property.tenant_id":
+		value := x.TenantId
+		return protoreflect.ValueOfString(value)
+	case "ardapoc.property.Property.unit_number":
+		value := x.UnitNumber
+		return protoreflect.ValueOfString(value)
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.property.Property"))
@@ -430,6 +580,26 @@ func (x *fastReflection_Property) Set(fd protoreflect.FieldDescriptor, value pro
 		lv := value.List()
 		clv := lv.(*_Property_7_list)
 		x.Transfers = *clv.list
+	case "ardapoc.property.Property.property_id":
+		x.PropertyId = value.Interface().(string)
+	case "ardapoc.property.Property.property_name":
+		x.PropertyName = value.Interface().(string)
+	case "ardapoc.property.Property.property_type":
+		x.PropertyType = value.Interface().(string)
+	case "ardapoc.property.Property.parcel_number":
+		x.ParcelNumber = value.Interface().(string)
+	case "ardapoc.property.Property.size":
+		x.Size = value.Interface().(string)
+	case "ardapoc.property.Property.construction_information":
+		x.ConstructionInformation = value.Interface().(string)
+	case "ardapoc.property.Property.zoning_classification":
+		x.ZoningClassification = value.Interface().(string)
+	case "ardapoc.property.Property.owner_information":
+		x.OwnerInformation = value.Interface().(string)
+	case "ardapoc.property.Property.tenant_id":
+		x.TenantId = value.Interface().(string)
+	case "ardapoc.property.Property.unit_number":
+		x.UnitNumber = value.Interface().(string)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.property.Property"))
@@ -476,6 +646,26 @@ func (x *fastReflection_Property) Mutable(fd protoreflect.FieldDescriptor) proto
 		panic(fmt.Errorf("field region of message ardapoc.property.Property is not mutable"))
 	case "ardapoc.property.Property.value":
 		panic(fmt.Errorf("field value of message ardapoc.property.Property is not mutable"))
+	case "ardapoc.property.Property.property_id":
+		panic(fmt.Errorf("field property_id of message ardapoc.property.Property is not mutable"))
+	case "ardapoc.property.Property.property_name":
+		panic(fmt.Errorf("field property_name of message ardapoc.property.Property is not mutable"))
+	case "ardapoc.property.Property.property_type":
+		panic(fmt.Errorf("field property_type of message ardapoc.property.Property is not mutable"))
+	case "ardapoc.property.Property.parcel_number":
+		panic(fmt.Errorf("field parcel_number of message ardapoc.property.Property is not mutable"))
+	case "ardapoc.property.Property.size":
+		panic(fmt.Errorf("field size of message ardapoc.property.Property is not mutable"))
+	case "ardapoc.property.Property.construction_information":
+		panic(fmt.Errorf("field construction_information of message ardapoc.property.Property is not mutable"))
+	case "ardapoc.property.Property.zoning_classification":
+		panic(fmt.Errorf("field zoning_classification of message ardapoc.property.Property is not mutable"))
+	case "ardapoc.property.Property.owner_information":
+		panic(fmt.Errorf("field owner_information of message ardapoc.property.Property is not mutable"))
+	case "ardapoc.property.Property.tenant_id":
+		panic(fmt.Errorf("field tenant_id of message ardapoc.property.Property is not mutable"))
+	case "ardapoc.property.Property.unit_number":
+		panic(fmt.Errorf("field unit_number of message ardapoc.property.Property is not mutable"))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.property.Property"))
@@ -506,6 +696,26 @@ func (x *fastReflection_Property) NewField(fd protoreflect.FieldDescriptor) prot
 	case "ardapoc.property.Property.transfers":
 		list := []*Transfer{}
 		return protoreflect.ValueOfList(&_Property_7_list{list: &list})
+	case "ardapoc.property.Property.property_id":
+		return protoreflect.ValueOfString("")
+	case "ardapoc.property.Property.property_name":
+		return protoreflect.ValueOfString("")
+	case "ardapoc.property.Property.property_type":
+		return protoreflect.ValueOfString("")
+	case "ardapoc.property.Property.parcel_number":
+		return protoreflect.ValueOfString("")
+	case "ardapoc.property.Property.size":
+		return protoreflect.ValueOfString("")
+	case "ardapoc.property.Property.construction_information":
+		return protoreflect.ValueOfString("")
+	case "ardapoc.property.Property.zoning_classification":
+		return protoreflect.ValueOfString("")
+	case "ardapoc.property.Property.owner_information":
+		return protoreflect.ValueOfString("")
+	case "ardapoc.property.Property.tenant_id":
+		return protoreflect.ValueOfString("")
+	case "ardapoc.property.Property.unit_number":
+		return protoreflect.ValueOfString("")
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.property.Property"))
@@ -609,6 +819,46 @@ func (x *fastReflection_Property) ProtoMethods() *protoiface.Methods {
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
 		}
+		l = len(x.PropertyId)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.PropertyName)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.PropertyType)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.ParcelNumber)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.Size)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.ConstructionInformation)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.ZoningClassification)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.OwnerInformation)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.TenantId)
+		if l > 0 {
+			n += 2 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.UnitNumber)
+		if l > 0 {
+			n += 2 + l + runtime.Sov(uint64(l))
+		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
 		}
@@ -637,6 +887,80 @@ func (x *fastReflection_Property) ProtoMethods() *protoiface.Methods {
 		if x.unknownFields != nil {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
+		}
+		if len(x.UnitNumber) > 0 {
+			i -= len(x.UnitNumber)
+			copy(dAtA[i:], x.UnitNumber)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.UnitNumber)))
+			i--
+			dAtA[i] = 0x1
+			i--
+			dAtA[i] = 0x8a
+		}
+		if len(x.TenantId) > 0 {
+			i -= len(x.TenantId)
+			copy(dAtA[i:], x.TenantId)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.TenantId)))
+			i--
+			dAtA[i] = 0x1
+			i--
+			dAtA[i] = 0x82
+		}
+		if len(x.OwnerInformation) > 0 {
+			i -= len(x.OwnerInformation)
+			copy(dAtA[i:], x.OwnerInformation)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.OwnerInformation)))
+			i--
+			dAtA[i] = 0x7a
+		}
+		if len(x.ZoningClassification) > 0 {
+			i -= len(x.ZoningClassification)
+			copy(dAtA[i:], x.ZoningClassification)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.ZoningClassification)))
+			i--
+			dAtA[i] = 0x72
+		}
+		if len(x.ConstructionInformation) > 0 {
+			i -= len(x.ConstructionInformation)
+			copy(dAtA[i:], x.ConstructionInformation)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.ConstructionInformation)))
+			i--
+			dAtA[i] = 0x6a
+		}
+		if len(x.Size) > 0 {
+			i -= len(x.Size)
+			copy(dAtA[i:], x.Size)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Size)))
+			i--
+			dAtA[i] = 0x62
+		}
+		if len(x.ParcelNumber) > 0 {
+			i -= len(x.ParcelNumber)
+			copy(dAtA[i:], x.ParcelNumber)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.ParcelNumber)))
+			i--
+			dAtA[i] = 0x5a
+		}
+		if len(x.PropertyType) > 0 {
+			i -= len(x.PropertyType)
+			copy(dAtA[i:], x.PropertyType)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.PropertyType)))
+			i--
+			dAtA[i] = 0x52
+		}
+		if len(x.PropertyName) > 0 {
+			i -= len(x.PropertyName)
+			copy(dAtA[i:], x.PropertyName)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.PropertyName)))
+			i--
+			dAtA[i] = 0x4a
+		}
+		if len(x.PropertyId) > 0 {
+			i -= len(x.PropertyId)
+			copy(dAtA[i:], x.PropertyId)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.PropertyId)))
+			i--
+			dAtA[i] = 0x42
 		}
 		if len(x.Transfers) > 0 {
 			for iNdEx := len(x.Transfers) - 1; iNdEx >= 0; iNdEx-- {
@@ -1014,6 +1338,326 @@ func (x *fastReflection_Property) ProtoMethods() *protoiface.Methods {
 				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Transfers[len(x.Transfers)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
+				iNdEx = postIndex
+			case 8:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field PropertyId", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.PropertyId = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 9:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field PropertyName", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.PropertyName = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 10:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field PropertyType", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.PropertyType = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 11:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field ParcelNumber", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.ParcelNumber = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 12:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Size", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Size = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 13:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field ConstructionInformation", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.ConstructionInformation = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 14:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field ZoningClassification", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.ZoningClassification = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 15:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field OwnerInformation", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.OwnerInformation = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 16:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field TenantId", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.TenantId = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 17:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field UnitNumber", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.UnitNumber = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
 			default:
 				iNdEx = preIndex
@@ -1623,6 +2267,17 @@ type Property struct {
 	Owners    []string    `protobuf:"bytes,5,rep,name=owners,proto3" json:"owners,omitempty"`         // list of owner addresses
 	Shares    []uint64    `protobuf:"varint,6,rep,packed,name=shares,proto3" json:"shares,omitempty"` // corresponding shares for each owner
 	Transfers []*Transfer `protobuf:"bytes,7,rep,name=transfers,proto3" json:"transfers,omitempty"`   // historical transfers
+	// additional metadata about the property
+	PropertyId              string `protobuf:"bytes,8,opt,name=property_id,json=propertyId,proto3" json:"property_id,omitempty"`                                         // unique identifier for the asset
+	PropertyName            string `protobuf:"bytes,9,opt,name=property_name,json=propertyName,proto3" json:"property_name,omitempty"`                                   // name or branding of the property
+	PropertyType            string `protobuf:"bytes,10,opt,name=property_type,json=propertyType,proto3" json:"property_type,omitempty"`                                  // residential, commercial, mixed-use, etc.
+	ParcelNumber            string `protobuf:"bytes,11,opt,name=parcel_number,json=parcelNumber,proto3" json:"parcel_number,omitempty"`                                  // government-issued land ID for tax/legal purposes
+	Size                    string `protobuf:"bytes,12,opt,name=size,proto3" json:"size,omitempty"`                                                                      // total land and building area
+	ConstructionInformation string `protobuf:"bytes,13,opt,name=construction_information,json=constructionInformation,proto3" json:"construction_information,omitempty"` // year built or last renovated
+	ZoningClassification    string `protobuf:"bytes,14,opt,name=zoning_classification,json=zoningClassification,proto3" json:"zoning_classification,omitempty"`          // usage type allowed by local government
+	OwnerInformation        string `protobuf:"bytes,15,opt,name=owner_information,json=ownerInformation,proto3" json:"owner_information,omitempty"`                      // legal entity or individual that owns it
+	TenantId                string `protobuf:"bytes,16,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`                                              // name of the occupying tenant and their ID
+	UnitNumber              string `protobuf:"bytes,17,opt,name=unit_number,json=unitNumber,proto3" json:"unit_number,omitempty"`                                        // unit number / apartment number
 }
 
 func (x *Property) Reset() {
@@ -1694,6 +2349,76 @@ func (x *Property) GetTransfers() []*Transfer {
 	return nil
 }
 
+func (x *Property) GetPropertyId() string {
+	if x != nil {
+		return x.PropertyId
+	}
+	return ""
+}
+
+func (x *Property) GetPropertyName() string {
+	if x != nil {
+		return x.PropertyName
+	}
+	return ""
+}
+
+func (x *Property) GetPropertyType() string {
+	if x != nil {
+		return x.PropertyType
+	}
+	return ""
+}
+
+func (x *Property) GetParcelNumber() string {
+	if x != nil {
+		return x.ParcelNumber
+	}
+	return ""
+}
+
+func (x *Property) GetSize() string {
+	if x != nil {
+		return x.Size
+	}
+	return ""
+}
+
+func (x *Property) GetConstructionInformation() string {
+	if x != nil {
+		return x.ConstructionInformation
+	}
+	return ""
+}
+
+func (x *Property) GetZoningClassification() string {
+	if x != nil {
+		return x.ZoningClassification
+	}
+	return ""
+}
+
+func (x *Property) GetOwnerInformation() string {
+	if x != nil {
+		return x.OwnerInformation
+	}
+	return ""
+}
+
+func (x *Property) GetTenantId() string {
+	if x != nil {
+		return x.TenantId
+	}
+	return ""
+}
+
+func (x *Property) GetUnitNumber() string {
+	if x != nil {
+		return x.UnitNumber
+	}
+	return ""
+}
+
 type Transfer struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1751,7 +2476,7 @@ var file_ardapoc_property_property_proto_rawDesc = []byte{
 	0x0a, 0x1f, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2f, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72,
 	0x74, 0x79, 0x2f, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x2e, 0x70, 0x72, 0x6f, 0x74,
 	0x6f, 0x12, 0x10, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x70, 0x72, 0x6f, 0x70, 0x65,
-	0x72, 0x74, 0x79, 0x22, 0xd2, 0x01, 0x0a, 0x08, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79,
+	0x72, 0x74, 0x79, 0x22, 0xd1, 0x04, 0x0a, 0x08, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79,
 	0x12, 0x14, 0x0a, 0x05, 0x69, 0x6e, 0x64, 0x65, 0x78, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
 	0x05, 0x69, 0x6e, 0x64, 0x65, 0x78, 0x12, 0x18, 0x0a, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73,
 	0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73,
@@ -1764,23 +2489,47 @@ var file_ardapoc_property_property_proto_rawDesc = []byte{
 	0x0a, 0x09, 0x74, 0x72, 0x61, 0x6e, 0x73, 0x66, 0x65, 0x72, 0x73, 0x18, 0x07, 0x20, 0x03, 0x28,
 	0x0b, 0x32, 0x1a, 0x2e, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x70, 0x72, 0x6f, 0x70,
 	0x65, 0x72, 0x74, 0x79, 0x2e, 0x54, 0x72, 0x61, 0x6e, 0x73, 0x66, 0x65, 0x72, 0x52, 0x09, 0x74,
-	0x72, 0x61, 0x6e, 0x73, 0x66, 0x65, 0x72, 0x73, 0x22, 0x4c, 0x0a, 0x08, 0x54, 0x72, 0x61, 0x6e,
-	0x73, 0x66, 0x65, 0x72, 0x12, 0x12, 0x0a, 0x04, 0x66, 0x72, 0x6f, 0x6d, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x04, 0x66, 0x72, 0x6f, 0x6d, 0x12, 0x0e, 0x0a, 0x02, 0x74, 0x6f, 0x18, 0x02,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x74, 0x6f, 0x12, 0x1c, 0x0a, 0x09, 0x74, 0x69, 0x6d, 0x65,
-	0x73, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x74, 0x69, 0x6d,
-	0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x42, 0xa4, 0x01, 0x0a, 0x14, 0x63, 0x6f, 0x6d, 0x2e, 0x61,
-	0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x42,
-	0x0d, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01,
-	0x5a, 0x1c, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x61, 0x72,
-	0x64, 0x61, 0x70, 0x6f, 0x63, 0x2f, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0xa2, 0x02,
-	0x03, 0x41, 0x50, 0x58, 0xaa, 0x02, 0x10, 0x41, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x50,
-	0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0xca, 0x02, 0x10, 0x41, 0x72, 0x64, 0x61, 0x70, 0x6f,
-	0x63, 0x5c, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0xe2, 0x02, 0x1c, 0x41, 0x72, 0x64,
-	0x61, 0x70, 0x6f, 0x63, 0x5c, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x5c, 0x47, 0x50,
-	0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x11, 0x41, 0x72, 0x64, 0x61,
-	0x70, 0x6f, 0x63, 0x3a, 0x3a, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x62, 0x06, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x72, 0x61, 0x6e, 0x73, 0x66, 0x65, 0x72, 0x73, 0x12, 0x1f, 0x0a, 0x0b, 0x70, 0x72, 0x6f, 0x70,
+	0x65, 0x72, 0x74, 0x79, 0x5f, 0x69, 0x64, 0x18, 0x08, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x70,
+	0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x49, 0x64, 0x12, 0x23, 0x0a, 0x0d, 0x70, 0x72, 0x6f,
+	0x70, 0x65, 0x72, 0x74, 0x79, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x09, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x0c, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x23,
+	0x0a, 0x0d, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x18,
+	0x0a, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x54,
+	0x79, 0x70, 0x65, 0x12, 0x23, 0x0a, 0x0d, 0x70, 0x61, 0x72, 0x63, 0x65, 0x6c, 0x5f, 0x6e, 0x75,
+	0x6d, 0x62, 0x65, 0x72, 0x18, 0x0b, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x70, 0x61, 0x72, 0x63,
+	0x65, 0x6c, 0x4e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x12, 0x12, 0x0a, 0x04, 0x73, 0x69, 0x7a, 0x65,
+	0x18, 0x0c, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x73, 0x69, 0x7a, 0x65, 0x12, 0x39, 0x0a, 0x18,
+	0x63, 0x6f, 0x6e, 0x73, 0x74, 0x72, 0x75, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x6e, 0x66,
+	0x6f, 0x72, 0x6d, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x0d, 0x20, 0x01, 0x28, 0x09, 0x52, 0x17,
+	0x63, 0x6f, 0x6e, 0x73, 0x74, 0x72, 0x75, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x6e, 0x66, 0x6f,
+	0x72, 0x6d, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x33, 0x0a, 0x15, 0x7a, 0x6f, 0x6e, 0x69, 0x6e,
+	0x67, 0x5f, 0x63, 0x6c, 0x61, 0x73, 0x73, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e,
+	0x18, 0x0e, 0x20, 0x01, 0x28, 0x09, 0x52, 0x14, 0x7a, 0x6f, 0x6e, 0x69, 0x6e, 0x67, 0x43, 0x6c,
+	0x61, 0x73, 0x73, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x2b, 0x0a, 0x11,
+	0x6f, 0x77, 0x6e, 0x65, 0x72, 0x5f, 0x69, 0x6e, 0x66, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x69, 0x6f,
+	0x6e, 0x18, 0x0f, 0x20, 0x01, 0x28, 0x09, 0x52, 0x10, 0x6f, 0x77, 0x6e, 0x65, 0x72, 0x49, 0x6e,
+	0x66, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x1b, 0x0a, 0x09, 0x74, 0x65, 0x6e,
+	0x61, 0x6e, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x10, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x74, 0x65,
+	0x6e, 0x61, 0x6e, 0x74, 0x49, 0x64, 0x12, 0x1f, 0x0a, 0x0b, 0x75, 0x6e, 0x69, 0x74, 0x5f, 0x6e,
+	0x75, 0x6d, 0x62, 0x65, 0x72, 0x18, 0x11, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x75, 0x6e, 0x69,
+	0x74, 0x4e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x22, 0x4c, 0x0a, 0x08, 0x54, 0x72, 0x61, 0x6e, 0x73,
+	0x66, 0x65, 0x72, 0x12, 0x12, 0x0a, 0x04, 0x66, 0x72, 0x6f, 0x6d, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x04, 0x66, 0x72, 0x6f, 0x6d, 0x12, 0x0e, 0x0a, 0x02, 0x74, 0x6f, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x02, 0x74, 0x6f, 0x12, 0x1c, 0x0a, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73,
+	0x74, 0x61, 0x6d, 0x70, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x74, 0x69, 0x6d, 0x65,
+	0x73, 0x74, 0x61, 0x6d, 0x70, 0x42, 0xa4, 0x01, 0x0a, 0x14, 0x63, 0x6f, 0x6d, 0x2e, 0x61, 0x72,
+	0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x42, 0x0d,
+	0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a,
+	0x1c, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x61, 0x72, 0x64,
+	0x61, 0x70, 0x6f, 0x63, 0x2f, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0xa2, 0x02, 0x03,
+	0x41, 0x50, 0x58, 0xaa, 0x02, 0x10, 0x41, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x50, 0x72,
+	0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0xca, 0x02, 0x10, 0x41, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63,
+	0x5c, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0xe2, 0x02, 0x1c, 0x41, 0x72, 0x64, 0x61,
+	0x70, 0x6f, 0x63, 0x5c, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x5c, 0x47, 0x50, 0x42,
+	0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x11, 0x41, 0x72, 0x64, 0x61, 0x70,
+	0x6f, 0x63, 0x3a, 0x3a, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x62, 0x06, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
