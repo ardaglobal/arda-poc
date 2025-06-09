@@ -77,4 +77,4 @@ func MakeEncodingConfig() EncodingConfig {
 	ModuleBasics.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 
 	return encodingConfig
-} 
+}
