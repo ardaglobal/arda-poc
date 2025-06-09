@@ -54,6 +54,14 @@ type RegisterPropertyRequest struct {
 	Shares  []uint64 `json:"shares"`
 }
 
+// KeyInfo defines the structure for returning key information.
+type KeyInfo struct {
+	Name    string `json:"name"`
+	Type    string `json:"type"`
+	Address string `json:"address"`
+	PubKey  string `json:"pubkey"`
+}
+
 // TransferSharesRequest defines the request body for transferring property shares.
 type TransferSharesRequest struct {
 	PropertyID string   `json:"property_id"`
@@ -85,6 +93,7 @@ func main() {
 
 	http.HandleFunc("/register-property", server.registerPropertyHandler)
 	http.HandleFunc("/transfer-shares", server.transferSharesHandler)
+	http.HandleFunc("/keys", server.listKeysHandler)
 
 	fmt.Println("Starting transaction sidecar server on :8080...")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
@@ -197,6 +206,47 @@ func (s *Server) registerPropertyHandler(w http.ResponseWriter, r *http.Request)
 		"tx_hash": res.TxResponse.TxHash,
 	})
 	fmt.Printf("Successfully broadcasted tx with hash: %s\n", res.TxResponse.TxHash)
+}
+
+func (s *Server) listKeysHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	records, err := s.clientCtx.Keyring.List()
+	if err != nil {
+		http.Error(w, "Failed to list keys from keyring", http.StatusInternalServerError)
+		return
+	}
+
+	keyInfos := make([]KeyInfo, len(records))
+	for i, record := range records {
+		addr, err := record.GetAddress()
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Failed to get address for key '%s': %v", record.Name, err), http.StatusInternalServerError)
+			return
+		}
+
+		pubKeyJSON, err := s.clientCtx.Codec.MarshalJSON(record.PubKey)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Failed to marshal pubkey for key '%s': %v", record.Name, err), http.StatusInternalServerError)
+			return
+		}
+
+		keyInfos[i] = KeyInfo{
+			Name:    record.Name,
+			Type:    "local",
+			Address: addr.String(),
+			PubKey:  string(pubKeyJSON),
+		}
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(keyInfos); err != nil {
+		http.Error(w, "Failed to encode keys to JSON", http.StatusInternalServerError)
+		return
+	}
 }
 
 func (s *Server) transferSharesHandler(w http.ResponseWriter, r *http.Request) {
