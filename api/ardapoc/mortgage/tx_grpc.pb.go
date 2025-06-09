@@ -19,7 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Msg_UpdateParams_FullMethodName = "/ardapoc.mortgage.Msg/UpdateParams"
+	Msg_UpdateParams_FullMethodName   = "/ardapoc.mortgage.Msg/UpdateParams"
+	Msg_CreateMortgage_FullMethodName = "/ardapoc.mortgage.Msg/CreateMortgage"
+	Msg_UpdateMortgage_FullMethodName = "/ardapoc.mortgage.Msg/UpdateMortgage"
+	Msg_DeleteMortgage_FullMethodName = "/ardapoc.mortgage.Msg/DeleteMortgage"
 )
 
 // MsgClient is the client API for Msg service.
@@ -29,6 +32,9 @@ type MsgClient interface {
 	// UpdateParams defines a (governance) operation for updating the module
 	// parameters. The authority defaults to the x/gov module account.
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
+	CreateMortgage(ctx context.Context, in *MsgCreateMortgage, opts ...grpc.CallOption) (*MsgCreateMortgageResponse, error)
+	UpdateMortgage(ctx context.Context, in *MsgUpdateMortgage, opts ...grpc.CallOption) (*MsgUpdateMortgageResponse, error)
+	DeleteMortgage(ctx context.Context, in *MsgDeleteMortgage, opts ...grpc.CallOption) (*MsgDeleteMortgageResponse, error)
 }
 
 type msgClient struct {
@@ -48,6 +54,33 @@ func (c *msgClient) UpdateParams(ctx context.Context, in *MsgUpdateParams, opts 
 	return out, nil
 }
 
+func (c *msgClient) CreateMortgage(ctx context.Context, in *MsgCreateMortgage, opts ...grpc.CallOption) (*MsgCreateMortgageResponse, error) {
+	out := new(MsgCreateMortgageResponse)
+	err := c.cc.Invoke(ctx, Msg_CreateMortgage_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) UpdateMortgage(ctx context.Context, in *MsgUpdateMortgage, opts ...grpc.CallOption) (*MsgUpdateMortgageResponse, error) {
+	out := new(MsgUpdateMortgageResponse)
+	err := c.cc.Invoke(ctx, Msg_UpdateMortgage_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) DeleteMortgage(ctx context.Context, in *MsgDeleteMortgage, opts ...grpc.CallOption) (*MsgDeleteMortgageResponse, error) {
+	out := new(MsgDeleteMortgageResponse)
+	err := c.cc.Invoke(ctx, Msg_DeleteMortgage_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility
@@ -55,6 +88,9 @@ type MsgServer interface {
 	// UpdateParams defines a (governance) operation for updating the module
 	// parameters. The authority defaults to the x/gov module account.
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
+	CreateMortgage(context.Context, *MsgCreateMortgage) (*MsgCreateMortgageResponse, error)
+	UpdateMortgage(context.Context, *MsgUpdateMortgage) (*MsgUpdateMortgageResponse, error)
+	DeleteMortgage(context.Context, *MsgDeleteMortgage) (*MsgDeleteMortgageResponse, error)
 	mustEmbedUnimplementedMsgServer()
 }
 
@@ -64,6 +100,15 @@ type UnimplementedMsgServer struct {
 
 func (UnimplementedMsgServer) UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateParams not implemented")
+}
+func (UnimplementedMsgServer) CreateMortgage(context.Context, *MsgCreateMortgage) (*MsgCreateMortgageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateMortgage not implemented")
+}
+func (UnimplementedMsgServer) UpdateMortgage(context.Context, *MsgUpdateMortgage) (*MsgUpdateMortgageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateMortgage not implemented")
+}
+func (UnimplementedMsgServer) DeleteMortgage(context.Context, *MsgDeleteMortgage) (*MsgDeleteMortgageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteMortgage not implemented")
 }
 func (UnimplementedMsgServer) mustEmbedUnimplementedMsgServer() {}
 
@@ -96,6 +141,60 @@ func _Msg_UpdateParams_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_CreateMortgage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgCreateMortgage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).CreateMortgage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_CreateMortgage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).CreateMortgage(ctx, req.(*MsgCreateMortgage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_UpdateMortgage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateMortgage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).UpdateMortgage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_UpdateMortgage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).UpdateMortgage(ctx, req.(*MsgUpdateMortgage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_DeleteMortgage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgDeleteMortgage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).DeleteMortgage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_DeleteMortgage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).DeleteMortgage(ctx, req.(*MsgDeleteMortgage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Msg_ServiceDesc is the grpc.ServiceDesc for Msg service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -106,6 +205,18 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateParams",
 			Handler:    _Msg_UpdateParams_Handler,
+		},
+		{
+			MethodName: "CreateMortgage",
+			Handler:    _Msg_CreateMortgage_Handler,
+		},
+		{
+			MethodName: "UpdateMortgage",
+			Handler:    _Msg_UpdateMortgage_Handler,
+		},
+		{
+			MethodName: "DeleteMortgage",
+			Handler:    _Msg_DeleteMortgage_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -17,6 +17,17 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Use:       "params",
 					Short:     "Shows the parameters of the module",
 				},
+				{
+					RpcMethod: "MortgageAll",
+					Use:       "list-mortgage",
+					Short:     "List all mortgage",
+				},
+				{
+					RpcMethod:      "Mortgage",
+					Use:            "show-mortgage [id]",
+					Short:          "Shows a mortgage",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "index"}},
+				},
 				// this line is used by ignite scaffolding # autocli/query
 			},
 		},
@@ -27,6 +38,24 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 				{
 					RpcMethod: "UpdateParams",
 					Skip:      true, // skipped because authority gated
+				},
+				{
+					RpcMethod:      "CreateMortgage",
+					Use:            "create-mortgage [index] [lender] [lendee] [collateral] [amount] [interestRate] [term]",
+					Short:          "Create a new mortgage",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "index"}, {ProtoField: "lender"}, {ProtoField: "lendee"}, {ProtoField: "collateral"}, {ProtoField: "amount"}, {ProtoField: "interestRate"}, {ProtoField: "term"}},
+				},
+				{
+					RpcMethod:      "UpdateMortgage",
+					Use:            "update-mortgage [index] [lender] [lendee] [collateral] [amount] [interestRate] [term]",
+					Short:          "Update mortgage",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "index"}, {ProtoField: "lender"}, {ProtoField: "lendee"}, {ProtoField: "collateral"}, {ProtoField: "amount"}, {ProtoField: "interestRate"}, {ProtoField: "term"}},
+				},
+				{
+					RpcMethod:      "DeleteMortgage",
+					Use:            "delete-mortgage [index]",
+					Short:          "Delete mortgage",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "index"}},
 				},
 				// this line is used by ignite scaffolding # autocli/tx
 			},

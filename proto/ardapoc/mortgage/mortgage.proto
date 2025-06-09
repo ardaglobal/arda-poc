@@ -1,0 +1,16 @@
+syntax = "proto3";
+package ardapoc.mortgage;
+
+option go_package = "github.com/ardaglobal/arda-poc/x/mortgage/types";
+
+message Mortgage {
+  string index = 1; 
+  string lender = 2; 
+  string lendee = 3; 
+  string collateral = 4; 
+  uint64 amount = 5; 
+  string interestRate = 6; 
+  string term = 7; 
+  string creator = 8;
+}
+

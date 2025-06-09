@@ -1,4 +1,5 @@
 syntax = "proto3";
+
 package ardapoc.mortgage;
 
 import "amino/amino.proto";
@@ -6,35 +7,72 @@ import "cosmos/msg/v1/msg.proto";
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 import "ardapoc/mortgage/params.proto";
+import "ardapoc/mortgage/mortgage.proto";
 
 option go_package = "github.com/ardaglobal/arda-poc/x/mortgage/types";
 
 // Msg defines the Msg service.
 service Msg {
   option (cosmos.msg.v1.service) = true;
-
+  
   // UpdateParams defines a (governance) operation for updating the module
   // parameters. The authority defaults to the x/gov module account.
-  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
+  rpc UpdateParams   (MsgUpdateParams  ) returns (MsgUpdateParamsResponse  );
+  rpc CreateMortgage (MsgCreateMortgage) returns (MsgCreateMortgageResponse);
+  rpc UpdateMortgage (MsgUpdateMortgage) returns (MsgUpdateMortgageResponse);
+  rpc DeleteMortgage (MsgDeleteMortgage) returns (MsgDeleteMortgageResponse);
 }
-
 // MsgUpdateParams is the Msg/UpdateParams request type.
 message MsgUpdateParams {
-  option (cosmos.msg.v1.signer) = "authority";
-  option (amino.name) = "arda/x/mortgage/MsgUpdateParams";
-
+  option (cosmos.msg.v1.signer) =                       "authority";
+  option           (amino.name) = "arda/x/mortgage/MsgUpdateParams";
+  
   // authority is the address that controls the module (defaults to x/gov unless overwritten).
   string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
-
+  
   // params defines the module parameters to update.
-  //
+  
   // NOTE: All parameters must be supplied.
-  Params params = 2 [
-    (gogoproto.nullable) = false,
-    (amino.dont_omitempty) = true
-  ];
+  Params params = 2 [(gogoproto.nullable) = false, (amino.dont_omitempty) = true];
 }
 
 // MsgUpdateParamsResponse defines the response structure for executing a
 // MsgUpdateParams message.
 message MsgUpdateParamsResponse {}
+
+message MsgCreateMortgage {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator      = 1;
+  string index        = 2;
+  string lender       = 3;
+  string lendee       = 4;
+  string collateral   = 5;
+  uint64 amount       = 6;
+  string interestRate = 7;
+  string term         = 8;
+}
+
+message MsgCreateMortgageResponse {}
+
+message MsgUpdateMortgage {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator      = 1;
+  string index        = 2;
+  string lender       = 3;
+  string lendee       = 4;
+  string collateral   = 5;
+  uint64 amount       = 6;
+  string interestRate = 7;
+  string term         = 8;
+}
+
+message MsgUpdateMortgageResponse {}
+
+message MsgDeleteMortgage {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string index   = 2;
+}
+
+message MsgDeleteMortgageResponse {}
+

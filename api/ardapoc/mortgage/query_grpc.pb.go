@@ -19,7 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Query_Params_FullMethodName = "/ardapoc.mortgage.Query/Params"
+	Query_Params_FullMethodName      = "/ardapoc.mortgage.Query/Params"
+	Query_Mortgage_FullMethodName    = "/ardapoc.mortgage.Query/Mortgage"
+	Query_MortgageAll_FullMethodName = "/ardapoc.mortgage.Query/MortgageAll"
 )
 
 // QueryClient is the client API for Query service.
@@ -28,6 +30,9 @@ const (
 type QueryClient interface {
 	// Parameters queries the parameters of the module.
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
+	// Queries a list of Mortgage items.
+	Mortgage(ctx context.Context, in *QueryGetMortgageRequest, opts ...grpc.CallOption) (*QueryGetMortgageResponse, error)
+	MortgageAll(ctx context.Context, in *QueryAllMortgageRequest, opts ...grpc.CallOption) (*QueryAllMortgageResponse, error)
 }
 
 type queryClient struct {
@@ -47,12 +52,33 @@ func (c *queryClient) Params(ctx context.Context, in *QueryParamsRequest, opts .
 	return out, nil
 }
 
+func (c *queryClient) Mortgage(ctx context.Context, in *QueryGetMortgageRequest, opts ...grpc.CallOption) (*QueryGetMortgageResponse, error) {
+	out := new(QueryGetMortgageResponse)
+	err := c.cc.Invoke(ctx, Query_Mortgage_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) MortgageAll(ctx context.Context, in *QueryAllMortgageRequest, opts ...grpc.CallOption) (*QueryAllMortgageResponse, error) {
+	out := new(QueryAllMortgageResponse)
+	err := c.cc.Invoke(ctx, Query_MortgageAll_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 // All implementations must embed UnimplementedQueryServer
 // for forward compatibility
 type QueryServer interface {
 	// Parameters queries the parameters of the module.
 	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
+	// Queries a list of Mortgage items.
+	Mortgage(context.Context, *QueryGetMortgageRequest) (*QueryGetMortgageResponse, error)
+	MortgageAll(context.Context, *QueryAllMortgageRequest) (*QueryAllMortgageResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -62,6 +88,12 @@ type UnimplementedQueryServer struct {
 
 func (UnimplementedQueryServer) Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Params not implemented")
+}
+func (UnimplementedQueryServer) Mortgage(context.Context, *QueryGetMortgageRequest) (*QueryGetMortgageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Mortgage not implemented")
+}
+func (UnimplementedQueryServer) MortgageAll(context.Context, *QueryAllMortgageRequest) (*QueryAllMortgageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MortgageAll not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}
 
@@ -94,6 +126,42 @@ func _Query_Params_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_Mortgage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryGetMortgageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).Mortgage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_Mortgage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).Mortgage(ctx, req.(*QueryGetMortgageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_MortgageAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryAllMortgageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).MortgageAll(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_MortgageAll_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).MortgageAll(ctx, req.(*QueryAllMortgageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Query_ServiceDesc is the grpc.ServiceDesc for Query service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -104,6 +172,14 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Params",
 			Handler:    _Query_Params_Handler,
+		},
+		{
+			MethodName: "Mortgage",
+			Handler:    _Query_Mortgage_Handler,
+		},
+		{
+			MethodName: "MortgageAll",
+			Handler:    _Query_MortgageAll_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

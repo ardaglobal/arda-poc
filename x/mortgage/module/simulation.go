@@ -23,7 +23,19 @@ var (
 )
 
 const (
-// this line is used by starport scaffolding # simapp/module/const
+	opWeightMsgCreateMortgage = "op_weight_msg_mortgage"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgCreateMortgage int = 100
+
+	opWeightMsgUpdateMortgage = "op_weight_msg_mortgage"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgUpdateMortgage int = 100
+
+	opWeightMsgDeleteMortgage = "op_weight_msg_mortgage"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgDeleteMortgage int = 100
+
+	// this line is used by starport scaffolding # simapp/module/const
 )
 
 // GenerateGenesisState creates a randomized GenState of the module.
@@ -34,6 +46,16 @@ func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
 	}
 	mortgageGenesis := types.GenesisState{
 		Params: types.DefaultParams(),
+		MortgageList: []types.Mortgage{
+			{
+				Creator: sample.AccAddress(),
+				Index:   "0",
+			},
+			{
+				Creator: sample.AccAddress(),
+				Index:   "1",
+			},
+		},
 		// this line is used by starport scaffolding # simapp/module/genesisState
 	}
 	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(&mortgageGenesis)
@@ -46,6 +68,39 @@ func (am AppModule) RegisterStoreDecoder(_ simtypes.StoreDecoderRegistry) {}
 func (am AppModule) WeightedOperations(simState module.SimulationState) []simtypes.WeightedOperation {
 	operations := make([]simtypes.WeightedOperation, 0)
 
+	var weightMsgCreateMortgage int
+	simState.AppParams.GetOrGenerate(opWeightMsgCreateMortgage, &weightMsgCreateMortgage, nil,
+		func(_ *rand.Rand) {
+			weightMsgCreateMortgage = defaultWeightMsgCreateMortgage
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgCreateMortgage,
+		mortgagesimulation.SimulateMsgCreateMortgage(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgUpdateMortgage int
+	simState.AppParams.GetOrGenerate(opWeightMsgUpdateMortgage, &weightMsgUpdateMortgage, nil,
+		func(_ *rand.Rand) {
+			weightMsgUpdateMortgage = defaultWeightMsgUpdateMortgage
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgUpdateMortgage,
+		mortgagesimulation.SimulateMsgUpdateMortgage(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgDeleteMortgage int
+	simState.AppParams.GetOrGenerate(opWeightMsgDeleteMortgage, &weightMsgDeleteMortgage, nil,
+		func(_ *rand.Rand) {
+			weightMsgDeleteMortgage = defaultWeightMsgDeleteMortgage
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgDeleteMortgage,
+		mortgagesimulation.SimulateMsgDeleteMortgage(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
 	// this line is used by starport scaffolding # simapp/module/operation
 
 	return operations
@@ -54,6 +109,30 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 // ProposalMsgs returns msgs used for governance proposals for simulations.
 func (am AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.WeightedProposalMsg {
 	return []simtypes.WeightedProposalMsg{
+		simulation.NewWeightedProposalMsg(
+			opWeightMsgCreateMortgage,
+			defaultWeightMsgCreateMortgage,
+			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+				mortgagesimulation.SimulateMsgCreateMortgage(am.accountKeeper, am.bankKeeper, am.keeper)
+				return nil
+			},
+		),
+		simulation.NewWeightedProposalMsg(
+			opWeightMsgUpdateMortgage,
+			defaultWeightMsgUpdateMortgage,
+			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+				mortgagesimulation.SimulateMsgUpdateMortgage(am.accountKeeper, am.bankKeeper, am.keeper)
+				return nil
+			},
+		),
+		simulation.NewWeightedProposalMsg(
+			opWeightMsgDeleteMortgage,
+			defaultWeightMsgDeleteMortgage,
+			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+				mortgagesimulation.SimulateMsgDeleteMortgage(am.accountKeeper, am.bankKeeper, am.keeper)
+				return nil
+			},
+		),
 		// this line is used by starport scaffolding # simapp/module/OpMsg
 	}
 }
