@@ -8,12 +8,11 @@ import (
 
 var _ sdk.Msg = &MsgBurnMortgageToken{}
 
-func NewMsgBurnMortgageToken(creator string, usdToken string, amount uint64, owner string) *MsgBurnMortgageToken {
+func NewMsgBurnMortgageToken(creator string, mortgageId string, amount uint64) *MsgBurnMortgageToken {
 	return &MsgBurnMortgageToken{
-		Creator:  creator,
-		UsdToken: usdToken,
-		Amount:   amount,
-		Owner:    owner,
+		Creator:    creator,
+		MortgageId: mortgageId,
+		Amount:     amount,
 	}
 }
 

@@ -59,15 +59,15 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 				},
 				{
 					RpcMethod:      "MintMortgageToken",
-					Use:            "mint-mortgage-token [property-type] [amount] [recipient]",
-					Short:          "Send a mintMortgageToken tx",
-					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "propertyType"}, {ProtoField: "amount"}, {ProtoField: "recipient"}},
+					Use:            "mint-mortgage-token [mortgage_id] [amount]",
+					Short:          "mint mortgage token",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "mortgage_id"}, {ProtoField: "amount"}},
 				},
 				{
-					RpcMethod:      "BurnMortgageToken",
-					Use:            "burn-mortgage-token [usd-token] [amount] [owner]",
-					Short:          "Send a burnMortgageToken tx",
-					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "usdToken"}, {ProtoField: "amount"}, {ProtoField: "owner"}},
+					RpcMethod: "BurnMortgageToken",
+					Use:       "burn-mortgage-token [mortgage_id] [amount]",
+					Short:     "burn mortgage token",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "mortgage_id"}, {ProtoField: "amount"}},
 				},
 				// this line is used by ignite scaffolding # autocli/tx
 			},

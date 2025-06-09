@@ -15,6 +15,12 @@ var (
 	ParamsKey = []byte("p_mortgage")
 )
 
+const (
+	// MortgageKey is the prefix to retrieve all Mortgage
+	KeyPrefixMortgage = "Mortgage-value-"
+	MintInfoKeyPrefix = "MintInfo-value-"
+)
+
 func KeyPrefix(p string) []byte {
 	return []byte(p)
 }

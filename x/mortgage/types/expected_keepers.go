@@ -3,6 +3,7 @@ package types
 import (
 	"context"
 
+	"github.com/ardaglobal/arda-poc/x/property/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -16,6 +17,17 @@ type AccountKeeper interface {
 type BankKeeper interface {
 	SpendableCoins(context.Context, sdk.AccAddress) sdk.Coins
 	// Methods imported from bank should be defined here
+}
+
+// PropertyKeeper defines the expected interface for the Property module.
+type PropertyKeeper interface {
+	GetProperty(ctx sdk.Context, id string) (types.Property, bool)
+}
+
+// USDArdaKeeper defines the expected interface for the USDArda module.
+type USDArdaKeeper interface {
+	Mint(ctx sdk.Context, property types.Property, amount uint64) error
+	Burn(ctx sdk.Context, property types.Property, burner sdk.AccAddress, amount uint64) error
 }
 
 // ParamSubspace defines the expected Subspace interface for parameters.

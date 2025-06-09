@@ -14,3 +14,9 @@ message Mortgage {
   string creator = 8;
 }
 
+message MortgageMintInfo {
+  string mortgage_id = 1;
+  uint64 minted = 2;
+  uint64 burned = 3;
+}
+

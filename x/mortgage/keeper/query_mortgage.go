@@ -6,6 +6,7 @@ import (
 	"cosmossdk.io/store/prefix"
 	"github.com/ardaglobal/arda-poc/x/mortgage/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -43,10 +44,7 @@ func (k Keeper) Mortgage(ctx context.Context, req *types.QueryGetMortgageRequest
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
-	val, found := k.GetMortgage(
-		ctx,
-		req.Index,
-	)
+	val, found := k.GetMortgage(sdk.UnwrapSDKContext(ctx), req.Index)
 	if !found {
 		return nil, status.Error(codes.NotFound, "not found")
 	}

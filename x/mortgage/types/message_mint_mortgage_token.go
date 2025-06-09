@@ -8,12 +8,11 @@ import (
 
 var _ sdk.Msg = &MsgMintMortgageToken{}
 
-func NewMsgMintMortgageToken(creator string, propertyType string, amount uint64, recipient string) *MsgMintMortgageToken {
+func NewMsgMintMortgageToken(creator string, mortgageId string, amount uint64) *MsgMintMortgageToken {
 	return &MsgMintMortgageToken{
-		Creator:      creator,
-		PropertyType: propertyType,
-		Amount:       amount,
-		Recipient:    recipient,
+		Creator:    creator,
+		MortgageId: mortgageId,
+		Amount:     amount,
 	}
 }
 
