@@ -36,7 +36,7 @@ Submits a transaction to register a new property on the blockchain.
   "address": "123 Sidecar Lane",
   "region": "dev",
   "value": 500000,
-  "owners": ["arda1shr8vdu7exvwdcwaptc9mq293d8m6vp53qpuh8"],
+  "owners": ["arda13pc7nj66w7cqsgs6kcn8x6n8a3gz76df7e552x"],
   "shares": [100]
 }
 ```
@@ -48,7 +48,7 @@ curl -X POST -H "Content-Type: application/json" -d '{
   "address": "123 Sidecar Lane",
   "region": "dev",
   "value": 500000,
-  "owners": ["arda1shr8vdu7exvwdcwaptc9mq293d8m6vp53qpuh8"],
+  "owners": ["arda13pc7nj66w7cqsgs6kcn8x6n8a3gz76df7e552x"],
   "shares": [100]
 }' http://localhost:8080/register-property
 ```
@@ -84,9 +84,9 @@ Submits a transaction to transfer property shares between one or more owners.
 ```bash
 curl -X POST http://localhost:8080/transfer-shares -H "Content-Type: application/json" -d '{
   "property_id": "123 main st, anytown, usa",
-  "from_owners": ["arda1qzy8mf8epnpaetctnnhr28vl5h3d34jma8ev5y"],
+  "from_owners": ["arda13pc7nj66w7cqsgs6kcn8x6n8a3gz76df7e552x"],
   "from_shares": [25],
-  "to_owners": ["arda1un6a2k876hqwhe75zv0k369yqmwexfj6qkuzsk"],
+  "to_owners": ["arda1szmz6ttcd2n85sfdlhat04m4443l99kfj2ju63"],
   "to_shares": [25]
 }'
 ```

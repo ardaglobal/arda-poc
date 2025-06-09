@@ -8,7 +8,9 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
+	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -79,6 +81,7 @@ type RegisterPropertyRequest struct {
 	Value   uint64   `json:"value"`
 	Owners  []string `json:"owners"`
 	Shares  []uint64 `json:"shares"`
+	Gas     string   `json:"gas,omitempty"`
 }
 
 // CreateUserRequest defines the request body for creating a new user.
@@ -101,6 +104,7 @@ type TransferSharesRequest struct {
 	FromShares []uint64 `json:"from_shares"`
 	ToOwners   []string `json:"to_owners"`
 	ToShares   []uint64 `json:"to_shares"`
+	Gas        string   `json:"gas,omitempty"`
 }
 
 // corsHandler wraps a handler to include CORS headers.
@@ -152,56 +156,35 @@ func main() {
 	}
 }
 
-func (s *Server) registerPropertyHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
-	}
-
-	var req RegisterPropertyRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
-	}
-
+// buildSignAndBroadcast handles the common logic for creating, signing, and broadcasting a transaction.
+func (s *Server) buildSignAndBroadcast(w http.ResponseWriter, r *http.Request, fromName string, gasStr string, msgBuilder func(fromAddr string) sdk.Msg) {
 	clientCtx := s.clientCtx
-	// 2. Set the signer
-	fromName := "ERES" // In a real app, this might come from the request or config
-	fromAddr, err := clientCtx.Keyring.Key(fromName)
+	// 1. Set the signer
+	fromAddrRec, err := clientCtx.Keyring.Key(fromName)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Failed to get key for '%s'", fromName), http.StatusInternalServerError)
 		return
 	}
 
-	fromAddress, err := fromAddr.GetAddress()
+	fromAddress, err := fromAddrRec.GetAddress()
 	if err != nil {
 		http.Error(w, "Failed to get address from key", http.StatusInternalServerError)
 		return
 	}
 	clientCtx = clientCtx.WithFrom(fromName).WithFromAddress(fromAddress)
 
-	// 3. Create the message
-	msg := propertytypes.NewMsgRegisterProperty(
-		clientCtx.GetFromAddress().String(),
-		req.Address,
-		req.Region,
-		req.Value,
-		req.Owners,
-		req.Shares,
-	)
-	if err := msg.ValidateBasic(); err != nil {
-		http.Error(w, fmt.Sprintf("Message validation failed: %v", err), http.StatusBadRequest)
-		return
-	}
+	// 2. Create the message
+	msg := msgBuilder(fromAddress.String())
 
-	// 4. Build, sign, and broadcast
+	// 3. Build, sign, and broadcast
 	txf := tx.Factory{}.
 		WithChainID(clientCtx.ChainID).
 		WithKeybase(clientCtx.Keyring).
-		WithGas(200000).
-		WithTxConfig(clientCtx.TxConfig)
+		WithTxConfig(clientCtx.TxConfig).
+		WithGasAdjustment(1.5).
+		WithGasPrices("0.025uarda") // NOTE: This may need to be configurable depending on the chain's requirements.
 
-	acc, err := s.authClient.Account(context.Background(), &authtypes.QueryAccountRequest{Address: fromAddress.String()})
+	acc, err := s.authClient.Account(r.Context(), &authtypes.QueryAccountRequest{Address: fromAddress.String()})
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Failed to get account: %v", err), http.StatusInternalServerError)
 		return
@@ -221,6 +204,19 @@ func (s *Server) registerPropertyHandler(w http.ResponseWriter, r *http.Request)
 
 	txf = txf.WithAccountNumber(baseAcc.AccountNumber).WithSequence(baseAcc.Sequence)
 
+	// We are removing auto gas calculation for now as it can be unreliable in this context.
+	// Using a generous default. This can be overridden by the request if needed.
+	var gas uint64 = 300000
+	if gasStr != "" && gasStr != "auto" {
+		parsedGas, err := strconv.ParseUint(gasStr, 10, 64)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("invalid gas value provided: %s", gasStr), http.StatusBadRequest)
+			return
+		}
+		gas = parsedGas
+	}
+	txf = txf.WithGas(gas)
+
 	txb, err := txf.BuildUnsignedTx(msg)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Failed to build unsigned tx: %v", err), http.StatusInternalServerError)
@@ -239,8 +235,9 @@ func (s *Server) registerPropertyHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	// Use SYNC broadcast mode and then poll for the transaction to be included in a block.
 	res, err := s.txClient.BroadcastTx(
-		context.Background(),
+		r.Context(),
 		&txtypes.BroadcastTxRequest{
 			Mode:    txtypes.BroadcastMode_BROADCAST_MODE_SYNC,
 			TxBytes: txBytes,
@@ -251,12 +248,71 @@ func (s *Server) registerPropertyHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	// 5. Return the transaction hash
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{
-		"tx_hash": res.TxResponse.TxHash,
-	})
-	fmt.Printf("Successfully broadcasted tx with hash: %s\n", res.TxResponse.TxHash)
+	// In sync mode, a non-zero code means the transaction failed validation (CheckTx).
+	if res.TxResponse.Code != 0 {
+		http.Error(w, fmt.Sprintf("Transaction failed on CheckTx with code %d: %s", res.TxResponse.Code, res.TxResponse.RawLog), http.StatusInternalServerError)
+		return
+	}
+
+	// Poll for the transaction to be included in a block.
+	txHash := res.TxResponse.TxHash
+	pollCtx, cancel := context.WithTimeout(r.Context(), 15*time.Second)
+	defer cancel()
+
+	for {
+		select {
+		case <-pollCtx.Done():
+			http.Error(w, fmt.Sprintf("Timed out waiting for transaction confirmation for hash %s. It may have failed or is still pending.", txHash), http.StatusInternalServerError)
+			return
+		default:
+			getTxRes, err := s.txClient.GetTx(pollCtx, &txtypes.GetTxRequest{Hash: txHash})
+			if err == nil {
+				// Transaction found.
+				if getTxRes.TxResponse.Code != 0 {
+					// It was included in a block but failed during execution.
+					http.Error(w, fmt.Sprintf("Transaction failed in block with code %d: %s", getTxRes.TxResponse.Code, getTxRes.TxResponse.RawLog), http.StatusInternalServerError)
+				} else {
+					// Success.
+					w.Header().Set("Content-Type", "application/json")
+					json.NewEncoder(w).Encode(map[string]string{
+						"tx_hash": getTxRes.TxResponse.TxHash,
+					})
+					fmt.Printf("Successfully processed tx with hash: %s\n", getTxRes.TxResponse.TxHash)
+				}
+				return // Exit polling.
+			}
+
+			// Continue polling if the transaction is not yet found.
+			time.Sleep(1 * time.Second)
+		}
+	}
+}
+
+func (s *Server) registerPropertyHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req RegisterPropertyRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	fromName := "ERES" // In a real app, this might come from the request or config
+	msgBuilder := func(fromAddr string) sdk.Msg {
+		return propertytypes.NewMsgRegisterProperty(
+			fromAddr,
+			req.Address,
+			req.Region,
+			req.Value,
+			req.Owners,
+			req.Shares,
+		)
+	}
+
+	s.buildSignAndBroadcast(w, r, fromName, req.Gas, msgBuilder)
 }
 
 func (s *Server) createUserHandler(w http.ResponseWriter, r *http.Request) {
@@ -379,97 +435,17 @@ func (s *Server) transferSharesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	clientCtx := s.clientCtx
-	// In a real app, this might come from the request or config
-	fromName := "ERES"
-	fromAddr, err := clientCtx.Keyring.Key(fromName)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to get key for '%s'", fromName), http.StatusInternalServerError)
-		return
+	fromName := "ERES" // In a real app, this might come from the request or config
+	msgBuilder := func(fromAddr string) sdk.Msg {
+		return propertytypes.NewMsgTransferShares(
+			fromAddr,
+			req.PropertyID,
+			req.FromOwners,
+			req.FromShares,
+			req.ToOwners,
+			req.ToShares,
+		)
 	}
 
-	fromAddress, err := fromAddr.GetAddress()
-	if err != nil {
-		http.Error(w, "Failed to get address from key", http.StatusInternalServerError)
-		return
-	}
-	clientCtx = clientCtx.WithFrom(fromName).WithFromAddress(fromAddress)
-
-	// Create the message
-	msg := propertytypes.NewMsgTransferShares(
-		clientCtx.GetFromAddress().String(),
-		req.PropertyID,
-		req.FromOwners,
-		req.FromShares,
-		req.ToOwners,
-		req.ToShares,
-	)
-	if err := msg.ValidateBasic(); err != nil {
-		http.Error(w, fmt.Sprintf("Message validation failed: %v", err), http.StatusBadRequest)
-		return
-	}
-
-	// Build, sign, and broadcast
-	txf := tx.Factory{}.
-		WithChainID(clientCtx.ChainID).
-		WithKeybase(clientCtx.Keyring).
-		WithGas(200000).
-		WithTxConfig(clientCtx.TxConfig)
-
-	acc, err := s.authClient.Account(context.Background(), &authtypes.QueryAccountRequest{Address: fromAddress.String()})
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to get account: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	var accI authtypes.AccountI
-	if err := clientCtx.InterfaceRegistry.UnpackAny(acc.Account, &accI); err != nil {
-		http.Error(w, fmt.Sprintf("Failed to unpack account into interface: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	baseAcc, ok := accI.(*authtypes.BaseAccount)
-	if !ok {
-		http.Error(w, "account is not a BaseAccount", http.StatusInternalServerError)
-		return
-	}
-
-	txf = txf.WithAccountNumber(baseAcc.AccountNumber).WithSequence(baseAcc.Sequence)
-
-	txb, err := txf.BuildUnsignedTx(msg)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to build unsigned tx: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	err = tx.Sign(r.Context(), txf, fromName, txb, true)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to sign tx: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	txBytes, err := clientCtx.TxConfig.TxEncoder()(txb.GetTx())
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to encode tx: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	res, err := s.txClient.BroadcastTx(
-		context.Background(),
-		&txtypes.BroadcastTxRequest{
-			Mode:    txtypes.BroadcastMode_BROADCAST_MODE_SYNC,
-			TxBytes: txBytes,
-		},
-	)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to broadcast tx: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	// Return the transaction hash
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{
-		"tx_hash": res.TxResponse.TxHash,
-	})
-	fmt.Printf("Successfully broadcasted tx with hash: %s\n", res.TxResponse.TxHash)
+	s.buildSignAndBroadcast(w, r, fromName, req.Gas, msgBuilder)
 }
