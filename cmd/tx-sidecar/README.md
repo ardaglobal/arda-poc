@@ -122,10 +122,12 @@ The login flow is as follows:
 ```json
 {
   "email": "user@example.com",
-  "name": "user-name"
+  "name": "user-name",
+  "role": "investor"
 }
 ```
 * `name` (string, optional): Required when registering a new user or linking an email to an existing user for the first time.
+* `role` (string, optional): The user's role. Defaults to `user`. Allowed values: `user`, `investor`, `developer`, `regulator`, `admin`.
 
 **Example `curl` Request (Login or Register/Link):**
 
@@ -133,8 +135,8 @@ The login flow is as follows:
 # Login for an existing user
 curl -X POST -H "Content-Type: application/json" -d '{"email": "bob@example.com"}' http://localhost:8080/login
 
-# Register a new user
-curl -X POST -H "Content-Type: application/json" -d '{"email": "alice@example.com", "name": "alice"}' http://localhost:8080/login
+# Register a new user with a specific role
+curl -X POST -H "Content-Type: application/json" -d '{"email": "alice@example.com", "name": "alice", "role": "investor"}' http://localhost:8080/login
 ```
 
 **Success Response (Login):**
@@ -142,7 +144,8 @@ curl -X POST -H "Content-Type: application/json" -d '{"email": "alice@example.co
 {
     "status": "success",
     "message": "User alice logged in",
-    "user": "alice"
+    "user": "alice",
+    "role": "investor"
 }
 ```
 
@@ -151,11 +154,12 @@ curl -X POST -H "Content-Type: application/json" -d '{"email": "alice@example.co
 {
     "status": "success",
     "message": "User alice created/linked and logged in",
-    "user": "alice"
+    "user": "alice",
+    "role": "investor"
 }
 ```
 
-*Note: When a new user is created, their details (including the mnemonic) are saved to the server's `users.json` file. The mnemonic is not returned in the API response for security reasons.*
+*Note: When a new user is created, their details (including the mnemonic and role) are saved to the server's `users.json` file. The mnemonic is not returned in the API response for security reasons.*
 
 ### `POST /logout`
 

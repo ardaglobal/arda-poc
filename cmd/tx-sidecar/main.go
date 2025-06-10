@@ -44,6 +44,7 @@ type UserData struct {
 	Name     string `json:"name"`
 	Address  string `json:"address"`
 	Mnemonic string `json:"mnemonic"`
+	Role     string `json:"role"`
 }
 
 // NewServer creates a new instance of the Server with all its dependencies.
@@ -105,6 +106,15 @@ type RegisterPropertyRequest struct {
 type LoginRequest struct {
 	Email string `json:"email"`
 	Name  string `json:"name,omitempty"`
+	Role  string `json:"role,omitempty"`
+}
+
+// LoginResponse defines the structure of the response for the login endpoint.
+type LoginResponse struct {
+	Status  string `json:"status"`
+	Message string `json:"message"`
+	User    string `json:"user"`
+	Role    string `json:"role,omitempty"`
 }
 
 // KeyInfo defines the structure for returning key information.
@@ -356,10 +366,12 @@ func (s *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
 	if s.loggedInUser != "" {
 		if emailExists && name == s.loggedInUser {
 			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(map[string]string{
-				"status":  "success",
-				"message": fmt.Sprintf("User %s is already logged in", s.loggedInUser),
-				"user":    s.loggedInUser,
+			userData := s.users[s.loggedInUser]
+			json.NewEncoder(w).Encode(LoginResponse{
+				Status:  "success",
+				Message: fmt.Sprintf("User %s is already logged in", s.loggedInUser),
+				User:    s.loggedInUser,
+				Role:    userData.Role,
 			})
 			return
 		}
@@ -371,11 +383,17 @@ func (s *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
 
 	if emailExists {
 		s.loggedInUser = name
+		userData, ok := s.users[name]
+		if !ok {
+			http.Error(w, fmt.Sprintf("internal data inconsistency: user %s not found", name), http.StatusInternalServerError)
+			return
+		}
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]string{
-			"status":  "success",
-			"message": fmt.Sprintf("User %s logged in", name),
-			"user":    name,
+		json.NewEncoder(w).Encode(LoginResponse{
+			Status:  "success",
+			Message: fmt.Sprintf("User %s logged in", name),
+			User:    name,
+			Role:    userData.Role,
 		})
 		return
 	}
@@ -386,16 +404,24 @@ func (s *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var finalUserData UserData
 	// Check if the user `name` already exists in the keyring
 	_, err := s.clientCtx.Keyring.Key(req.Name)
 	if err != nil { // User does not exist, create new one
-		userData, err := s.createUser(req.Name)
+		createdUser, err := s.createUser(req.Name, req.Role)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("Failed to create user: %v", err), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("Failed to create user: %v", err), http.StatusBadRequest)
 			return
 		}
-		log.Printf("Created new user '%s' with address %s", userData.Name, userData.Address)
+		finalUserData = *createdUser
+		log.Printf("Created new user '%s' with address %s and role %s", finalUserData.Name, finalUserData.Address, finalUserData.Role)
 	} else {
+		existingUser, ok := s.users[req.Name]
+		if !ok {
+			http.Error(w, fmt.Sprintf("internal data inconsistency: user %s not found", req.Name), http.StatusInternalServerError)
+			return
+		}
+		finalUserData = existingUser
 		log.Printf("User with name '%s' already exists, linking to email '%s'", req.Name, req.Email)
 	}
 
@@ -408,10 +434,11 @@ func (s *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
 	s.loggedInUser = req.Name
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]string{
-		"status":  "success",
-		"message": fmt.Sprintf("User %s created/linked and logged in", req.Name),
-		"user":    req.Name,
+	json.NewEncoder(w).Encode(LoginResponse{
+		Status:  "success",
+		Message: fmt.Sprintf("User %s created/linked and logged in", req.Name),
+		User:    req.Name,
+		Role:    finalUserData.Role,
 	})
 }
 
@@ -435,7 +462,7 @@ func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (s *Server) createUser(name string) (*UserData, error) {
+func (s *Server) createUser(name, role string) (*UserData, error) {
 	// Check if key with this name already exists in the keyring
 	if _, err := s.clientCtx.Keyring.Key(name); err == nil {
 		return nil, fmt.Errorf("user with name '%s' already exists", name)
@@ -458,11 +485,28 @@ func (s *Server) createUser(name string) (*UserData, error) {
 		return nil, fmt.Errorf("failed to get address from record: %v", err)
 	}
 
+	// Validate and set role
+	finalRole := "user" // default role
+	if role != "" {
+		allowedRoles := map[string]bool{
+			"user":      true,
+			"investor":  true,
+			"developer": true,
+			"regulator": true,
+			"admin":     true,
+		}
+		if _, ok := allowedRoles[role]; !ok {
+			return nil, fmt.Errorf("invalid role provided: '%s'. aRole must be one of user, investor, developer, regulator, or admin", role)
+		}
+		finalRole = role
+	}
+
 	// Store user data in memory and save to file
 	userData := UserData{
 		Name:     name,
 		Address:  addr.String(),
 		Mnemonic: mnemonic,
+		Role:     finalRole,
 	}
 	s.users[name] = userData
 	if err := s.saveUsersToFile(); err != nil {
