@@ -12,8 +12,10 @@ import (
 	"strings"
 	"time"
 
+	"cosmossdk.io/math"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"gopkg.in/yaml.v3"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -23,9 +25,20 @@ import (
 	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+
 	sidecarclient "github.com/ardaglobal/arda-poc/pkg/client"
 	propertytypes "github.com/ardaglobal/arda-poc/x/property/types"
 )
+
+// Config structs for parsing config.yml
+type FaucetConfig struct {
+	Name string `yaml:"name"`
+}
+
+type AppConfig struct {
+	Faucet FaucetConfig `yaml:"faucet"`
+}
 
 // Server holds the dependencies for the sidecar http server.
 type Server struct {
@@ -36,6 +49,7 @@ type Server struct {
 	usersFile    string
 	logins       map[string]string // email -> name
 	loginsFile   string
+	faucetName   string
 	loggedInUser string
 }
 
@@ -114,7 +128,23 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		return nil, fmt.Errorf("failed to read logins file: %w", err)
 	}
 
-	return &Server{
+	// Read faucet configuration
+	configPath := "config.yml"
+	configData, err := os.ReadFile(configPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read config file %s: %w", configPath, err)
+	}
+
+	var appConfig AppConfig
+	if err := yaml.Unmarshal(configData, &appConfig); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal config file: %w", err)
+	}
+
+	if appConfig.Faucet.Name == "" {
+		return nil, fmt.Errorf("faucet name is not defined in config.yml")
+	}
+
+	s := &Server{
 		clientCtx:  clientCtx,
 		authClient: authtypes.NewQueryClient(grpcConn),
 		txClient:   txtypes.NewServiceClient(grpcConn),
@@ -122,7 +152,28 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		usersFile:  usersFile,
 		logins:     logins,
 		loginsFile: loginsFile,
-	}, nil
+		faucetName: appConfig.Faucet.Name,
+	}
+
+	// Ensure that the faucet account from config exists in the keyring.
+	if _, err := s.clientCtx.Keyring.Key(s.faucetName); err != nil {
+		return nil, fmt.Errorf("faucet user '%s' from config.yml not found in keyring: %w", s.faucetName, err)
+	}
+	log.Printf("Using '%s' as the faucet account.", s.faucetName)
+
+	// Ensure faucet user has the 'faucet' role.
+	if faucetUserData, ok := s.users[s.faucetName]; ok {
+		if faucetUserData.Role != "faucet" {
+			log.Printf("Updating role of faucet user '%s' to 'faucet'.", s.faucetName)
+			faucetUserData.Role = "faucet"
+			s.users[s.faucetName] = faucetUserData
+			if err := s.saveUsersToFile(); err != nil {
+				log.Printf("Warning: failed to save users file after updating faucet role: %v", err)
+			}
+		}
+	}
+
+	return s, nil
 }
 
 // Close is a no-op for this server version but can be used for cleanup.
@@ -172,6 +223,14 @@ type TransferSharesRequest struct {
 	Gas        string   `json:"gas,omitempty"`
 }
 
+// FaucetRequest defines the request body for requesting funds from the faucet.
+type FaucetRequest struct {
+	Address string `json:"address"`
+	Amount  uint64 `json:"amount"`
+	Denom   string `json:"denom"`
+	Gas     string `json:"gas,omitempty"`
+}
+
 // corsHandler wraps a handler to include CORS headers.
 func corsHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -215,6 +274,7 @@ func main() {
 	mux.HandleFunc("/users", server.listUsersHandler)
 	mux.HandleFunc("/login", server.loginHandler)
 	mux.HandleFunc("/logout", server.logoutHandler)
+	mux.HandleFunc("/faucet", server.faucetHandler)
 
 	fmt.Println("Starting transaction sidecar server on :8080...")
 	if err := http.ListenAndServe(":8080", corsHandler(mux)); err != nil {
@@ -531,9 +591,10 @@ func (s *Server) createUser(name, role string) (*UserData, error) {
 			"developer": true,
 			"regulator": true,
 			"admin":     true,
+			"faucet":    true,
 		}
 		if _, ok := allowedRoles[role]; !ok {
-			return nil, fmt.Errorf("invalid role provided: '%s'. aRole must be one of user, investor, developer, regulator, or admin", role)
+			return nil, fmt.Errorf("invalid role provided: '%s'. aRole must be one of user, investor, developer, regulator, admin, or faucet", role)
 		}
 		finalRole = role
 	}
@@ -640,6 +701,40 @@ func (s *Server) transferSharesHandler(w http.ResponseWriter, r *http.Request) {
 			req.ToOwners,
 			req.ToShares,
 		)
+	}
+
+	s.buildSignAndBroadcast(w, r, fromName, req.Gas, msgBuilder)
+}
+
+func (s *Server) faucetHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req FaucetRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	if req.Amount == 0 || req.Denom == "" || req.Address == "" {
+		http.Error(w, "address, amount, and denom must be provided, and amount must be positive", http.StatusBadRequest)
+		return
+	}
+
+	if _, err := sdk.AccAddressFromBech32(req.Address); err != nil {
+		http.Error(w, fmt.Sprintf("Invalid recipient address: %v", err), http.StatusBadRequest)
+		return
+	}
+
+	fromName := s.faucetName
+	msgBuilder := func(fromAddr string) sdk.Msg {
+		return &banktypes.MsgSend{
+			FromAddress: fromAddr,
+			ToAddress:   req.Address,
+			Amount:      sdk.NewCoins(sdk.NewCoin(req.Denom, math.NewInt(int64(req.Amount)))),
+		}
 	}
 
 	s.buildSignAndBroadcast(w, r, fromName, req.Gas, msgBuilder)

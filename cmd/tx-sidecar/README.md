@@ -127,7 +127,7 @@ The login flow is as follows:
 }
 ```
 * `name` (string, optional): Required when registering a new user or linking an email to an existing user for the first time.
-* `role` (string, optional): The user's role. Defaults to `user`. Allowed values: `user`, `investor`, `developer`, `regulator`, `admin`.
+* `role` (string, optional): The user's role. Defaults to `user`. Allowed values: `user`, `investor`, `developer`, `regulator`, `admin`, `faucet`.
 
 **Example `curl` Request (Login or Register/Link):**
 
@@ -210,4 +210,43 @@ Returns a JSON array of user details.
         "pubkey": "{\"@type\":\"/cosmos.crypto.secp256k1.PubKey\",\"key\":\"A8E7b2c...\"}"
     }
 ]
+``` 
+
+### `POST /faucet`
+
+Requests funds from the built-in faucet. This is only available for development and testing purposes. The faucet account must be funded for this to work. On the first run, the sidecar will generate a `faucet` account and print its mnemonic phrase to the console. This mnemonic must be used to send funds to the faucet address before it can dispense tokens.
+
+**Request Body:**
+
+```json
+{
+  "address": "arda13pc7nj66w7cqsgs6kcn8x6n8a3gz76df7e552x",
+  "amount": 1000000,
+  "denom": "uarda",
+  "gas": "auto"
+}
+```
+*   `address` (string): The bech32 address to receive the funds.
+*   `amount` (number): The amount of tokens to send.
+*   `denom` (string): The token denomination (e.g., `uarda`).
+*   `gas` (string, optional): The gas limit for the transaction. Can be a specific number (e.g., `"300000"`) or `"auto"` to use the sidecar's default.
+
+**Example `curl` Request:**
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{
+  "address": "arda1nwtujr8y49zeajrqskav5pvgn7dgad7up92pqm",
+  "amount": 1000000,
+  "denom": "uarda"
+}' http://localhost:8080/faucet
+```
+
+**Success Response:**
+
+A successful broadcast will return a JSON object containing the transaction hash.
+
+```json
+{
+  "tx_hash": "B2C3D4E5F6A1..."
+}
 ``` 

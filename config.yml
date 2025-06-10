@@ -6,10 +6,14 @@ accounts:
   - name: ERES
     coins:
       - 200000000uarda
-  - name: bob
+  - name: Bank
+    coins:
+      - 200000000000000uarda
+      - 200000000usdarda
+  - name: alice
     coins:
       - 100000000uarda
-  - name: alice
+  - name: bob
     coins:
       - 100000000uarda
   - name: charlie
@@ -34,9 +38,10 @@ client:
   openapi:
     path: docs/static/openapi.yml
 faucet:
-  name: bob
+  name: Bank
   coins:
     - 100000uarda
+    - 100000usdarda
 validators:
   - name: ERES
     bonded: 100000000uarda
