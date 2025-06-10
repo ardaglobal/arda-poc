@@ -180,31 +180,33 @@ curl -X POST http://localhost:8080/logout
 }
 ```
 
-### `GET /keys`
+### `GET /users`
 
-Lists all keys currently managed by the sidecar's keyring.
+Lists all registered users and their key details.
 
 **Example `curl` Request:**
 
 ```bash
-curl http://localhost:8080/keys
+curl http://localhost:8080/users
 ```
 
 **Success Response:**
 
-Returns a JSON array of key information.
+Returns a JSON array of user details.
 ```json
 [
     {
         "name": "ERES",
-        "type": "local",
         "address": "arda1qzy8mf8epnpaetctnnhr28vl5h3d34jma8ev5y",
+        "role": "admin",
+        "type": "local",
         "pubkey": "{\"@type\":\"/cosmos.crypto.secp256k1.PubKey\",\"key\":\"A0O5s8d...\"}"
     },
     {
         "name": "bob",
-        "type": "local",
         "address": "arda13pc7nj66w7cqsgs6kcn8x6n8a3gz76df7e552x",
+        "role": "investor",
+        "type": "local",
         "pubkey": "{\"@type\":\"/cosmos.crypto.secp256k1.PubKey\",\"key\":\"A8E7b2c...\"}"
     }
 ]

@@ -66,6 +66,42 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		return nil, fmt.Errorf("failed to read users file: %w", err)
 	}
 
+	// Sync keyring with users.json
+	records, err := clientCtx.Keyring.List()
+	if err != nil {
+		return nil, fmt.Errorf("failed to list keys from keyring: %w", err)
+	}
+
+	usersFileNeedsSave := false
+	for _, record := range records {
+		if _, ok := users[record.Name]; !ok {
+			// User exists in keyring but not in users.json, add them.
+			addr, err := record.GetAddress()
+			if err != nil {
+				log.Printf("Warning: failed to get address for key '%s', skipping sync: %v", record.Name, err)
+				continue
+			}
+			users[record.Name] = UserData{
+				Name:     record.Name,
+				Address:  addr.String(),
+				Mnemonic: "", // Mnemonic is not available from keyring listing
+				Role:     "user",
+			}
+			log.Printf("Syncing key '%s' from keyring to users.json", record.Name)
+			usersFileNeedsSave = true
+		}
+	}
+
+	if usersFileNeedsSave {
+		data, err := json.MarshalIndent(users, "", "  ")
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal users for sync: %w", err)
+		}
+		if err := os.WriteFile(usersFile, data, 0644); err != nil {
+			return nil, fmt.Errorf("failed to write users file for sync: %w", err)
+		}
+	}
+
 	loginsFile := "logins.json"
 	logins := make(map[string]string)
 
@@ -117,11 +153,12 @@ type LoginResponse struct {
 	Role    string `json:"role,omitempty"`
 }
 
-// KeyInfo defines the structure for returning key information.
-type KeyInfo struct {
+// UserDetailResponse defines the structure for returning detailed user information.
+type UserDetailResponse struct {
 	Name    string `json:"name"`
-	Type    string `json:"type"`
 	Address string `json:"address"`
+	Role    string `json:"role"`
+	Type    string `json:"type"`
 	PubKey  string `json:"pubkey"`
 }
 
@@ -175,7 +212,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/register-property", server.registerPropertyHandler)
 	mux.HandleFunc("/transfer-shares", server.transferSharesHandler)
-	mux.HandleFunc("/keys", server.listKeysHandler)
+	mux.HandleFunc("/users", server.listUsersHandler)
 	mux.HandleFunc("/login", server.loginHandler)
 	mux.HandleFunc("/logout", server.logoutHandler)
 
@@ -532,20 +569,27 @@ func (s *Server) saveLoginsToFile() error {
 	return os.WriteFile(s.loginsFile, data, 0644)
 }
 
-func (s *Server) listKeysHandler(w http.ResponseWriter, r *http.Request) {
+func (s *Server) listUsersHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
 
-	records, err := s.clientCtx.Keyring.List()
-	if err != nil {
-		http.Error(w, "Failed to list keys from keyring", http.StatusInternalServerError)
-		return
-	}
+	userInfos := make([]UserDetailResponse, 0, len(s.users))
+	for name, userData := range s.users {
+		record, err := s.clientCtx.Keyring.Key(name)
+		if err != nil {
+			log.Printf("Warning: User '%s' is in users.json but not in the keyring. Listing without key info.", name)
+			userInfos = append(userInfos, UserDetailResponse{
+				Name:    userData.Name,
+				Address: userData.Address,
+				Role:    userData.Role,
+				Type:    "local (key missing)",
+				PubKey:  "",
+			})
+			continue
+		}
 
-	keyInfos := make([]KeyInfo, len(records))
-	for i, record := range records {
 		addr, err := record.GetAddress()
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Failed to get address for key '%s': %v", record.Name, err), http.StatusInternalServerError)
@@ -558,17 +602,18 @@ func (s *Server) listKeysHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		keyInfos[i] = KeyInfo{
+		userInfos = append(userInfos, UserDetailResponse{
 			Name:    record.Name,
 			Type:    "local",
 			Address: addr.String(),
 			PubKey:  string(pubKeyJSON),
-		}
+			Role:    userData.Role,
+		})
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(keyInfos); err != nil {
-		http.Error(w, "Failed to encode keys to JSON", http.StatusInternalServerError)
+	if err := json.NewEncoder(w).Encode(userInfos); err != nil {
+		http.Error(w, "Failed to encode users to JSON", http.StatusInternalServerError)
 		return
 	}
 }
