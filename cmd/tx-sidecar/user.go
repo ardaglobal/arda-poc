@@ -35,6 +35,11 @@ type LoginResponse struct {
 	Role    string `json:"role,omitempty"`
 }
 
+// KYCRequest defines the request body for KYC'ing a user.
+type KYCRequest struct {
+	Name string `json:"name"`
+}
+
 // UserDetailResponse defines the structure for returning detailed user information.
 type UserDetailResponse struct {
 	Name    string `json:"name"`
@@ -159,6 +164,55 @@ func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{
 		"status":  "success",
 		"message": fmt.Sprintf("User %s logged out", loggedOutUser),
+	})
+}
+
+func (s *Server) kycUserHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req KYCRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	if req.Name == "" {
+		http.Error(w, "User name cannot be empty", http.StatusBadRequest)
+		return
+	}
+
+	userData, ok := s.users[req.Name]
+	if !ok {
+		http.Error(w, fmt.Sprintf("User '%s' not found", req.Name), http.StatusNotFound)
+		return
+	}
+
+	if userData.Role != "user" && userData.Role != "" {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]string{
+			"status":  "noop",
+			"message": fmt.Sprintf("User '%s' is already KYC'd", req.Name),
+		})
+		return
+	}
+
+	userData.Role = "investor"
+	s.users[req.Name] = userData
+
+	if err := s.saveUsersToFile(); err != nil {
+		http.Error(w, "Failed to save updated user data", http.StatusInternalServerError)
+		log.Printf("Error saving users to file: %v", err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{
+		"status":  "success",
+		"message": fmt.Sprintf("User '%s' role updated to 'investor'", req.Name),
 	})
 }
 

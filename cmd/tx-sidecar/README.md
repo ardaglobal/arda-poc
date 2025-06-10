@@ -180,6 +180,43 @@ curl -X POST http://localhost:8080/logout
 }
 ```
 
+### `POST /kyc-user`
+
+Updates a user's role from `user` to `investor`, marking them as KYC'd. If the user's role is not `user`, it is considered a no-op.
+
+**Request Body:**
+
+```json
+{
+  "name": "a-user-name"
+}
+```
+*   `name` (string): The name of the user to KYC.
+
+**Example `curl` Request:**
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{"name": "a-user-name"}' http://localhost:8080/kyc-user
+```
+
+**Success Response:**
+
+```json
+{
+    "status": "success",
+    "message": "User 'a-user-name' role updated to 'investor'"
+}
+```
+
+**No-Op Response (if user is already KYC'd or not a 'user'):**
+
+```json
+{
+    "status": "noop",
+    "message": "User 'a-user-name' is already KYC'd"
+}
+```
+
 ### `GET /users`
 
 Lists all registered users and their key details.

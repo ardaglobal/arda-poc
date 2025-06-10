@@ -236,6 +236,7 @@ func main() {
 	mux.HandleFunc("/faucet", server.faucetHandler)
 	mux.HandleFunc("/transactions", server.listTransactionsHandler)
 	mux.HandleFunc("/transaction/", server.getTransactionHandler)
+	mux.HandleFunc("/kyc-user", server.kycUserHandler)
 
 	fmt.Println("Starting transaction sidecar server on :8080...")
 	if err := http.ListenAndServe(":8080", corsHandler(mux)); err != nil {
