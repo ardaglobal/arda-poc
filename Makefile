@@ -136,10 +136,12 @@ setup-dev: setup-script proto-deps
 dev:
 	@echo "--> Running dev"
 	@ignite chain serve 
+.PHONY: dev
 
 dev-sidecar:
 	@echo "--> Running dev-sidecar"
 	@go run cmd/tx-sidecar/main.go
+.PHONY: dev-sidecar
 
 govet:
 	@echo Running go vet...
@@ -150,3 +152,10 @@ govulncheck:
 	@govulncheck ./...
 
 .PHONY: govet govulncheck
+
+clean:
+	rm -rf ~/.arda-poc
+	rm users.json
+	rm logins.json
+	rm tx.json
+.PHONY: clean
