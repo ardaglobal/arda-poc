@@ -29,11 +29,14 @@ import (
 
 // Server holds the dependencies for the sidecar http server.
 type Server struct {
-	clientCtx  client.Context
-	authClient authtypes.QueryClient
-	txClient   txtypes.ServiceClient
-	users      map[string]UserData
-	usersFile  string
+	clientCtx    client.Context
+	authClient   authtypes.QueryClient
+	txClient     txtypes.ServiceClient
+	users        map[string]UserData
+	usersFile    string
+	logins       map[string]string // email -> name
+	loginsFile   string
+	loggedInUser string
 }
 
 // UserData holds the information for a created user.
@@ -62,12 +65,26 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		return nil, fmt.Errorf("failed to read users file: %w", err)
 	}
 
+	loginsFile := "logins.json"
+	logins := make(map[string]string)
+
+	loginData, err := os.ReadFile(loginsFile)
+	if err == nil {
+		if err := json.Unmarshal(loginData, &logins); err != nil {
+			log.Printf("Warning: failed to unmarshal logins file, starting with empty login map: %v", err)
+		}
+	} else if !os.IsNotExist(err) {
+		return nil, fmt.Errorf("failed to read logins file: %w", err)
+	}
+
 	return &Server{
 		clientCtx:  clientCtx,
 		authClient: authtypes.NewQueryClient(grpcConn),
 		txClient:   txtypes.NewServiceClient(grpcConn),
 		users:      users,
 		usersFile:  usersFile,
+		logins:     logins,
+		loginsFile: loginsFile,
 	}, nil
 }
 
@@ -84,9 +101,10 @@ type RegisterPropertyRequest struct {
 	Gas     string   `json:"gas,omitempty"`
 }
 
-// CreateUserRequest defines the request body for creating a new user.
-type CreateUserRequest struct {
-	Name string `json:"name"`
+// LoginRequest defines the request body for logging in or registering a user.
+type LoginRequest struct {
+	Email string `json:"email"`
+	Name  string `json:"name,omitempty"`
 }
 
 // KeyInfo defines the structure for returning key information.
@@ -148,7 +166,8 @@ func main() {
 	mux.HandleFunc("/register-property", server.registerPropertyHandler)
 	mux.HandleFunc("/transfer-shares", server.transferSharesHandler)
 	mux.HandleFunc("/keys", server.listKeysHandler)
-	mux.HandleFunc("/create-user", server.createUserHandler)
+	mux.HandleFunc("/login", server.loginHandler)
+	mux.HandleFunc("/logout", server.logoutHandler)
 
 	fmt.Println("Starting transaction sidecar server on :8080...")
 	if err := http.ListenAndServe(":8080", corsHandler(mux)); err != nil {
@@ -315,63 +334,142 @@ func (s *Server) registerPropertyHandler(w http.ResponseWriter, r *http.Request)
 	s.buildSignAndBroadcast(w, r, fromName, req.Gas, msgBuilder)
 }
 
-func (s *Server) createUserHandler(w http.ResponseWriter, r *http.Request) {
+func (s *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
 
-	var req CreateUserRequest
+	var req LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-	if req.Name == "" {
-		http.Error(w, "Name cannot be empty", http.StatusBadRequest)
+
+	if req.Email == "" {
+		http.Error(w, "Email cannot be empty", http.StatusBadRequest)
 		return
 	}
 
-	// Check if key with this name already exists in the keyring
-	if _, err := s.clientCtx.Keyring.Key(req.Name); err == nil {
-		http.Error(w, fmt.Sprintf("User with name '%s' already exists", req.Name), http.StatusConflict)
+	name, emailExists := s.logins[req.Email]
+
+	if s.loggedInUser != "" {
+		if emailExists && name == s.loggedInUser {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(map[string]string{
+				"status":  "success",
+				"message": fmt.Sprintf("User %s is already logged in", s.loggedInUser),
+				"user":    s.loggedInUser,
+			})
+			return
+		}
+		http.Error(w, fmt.Sprintf("User '%s' is already logged in. Please log out first.", s.loggedInUser), http.StatusConflict)
 		return
+	}
+
+	// from here, we know s.loggedInUser == ""
+
+	if emailExists {
+		s.loggedInUser = name
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]string{
+			"status":  "success",
+			"message": fmt.Sprintf("User %s logged in", name),
+			"user":    name,
+		})
+		return
+	}
+
+	// Email doesn't exist. This is a registration/linking flow.
+	if req.Name == "" {
+		http.Error(w, "Email not registered. Please provide a name to create a new user.", http.StatusBadRequest)
+		return
+	}
+
+	// Check if the user `name` already exists in the keyring
+	_, err := s.clientCtx.Keyring.Key(req.Name)
+	if err != nil { // User does not exist, create new one
+		userData, err := s.createUser(req.Name)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Failed to create user: %v", err), http.StatusInternalServerError)
+			return
+		}
+		log.Printf("Created new user '%s' with address %s", userData.Name, userData.Address)
+	} else {
+		log.Printf("User with name '%s' already exists, linking to email '%s'", req.Name, req.Email)
+	}
+
+	// Map email to name and save
+	s.logins[req.Email] = req.Name
+	if err := s.saveLoginsToFile(); err != nil {
+		log.Printf("Warning: failed to save logins to file: %v", err)
+	}
+
+	s.loggedInUser = req.Name
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(map[string]string{
+		"status":  "success",
+		"message": fmt.Sprintf("User %s created/linked and logged in", req.Name),
+		"user":    req.Name,
+	})
+}
+
+func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if s.loggedInUser == "" {
+		http.Error(w, "No user is currently logged in", http.StatusBadRequest)
+		return
+	}
+
+	loggedOutUser := s.loggedInUser
+	s.loggedInUser = ""
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{
+		"status":  "success",
+		"message": fmt.Sprintf("User %s logged out", loggedOutUser),
+	})
+}
+
+func (s *Server) createUser(name string) (*UserData, error) {
+	// Check if key with this name already exists in the keyring
+	if _, err := s.clientCtx.Keyring.Key(name); err == nil {
+		return nil, fmt.Errorf("user with name '%s' already exists", name)
 	}
 
 	// Create a new key in the keyring
 	record, mnemonic, err := s.clientCtx.Keyring.NewMnemonic(
-		req.Name,
+		name,
 		keyring.English,
 		sdk.GetConfig().GetFullBIP44Path(),
 		keyring.DefaultBIP39Passphrase,
 		hd.Secp256k1,
 	)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to create new key: %v", err), http.StatusInternalServerError)
-		return
+		return nil, fmt.Errorf("failed to create new key: %v", err)
 	}
 
 	addr, err := record.GetAddress()
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to get address from record: %v", err), http.StatusInternalServerError)
-		return
+		return nil, fmt.Errorf("failed to get address from record: %v", err)
 	}
 
 	// Store user data in memory and save to file
 	userData := UserData{
-		Name:     req.Name,
+		Name:     name,
 		Address:  addr.String(),
 		Mnemonic: mnemonic,
 	}
-	s.users[req.Name] = userData
+	s.users[name] = userData
 	if err := s.saveUsersToFile(); err != nil {
 		log.Printf("Warning: failed to save users to file: %v", err)
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(w).Encode(userData); err != nil {
-		log.Printf("Failed to encode response: %v", err)
-	}
+	return &userData, nil
 }
 
 func (s *Server) saveUsersToFile() error {
@@ -380,6 +478,14 @@ func (s *Server) saveUsersToFile() error {
 		return fmt.Errorf("failed to marshal users: %w", err)
 	}
 	return os.WriteFile(s.usersFile, data, 0644)
+}
+
+func (s *Server) saveLoginsToFile() error {
+	data, err := json.MarshalIndent(s.logins, "", "  ")
+	if err != nil {
+		return fmt.Errorf("failed to marshal logins: %w", err)
+	}
+	return os.WriteFile(s.loginsFile, data, 0644)
 }
 
 func (s *Server) listKeysHandler(w http.ResponseWriter, r *http.Request) {

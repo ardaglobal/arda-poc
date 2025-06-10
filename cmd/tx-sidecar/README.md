@@ -7,7 +7,7 @@ This is a **proof-of-concept** to demonstrate server-side transaction signing. F
 ## How it Works
 
 The service exposes several endpoints for interacting with the `arda-poc` blockchain. It uses the Cosmos SDK's Go libraries to programmatically:
-1.  Manage an on-server keyring for creating users and storing their keys in a local `users.json` file.
+1.  Manage user registration and login via email. It maintains a `logins.json` to map emails to on-server keyring names, and a `users.json` to store created user account details (including mnemonics).
 2.  Load a pre-configured key (`ERES`) to sign administrative transactions like registering properties and transferring shares.
 3.  Construct the appropriate messages (`MsgRegisterProperty`, `MsgTransferShares`).
 4.  Query the blockchain for account details (number and sequence) needed for signing.
@@ -107,32 +107,72 @@ A successful broadcast will return a JSON object containing the transaction hash
 }
 ``` 
 
-### `POST /create-user`
+### `POST /login`
 
-Creates a new user account (key) in the sidecar's keyring and saves it to `users.json`.
+Handles user login, registration, and linking.
+
+The login flow is as follows:
+- **Login:** If a user with the given `email` exists, they are logged in. The `name` field is ignored.
+- **Register:** If the `email` does not exist and a `name` is provided, a new user account and key are created with that name. The new email is then linked to the new user, and they are logged in.
+- **Link:** If the `email` does not exist but a user with the given `name` *does* exist, the email is linked to the existing user account, and they are logged in.
+- **Error:** If the `email` does not exist and no `name` is provided, the request will fail, prompting the user to provide a name.
 
 **Request Body:**
 
 ```json
 {
-  "name": "new-user-name"
+  "email": "user@example.com",
+  "name": "user-name"
 }
 ```
+* `name` (string, optional): Required when registering a new user or linking an email to an existing user for the first time.
+
+**Example `curl` Request (Login or Register/Link):**
+
+```bash
+# Login for an existing user
+curl -X POST -H "Content-Type: application/json" -d '{"email": "bob@example.com"}' http://localhost:8080/login
+
+# Register a new user
+curl -X POST -H "Content-Type: application/json" -d '{"email": "alice@example.com", "name": "alice"}' http://localhost:8080/login
+```
+
+**Success Response (Login):**
+```json
+{
+    "status": "success",
+    "message": "User alice logged in",
+    "user": "alice"
+}
+```
+
+**Success Response (Register/Link):**
+```json
+{
+    "status": "success",
+    "message": "User alice created/linked and logged in",
+    "user": "alice"
+}
+```
+
+*Note: When a new user is created, their details (including the mnemonic) are saved to the server's `users.json` file. The mnemonic is not returned in the API response for security reasons.*
+
+### `POST /logout`
+
+Logs out the currently authenticated user.
 
 **Example `curl` Request:**
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{"name": "bob"}' http://localhost:8080/create-user
+curl -X POST http://localhost:8080/logout
 ```
 
 **Success Response:**
 
-A successful request will return a JSON object with the new user's details, including their mnemonic. **Store the mnemonic securely!**
 ```json
 {
-    "name": "bob",
-    "address": "arda1...",
-    "mnemonic": "word1 word2 ..."
+    "status": "success",
+    "message": "User alice logged out"
 }
 ```
 

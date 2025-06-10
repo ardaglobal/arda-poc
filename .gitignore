@@ -9,6 +9,7 @@ release/
 *.ign
 
 users.json
+logins.json
 
 .arda_data/
 
