@@ -5,33 +5,39 @@ validation: sovereign
 accounts:
   - name: ERES
     coins:
-      - 200000000uarda
+      - 200000000000000uarda
   - name: Bank
     coins:
       - 200000000000000uarda
       - 200000000usdarda
-  - name: alice
+  - name: AIX
     coins:
       - 100000000uarda
-  - name: bob
+  - name: DLD
+    coins:
+      - 100000000000000uarda
+  - name: Fatima_Developers
     coins:
       - 100000000uarda
-  - name: charlie
+  - name: matt
     coins:
       - 100000000uarda
-  - name: dan
+  - name: oli
     coins:
       - 100000000uarda
-  - name: eve
+  - name: toby
     coins:
       - 100000000uarda
-  - name: fred
+  - name: fawad
     coins:
       - 100000000uarda
-  - name: george
+  - name: siddiq
     coins:
       - 100000000uarda
-  - name: harry
+  - name: mohammad
+    coins:
+      - 100000000uarda
+  - name: ahmed
     coins:
       - 100000000uarda
 client:

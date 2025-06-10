@@ -140,7 +140,7 @@ dev:
 
 dev-sidecar:
 	@echo "--> Running dev-sidecar"
-	@go run cmd/tx-sidecar/main.go
+	@go run ./cmd/tx-sidecar
 .PHONY: dev-sidecar
 
 govet:
