@@ -40,17 +40,26 @@ type AppConfig struct {
 	Faucet FaucetConfig `yaml:"faucet"`
 }
 
+// TrackedTx stores information about a transaction that has been broadcast.
+type TrackedTx struct {
+	Timestamp time.Time `json:"timestamp"`
+	Type      string    `json:"type"`
+	TxHash    string    `json:"tx_hash"`
+}
+
 // Server holds the dependencies for the sidecar http server.
 type Server struct {
-	clientCtx    client.Context
-	authClient   authtypes.QueryClient
-	txClient     txtypes.ServiceClient
-	users        map[string]UserData
-	usersFile    string
-	logins       map[string]string // email -> name
-	loginsFile   string
-	faucetName   string
-	loggedInUser string
+	clientCtx        client.Context
+	authClient       authtypes.QueryClient
+	txClient         txtypes.ServiceClient
+	users            map[string]UserData
+	usersFile        string
+	logins           map[string]string // email -> name
+	loginsFile       string
+	faucetName       string
+	loggedInUser     string
+	transactions     []TrackedTx
+	transactionsFile string
 }
 
 // UserData holds the information for a created user.
@@ -128,6 +137,17 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		return nil, fmt.Errorf("failed to read logins file: %w", err)
 	}
 
+	transactionsFile := "tx.json"
+	transactions := make([]TrackedTx, 0)
+	txData, err := os.ReadFile(transactionsFile)
+	if err == nil {
+		if err := json.Unmarshal(txData, &transactions); err != nil {
+			log.Printf("Warning: failed to unmarshal transactions file, starting with empty list: %v", err)
+		}
+	} else if !os.IsNotExist(err) {
+		return nil, fmt.Errorf("failed to read transactions file: %w", err)
+	}
+
 	// Read faucet configuration
 	configPath := "config.yml"
 	configData, err := os.ReadFile(configPath)
@@ -145,14 +165,16 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 	}
 
 	s := &Server{
-		clientCtx:  clientCtx,
-		authClient: authtypes.NewQueryClient(grpcConn),
-		txClient:   txtypes.NewServiceClient(grpcConn),
-		users:      users,
-		usersFile:  usersFile,
-		logins:     logins,
-		loginsFile: loginsFile,
-		faucetName: appConfig.Faucet.Name,
+		clientCtx:        clientCtx,
+		authClient:       authtypes.NewQueryClient(grpcConn),
+		txClient:         txtypes.NewServiceClient(grpcConn),
+		users:            users,
+		usersFile:        usersFile,
+		logins:           logins,
+		loginsFile:       loginsFile,
+		faucetName:       appConfig.Faucet.Name,
+		transactions:     transactions,
+		transactionsFile: transactionsFile,
 	}
 
 	// Ensure that the faucet account from config exists in the keyring.
@@ -275,6 +297,7 @@ func main() {
 	mux.HandleFunc("/login", server.loginHandler)
 	mux.HandleFunc("/logout", server.logoutHandler)
 	mux.HandleFunc("/faucet", server.faucetHandler)
+	mux.HandleFunc("/transactions", server.listTransactionsHandler)
 
 	fmt.Println("Starting transaction sidecar server on :8080...")
 	if err := http.ListenAndServe(":8080", corsHandler(mux)); err != nil {
@@ -283,7 +306,7 @@ func main() {
 }
 
 // buildSignAndBroadcast handles the common logic for creating, signing, and broadcasting a transaction.
-func (s *Server) buildSignAndBroadcast(w http.ResponseWriter, r *http.Request, fromName string, gasStr string, msgBuilder func(fromAddr string) sdk.Msg) {
+func (s *Server) buildSignAndBroadcast(w http.ResponseWriter, r *http.Request, fromName, gasStr, txType string, msgBuilder func(fromAddr string) sdk.Msg) {
 	clientCtx := s.clientCtx
 	// 1. Set the signer
 	fromAddrRec, err := clientCtx.Keyring.Key(fromName)
@@ -399,11 +422,13 @@ func (s *Server) buildSignAndBroadcast(w http.ResponseWriter, r *http.Request, f
 					http.Error(w, fmt.Sprintf("Transaction failed in block with code %d: %s", getTxRes.TxResponse.Code, getTxRes.TxResponse.RawLog), http.StatusInternalServerError)
 				} else {
 					// Success.
+					txHash := getTxRes.TxResponse.TxHash
+					s.addTransaction(txType, txHash)
 					w.Header().Set("Content-Type", "application/json")
 					json.NewEncoder(w).Encode(map[string]string{
-						"tx_hash": getTxRes.TxResponse.TxHash,
+						"tx_hash": txHash,
 					})
-					fmt.Printf("Successfully processed tx with hash: %s\n", getTxRes.TxResponse.TxHash)
+					fmt.Printf("Successfully processed tx with hash: %s\n", txHash)
 				}
 				return // Exit polling.
 			}
@@ -438,7 +463,7 @@ func (s *Server) registerPropertyHandler(w http.ResponseWriter, r *http.Request)
 		)
 	}
 
-	s.buildSignAndBroadcast(w, r, fromName, req.Gas, msgBuilder)
+	s.buildSignAndBroadcast(w, r, fromName, req.Gas, "register_property", msgBuilder)
 }
 
 func (s *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
@@ -559,6 +584,18 @@ func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func (s *Server) addTransaction(txType, txHash string) {
+	tx := TrackedTx{
+		Timestamp: time.Now().UTC(),
+		Type:      txType,
+		TxHash:    txHash,
+	}
+	s.transactions = append(s.transactions, tx)
+	if err := s.saveTransactionsToFile(); err != nil {
+		log.Printf("Warning: failed to save transactions to file: %v", err)
+	}
+}
+
 func (s *Server) createUser(name, role string) (*UserData, error) {
 	// Check if key with this name already exists in the keyring
 	if _, err := s.clientCtx.Keyring.Key(name); err == nil {
@@ -630,6 +667,14 @@ func (s *Server) saveLoginsToFile() error {
 	return os.WriteFile(s.loginsFile, data, 0644)
 }
 
+func (s *Server) saveTransactionsToFile() error {
+	data, err := json.MarshalIndent(s.transactions, "", "  ")
+	if err != nil {
+		return fmt.Errorf("failed to marshal transactions: %w", err)
+	}
+	return os.WriteFile(s.transactionsFile, data, 0644)
+}
+
 func (s *Server) listUsersHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -679,6 +724,19 @@ func (s *Server) listUsersHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (s *Server) listTransactionsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(s.transactions); err != nil {
+		http.Error(w, "Failed to encode transactions to JSON", http.StatusInternalServerError)
+		return
+	}
+}
+
 func (s *Server) transferSharesHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -703,7 +761,7 @@ func (s *Server) transferSharesHandler(w http.ResponseWriter, r *http.Request) {
 		)
 	}
 
-	s.buildSignAndBroadcast(w, r, fromName, req.Gas, msgBuilder)
+	s.buildSignAndBroadcast(w, r, fromName, req.Gas, "transfer_shares", msgBuilder)
 }
 
 func (s *Server) faucetHandler(w http.ResponseWriter, r *http.Request) {
@@ -737,5 +795,5 @@ func (s *Server) faucetHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	s.buildSignAndBroadcast(w, r, fromName, req.Gas, msgBuilder)
+	s.buildSignAndBroadcast(w, r, fromName, req.Gas, "faucet", msgBuilder)
 }

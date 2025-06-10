@@ -212,6 +212,39 @@ Returns a JSON array of user details.
 ]
 ``` 
 
+### `GET /transactions`
+
+Lists all transaction hashes that have been successfully processed and stored by the sidecar.
+
+**Example `curl` Request:**
+
+```bash
+curl http://localhost:8080/transactions
+```
+
+**Success Response:**
+
+Returns a JSON array of transaction details.
+```json
+[
+    {
+        "timestamp": "2023-10-27T10:00:00Z",
+        "type": "register_property",
+        "tx_hash": "A1B2C3D4E5F6..."
+    },
+    {
+        "timestamp": "2023-10-27T10:05:00Z",
+        "type": "transfer_shares",
+        "tx_hash": "B2C3D4E5F6A1..."
+    },
+    {
+        "timestamp": "2023-10-27T10:10:00Z",
+        "type": "faucet",
+        "tx_hash": "C3D4E5F6A1B2..."
+    }
+]
+```
+
 ### `POST /faucet`
 
 Requests funds from the built-in faucet. This is only available for development and testing purposes. The faucet account must be funded for this to work. On the first run, the sidecar will generate a `faucet` account and print its mnemonic phrase to the console. This mnemonic must be used to send funds to the faucet address before it can dispense tokens.
