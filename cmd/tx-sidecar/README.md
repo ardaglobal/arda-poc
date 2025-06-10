@@ -245,6 +245,33 @@ Returns a JSON array of transaction details.
 ]
 ```
 
+### `GET /transaction/{tx_hash}`
+
+Queries the blockchain for a specific transaction by its hash and returns details.
+
+If the transaction type (as stored by the sidecar) is `register_property` or `transfer_shares`, it parses the transaction logs to extract and return a simplified object from the `submission` event. For all other transaction types, it returns the full, raw transaction response from the blockchain node.
+
+**Path Parameters:**
+*   `tx_hash` (string): The hex-encoded transaction hash.
+
+**Example `curl` Request:**
+
+```bash
+curl http://localhost:8080/transaction/5135771E0459ED85468EDF464C69BB6B335F43665B9E4DC96E609F72E2F9DC87
+```
+
+**Success Response (for `register_property`):**
+
+```json
+{
+  "type": "submission",
+  "region": "Dubai",
+  "valid": "true",
+  "hash": "c35ab3e83ff8518566190cb4d71f36781790ce5101dcdd8ccc2d67ca694edbcb",
+  "msg_index": "0"
+}
+```
+
 ### `POST /faucet`
 
 Requests funds from the built-in faucet. This is only available for development and testing purposes. The faucet account must be funded for this to work. On the first run, the sidecar will generate a `faucet` account and print its mnemonic phrase to the console. This mnemonic must be used to send funds to the faucet address before it can dispense tokens.

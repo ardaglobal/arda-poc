@@ -298,6 +298,7 @@ func main() {
 	mux.HandleFunc("/logout", server.logoutHandler)
 	mux.HandleFunc("/faucet", server.faucetHandler)
 	mux.HandleFunc("/transactions", server.listTransactionsHandler)
+	mux.HandleFunc("/transaction/", server.getTransactionHandler)
 
 	fmt.Println("Starting transaction sidecar server on :8080...")
 	if err := http.ListenAndServe(":8080", corsHandler(mux)); err != nil {
@@ -734,6 +735,80 @@ func (s *Server) listTransactionsHandler(w http.ResponseWriter, r *http.Request)
 	if err := json.NewEncoder(w).Encode(s.transactions); err != nil {
 		http.Error(w, "Failed to encode transactions to JSON", http.StatusInternalServerError)
 		return
+	}
+}
+
+func (s *Server) getTransactionHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	txHash := strings.TrimPrefix(r.URL.Path, "/transaction/")
+	if txHash == "" {
+		http.Error(w, "Transaction hash must be provided in the path", http.StatusBadRequest)
+		return
+	}
+
+	// Find our internal transaction type from the cache.
+	var trackedTx TrackedTx
+	found := false
+	for _, tx := range s.transactions {
+		if tx.TxHash == txHash {
+			trackedTx = tx
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		http.Error(w, "Transaction not found in local cache", http.StatusNotFound)
+		return
+	}
+
+	// Query the blockchain for the full transaction details
+	getTxRes, err := s.txClient.GetTx(r.Context(), &txtypes.GetTxRequest{Hash: txHash})
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to get transaction from blockchain: %v", err), http.StatusNotFound)
+		return
+	}
+
+	if getTxRes.TxResponse.Code != 0 {
+		http.Error(w, fmt.Sprintf("Transaction failed on-chain with code %d: %s", getTxRes.TxResponse.Code, getTxRes.TxResponse.RawLog), http.StatusInternalServerError)
+		return
+	}
+
+	// Process the response based on the transaction type from tx.json
+	switch trackedTx.Type {
+	case "register_property", "transfer_shares":
+		response := make(map[string]string)
+		eventFound := false
+
+		// The 'submission' event is in the top-level Events list.
+		for _, event := range getTxRes.TxResponse.Events {
+			if event.Type == "submission" {
+				eventFound = true
+				response["type"] = event.Type
+				for _, attr := range event.Attributes {
+					response[attr.Key] = attr.Value
+				}
+				break // We found the event, no need to continue.
+			}
+		}
+
+		if !eventFound {
+			http.Error(w, "Could not find 'submission' event in transaction logs", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		}
+
+	default:
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(getTxRes.TxResponse)
 	}
 }
 
