@@ -10,6 +10,7 @@ import (
 	"github.com/ardaglobal/arda-poc/pkg/utils"
 	ardatypes "github.com/ardaglobal/arda-poc/x/arda/types"
 	"github.com/ardaglobal/arda-poc/x/property/types"
+	usdtypes "github.com/ardaglobal/arda-poc/x/usdarda/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -56,8 +57,22 @@ func (k msgServer) TransferShares(goCtx context.Context, msg *types.MsgTransferS
 
 	ownerMap := k.ConvertPropertyOwnersToMap(property)
 	denom := types.PropertyShareDenom(property.Index)
+	usdDenom := usdtypes.USDArdaDenom
 
-	// Deduct shares from from_owners, move tokens to module account and burn USDArda
+	// Ensure all recipients have sufficient USDArda to cover the purchase
+	for i, newOwner := range msg.ToOwners {
+		addr, err := sdk.AccAddressFromBech32(newOwner)
+		if err != nil {
+			return nil, err
+		}
+		usdAmt := property.Value * msg.ToShares[i] / 100
+		balance := k.bankKeeper.SpendableCoins(ctx, addr).AmountOf(usdDenom)
+		if balance.LT(math.NewIntFromUint64(usdAmt)) {
+			return nil, fmt.Errorf("owner %s has insufficient usdarda", newOwner)
+		}
+	}
+
+	// Deduct shares from from_owners and move share tokens to the module account
 	fromSharesAndOwners := make([]string, 0, len(msg.FromOwners))
 	// NOTE: this is not atomic
 	for i, owner := range msg.FromOwners {
@@ -79,13 +94,9 @@ func (k msgServer) TransferShares(goCtx context.Context, msg *types.MsgTransferS
 		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, addr, types.ModuleName, sdk.NewCoins(coin)); err != nil {
 			return nil, err
 		}
-		usdAmt := property.Value * msg.FromShares[i] / 100
-		if err := k.usdardaKeeper.BurnFromAddress(ctx, addr, usdAmt); err != nil {
-			return nil, err
-		}
 	}
 
-	// Add shares to to_owners, distribute tokens from module account and mint USDArda
+	// Add shares to to_owners, distributing share tokens from the module account
 	toSharesAndOwners := make([]string, 0, len(msg.ToOwners))
 	// NOTE: this is not atomic
 	for i, newOwner := range msg.ToOwners {
@@ -100,8 +111,28 @@ func (k msgServer) TransferShares(goCtx context.Context, msg *types.MsgTransferS
 		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, addr, sdk.NewCoins(coin)); err != nil {
 			return nil, err
 		}
+	}
+
+	// Move USDArda from buyers to sellers via the module account
+	for i, newOwner := range msg.ToOwners {
+		addr, err := sdk.AccAddressFromBech32(newOwner)
+		if err != nil {
+			return nil, err
+		}
 		usdAmt := property.Value * msg.ToShares[i] / 100
-		if err := k.usdardaKeeper.MintToAddress(ctx, addr, usdAmt); err != nil {
+		coin := sdk.NewCoin(usdDenom, math.NewInt(int64(usdAmt)))
+		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, addr, types.ModuleName, sdk.NewCoins(coin)); err != nil {
+			return nil, err
+		}
+	}
+	for i, owner := range msg.FromOwners {
+		addr, err := sdk.AccAddressFromBech32(owner)
+		if err != nil {
+			return nil, err
+		}
+		usdAmt := property.Value * msg.FromShares[i] / 100
+		coin := sdk.NewCoin(usdDenom, math.NewInt(int64(usdAmt)))
+		if err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, addr, sdk.NewCoins(coin)); err != nil {
 			return nil, err
 		}
 	}

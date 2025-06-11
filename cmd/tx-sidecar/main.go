@@ -227,13 +227,17 @@ func main() {
 	}
 	defer server.Close()
 
-	userNames := make([]string, 0, len(server.users))
-	for name := range server.users {
-		if name != server.faucetName {
-			userNames = append(userNames, name)
+	developerUsers := make([]string, 0)
+	investorUsers := make([]string, 0)
+	for name, user := range server.users {
+		switch user.Role {
+		case "developer":
+			developerUsers = append(developerUsers, name)
+		case "investor":
+			investorUsers = append(investorUsers, name)
 		}
 	}
-	go server.RunAutoProperty(userNames)
+	go server.RunAutoProperty(developerUsers, investorUsers)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/register-property", server.registerPropertyHandler)
