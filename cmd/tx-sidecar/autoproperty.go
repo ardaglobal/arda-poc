@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math/rand"
 	"strings"
-	"time"
 
 	propertytypes "github.com/ardaglobal/arda-poc/x/property/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -248,6 +247,6 @@ func (s *Server) RunAutoProperty(developerUsers, investorUsers []string) {
 				fmt.Println(err)
 			}
 		}
-		time.Sleep(5 * time.Second)
 	}
+	fmt.Println("AutoProperty: Done")
 } 
