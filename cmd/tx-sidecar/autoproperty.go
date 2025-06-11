@@ -216,6 +216,52 @@ func (s *Server) transferShares(ctx context.Context, p *Property, investorUsers 
 	return nil
 }
 
+// autoEditPropertyMetadata fills in placeholder data for a newly created property.
+func (s *Server) autoEditPropertyMetadata(ctx context.Context, p *Property) error {
+	if len(p.Owners) == 0 {
+		return fmt.Errorf("autoproperty: property has no owners to source owner info from")
+	}
+
+	// 1. Generate placeholder data
+	propertyName := fmt.Sprintf("Auto Property %d", rand.Intn(1000))
+	propertyType := "residential"
+	parcelNumber := fmt.Sprintf("PN-%d", rand.Intn(100000))
+	size := fmt.Sprintf("%d sqft", rand.Intn(3000)+500)
+	constructionInfo := fmt.Sprintf("Built in %d", rand.Intn(50)+1970)
+	zoning := "R-1"
+	// Use the first owner's name for owner information.
+	// In a real scenario, this would be more detailed.
+	ownerInfo := p.Owners[0]
+	tenantId := "" // No tenant initially
+	unitNumber := fmt.Sprintf("Unit %d", rand.Intn(100)+1)
+
+	// 2. Build and broadcast the transaction
+	fromName := "ERES" // The transaction is authorized by the regulator
+	msgBuilder := func(fromAddr string) sdk.Msg {
+		return propertytypes.NewMsgEditPropertyMetadata(
+			fromAddr,
+			strings.ToLower(p.Address), // propertyID is the address
+			propertyName,
+			propertyType,
+			parcelNumber,
+			size,
+			constructionInfo,
+			zoning,
+			ownerInfo,
+			tenantId,
+			unitNumber,
+		)
+	}
+
+	_, err := s.buildSignAndBroadcastInternal(ctx, fromName, "auto", "edit_property_metadata", msgBuilder)
+	if err != nil {
+		return fmt.Errorf("autoproperty failed to edit property metadata: %w", err)
+	}
+
+	fmt.Printf("AutoProperty: Successfully edited metadata for property %s\n", p.Address)
+	return nil
+}
+
 // RunAutoProperty registers properties and continuously transfers shares.
 func (s *Server) RunAutoProperty(developerUsers, investorUsers []string) {
 	if len(developerUsers) == 0 {
@@ -237,6 +283,12 @@ func (s *Server) RunAutoProperty(developerUsers, investorUsers []string) {
 			fmt.Println(err)
 		} else {
 			properties = append(properties, p)
+
+			// Also edit the property's metadata with placeholder info.
+			fmt.Println("AutoProperty: Editing property metadata...")
+			if err := s.autoEditPropertyMetadata(ctx, &properties[len(properties)-1]); err != nil {
+				fmt.Println(err)
+			}
 		}
 
 		if len(properties) > 0 {
