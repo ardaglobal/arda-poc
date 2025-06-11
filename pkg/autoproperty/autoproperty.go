@@ -1,15 +1,14 @@
-// To run this script, update this to main. Do this after the chain is running to avoid build errors about duplicate main packages
-package scripts
+package autoproperty
 
 import (
+	"bytes"
 	"fmt"
 	"math/rand"
+	"os"
 	"os/exec"
 	"strings"
 	"time"
 )
-
-var users = []string{"alice", "bob", "charlie", "dan", "eve", "fred", "george", "harry"}
 
 // Property tracks current owners and their shares
 // Shares are represented as percentages and should sum to 100
@@ -48,15 +47,17 @@ func intSliceToString(v []int) string {
 }
 
 // registerProperty creates a new property with random data and sends the CLI command.
-func registerProperty() Property {
+func registerProperty(users []string) Property {
 	address := fmt.Sprintf("%d Main St", rand.Intn(9000)+100)
 	value := rand.Intn(900000) + 100000
 
 	// choose random number of owners
 	n := rand.Intn(len(users)) + 1
-	rand.Shuffle(len(users), func(i, j int) { users[i], users[j] = users[j], users[i] })
+	shuffledUsers := make([]string, len(users))
+	copy(shuffledUsers, users)
+	rand.Shuffle(len(shuffledUsers), func(i, j int) { shuffledUsers[i], shuffledUsers[j] = shuffledUsers[j], shuffledUsers[i] })
 	owners := make([]string, n)
-	copy(owners, users[:n])
+	copy(owners, shuffledUsers[:n])
 
 	shares := randomShares(n)
 
@@ -68,14 +69,22 @@ func registerProperty() Property {
 		address, "dubai", fmt.Sprintf("%d", value),
 		"--owners", ownersStr,
 		"--shares", sharesStr,
+		"--gas", "auto",
 		"--from", "ERES",
 		"-y",
 	}
 
 	cmd := exec.Command("arda-pocd", args...)
-	cmd.Stdout = nil
-	cmd.Stderr = nil
-	_ = cmd.Run() // ignore errors in this demo
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	err := cmd.Run()
+		fmt.Println("Stdout:", stdout.String())
+		fmt.Println("Stderr:", stderr.String())
+	if err != nil {
+		fmt.Println("Error registering property:", err)
+		os.Exit(1)
+	}
 
 	return Property{Address: address, Value: value, Owners: owners, Shares: shares}
 }
@@ -106,32 +115,46 @@ func transferShares(p *Property) {
 		strings.ToLower(p.Address),
 		fromOwner, fmt.Sprintf("%d", share),
 		toOwner, fmt.Sprintf("%d", share),
+		"--gas", "auto",
 		"--from", "ERES",
 		"-y",
 	}
 
 	cmd := exec.Command("arda-pocd", args...)
-	cmd.Stdout = nil
-	cmd.Stderr = nil
-	_ = cmd.Run()
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	err := cmd.Run()
+		fmt.Println("Stdout:", stdout.String())
+		fmt.Println("Stderr:", stderr.String())
+	if err != nil {
+		fmt.Println("Error transferring shares:", err)
+		os.Exit(1)
+	}
 
 	p.Shares[fromIdx] -= share
 	p.Shares[toIdx] += share
 }
 
-// AutoProperty registers properties and continuously transfers shares.
-func main() {
+// Run registers properties and continuously transfers shares.
+func Run(userList []string) {
+	if len(userList) < 2 {
+		fmt.Println("AutoProperty: At least 2 users are required to run, skipping.")
+		return
+	}
+
+	rand.Seed(time.Now().UnixNano())
+
 	var properties []Property
-	for {
-		fmt.Println("Registering property..")
-		p := registerProperty()
+	for i := 0; i < 10; i++ {
+		fmt.Println("AutoProperty: Registering property...")
+		p := registerProperty(userList)
 		properties = append(properties, p)
 		time.Sleep(5 * time.Second)
 
-		// Create transfers using random properties
-		fmt.Println("  Creating transfer..")
+		fmt.Println("AutoProperty: Creating transfer...")
 		randIdx := rand.Intn(len(properties))
 		transferShares(&properties[randIdx])
 		time.Sleep(5 * time.Second)
 	}
-}
+} 

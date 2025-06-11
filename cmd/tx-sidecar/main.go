@@ -20,6 +20,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
+	"github.com/ardaglobal/arda-poc/pkg/autoproperty"
 	sidecarclient "github.com/ardaglobal/arda-poc/pkg/client"
 )
 
@@ -226,6 +227,14 @@ func main() {
 		log.Fatalf("Failed to create server: %v", err)
 	}
 	defer server.Close()
+
+	userNames := make([]string, 0, len(server.users))
+	for name := range server.users {
+		if name != server.faucetName {
+			userNames = append(userNames, name)
+		}
+	}
+	go autoproperty.Run(userNames)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/register-property", server.registerPropertyHandler)
