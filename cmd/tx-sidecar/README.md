@@ -9,7 +9,7 @@ This is a **proof-of-concept** to demonstrate server-side transaction signing. F
 The service exposes several endpoints for interacting with the `arda-poc` blockchain. It uses the Cosmos SDK's Go libraries to programmatically:
 1.  Manage user registration and login via email. It maintains a `logins.json` to map emails to on-server keyring names, and a `users.json` to store created user account details (including mnemonics).
 2.  Load a pre-configured key (`ERES`) to sign administrative transactions like registering properties and transferring shares.
-3.  Construct the appropriate messages (`MsgRegisterProperty`, `MsgTransferShares`).
+3.  Construct the appropriate messages (`MsgRegisterProperty`, `MsgTransferShares`, `MsgEditPropertyMetadata`).
 4.  Query the blockchain for account details (number and sequence) needed for signing.
 5.  Build, sign, encode, and broadcast the transaction to a local node via gRPC.
 6.  Wait for the transaction to be included in a block and return the result.
@@ -312,7 +312,7 @@ Returns a JSON array of transaction details.
 
 Queries the blockchain for a specific transaction by its hash and returns details.
 
-If the transaction type (as stored by the sidecar) is `register_property` or `transfer_shares`, it parses the transaction logs to extract and return a simplified object from the `submission` event. For all other transaction types, it returns the full, raw transaction response from the blockchain node.
+If the transaction type (as stored by the sidecar) is `register_property` or `transfer_shares`, it returns a rich JSON object containing core transaction details, the decoded transaction messages, and any `submission` events that were emitted. For all other transaction types, it returns the full, raw transaction response from the blockchain node.
 
 **Path Parameters:**
 *   `tx_hash` (string): The hex-encoded transaction hash.
@@ -323,15 +323,40 @@ If the transaction type (as stored by the sidecar) is `register_property` or `tr
 curl http://localhost:8080/transaction/4778E3F24B96F69CB9C475DEEFF72C560F5E24DFC35F84DB1A141ACD9C574465
 ```
 
-**Success Response (for `register_property`):**
+**Success Response (for `register_property` or `transfer_shares`):**
 
+This response includes the decoded message that was part of the transaction.
 ```json
 {
-  "type": "submission",
-  "region": "Dubai",
-  "valid": "true",
-  "hash": "c35ab3e83ff8518566190cb4d71f36781790ce5101dcdd8ccc2d67ca694edbcb",
-  "msg_index": "0"
+  "height": "12345",
+  "txhash": "4778E3F24B96F69CB9C475DEEFF72C560F5E24DFC35F84DB1A141ACD9C574465",
+  "timestamp": "2023-10-30T12:00:00Z",
+  "events": [
+    {
+      "type": "submission",
+      "attributes": [
+        { "key": "region", "value": "Dubai" },
+        { "key": "valid", "value": "true" },
+        { "key": "hash", "value": "c35ab3e8..." },
+        { "key": "msg_index", "value": "0" }
+      ]
+    }
+  ],
+  "tx": {
+    "body": {
+      "messages": [
+        {
+          "@type": "/ardaglobal.arda.property.MsgRegisterProperty",
+          "creator": "arda1qzy8mf8epnpaetctnnhr28vl5h3d34jma8ev5y",
+          "address": "123 Sidecar Lane",
+          "region": "dev",
+          "value": "500000",
+          "owners": ["arda13pc7nj66w7cqsgs6kcn8x6n8a3gz76df7e552x"],
+          "shares": ["100"]
+        }
+      ]
+    }
+  }
 }
 ```
 
