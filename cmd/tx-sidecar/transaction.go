@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -15,6 +14,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	zlog "github.com/rs/zerolog/log"
 )
 
 // TrackedTx stores information about a transaction that has been broadcast.
@@ -124,7 +124,7 @@ func (s *Server) buildSignAndBroadcastInternal(ctx context.Context, fromName, ga
 
 	// Poll for the transaction to be included in a block.
 	txHash := res.TxResponse.TxHash
-	log.Printf("Transaction broadcasted with hash: %s. Polling for confirmation...", txHash)
+	zlog.Info().Msgf("Transaction broadcasted with hash: %s. Polling for confirmation...", txHash)
 
 	// This is a simplified polling mechanism. In a production system, you might want
 	// a more robust solution, possibly involving a message queue or a dedicated transaction tracker.
@@ -143,7 +143,7 @@ func (s *Server) buildSignAndBroadcastInternal(ctx context.Context, fromName, ga
 		}
 
 		// Transaction is confirmed.
-		log.Printf("Transaction %s confirmed in block %d.", txHash, txRes.TxResponse.Height)
+		zlog.Info().Msgf("Transaction %s confirmed in block %d.", txHash, txRes.TxResponse.Height)
 		s.trackTransaction(txType, txHash)
 		return txHash, nil
 	}
@@ -165,11 +165,11 @@ func (s *Server) trackTransaction(txType, txHash string) {
 func (s *Server) saveTransactionsToFile() {
 	data, err := json.MarshalIndent(s.transactions, "", "  ")
 	if err != nil {
-		log.Printf("Warning: failed to marshal transactions: %v", err)
+		zlog.Warn().Msgf("failed to marshal transactions: %v", err)
 		return
 	}
 	if err := os.WriteFile(s.transactionsFile, data, 0644); err != nil {
-		log.Printf("Warning: failed to write transactions file: %v", err)
+		zlog.Warn().Msgf("failed to write transactions file: %v", err)
 	}
 }
 
@@ -252,7 +252,7 @@ func (s *Server) getTransactionHandler(w http.ResponseWriter, r *http.Request) {
 		for _, msg := range sdkTx.GetMsgs() {
 			jsonBytes, err := s.clientCtx.Codec.MarshalJSON(msg)
 			if err != nil {
-				log.Printf("Warning: failed to marshal message to JSON: %v", err)
+				zlog.Warn().Msgf("failed to marshal message to JSON: %v", err)
 				http.Error(w, "Failed to marshal a transaction message to JSON", http.StatusInternalServerError)
 				return
 			}
@@ -275,4 +275,4 @@ func (s *Server) getTransactionHandler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(getTxRes.TxResponse)
 	}
-} 
+}
