@@ -8,6 +8,7 @@ import (
 
 	propertytypes "github.com/ardaglobal/arda-poc/x/property/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	zlog "github.com/rs/zerolog/log"
 )
 
 // Property tracks current owners and their shares
@@ -258,18 +259,18 @@ func (s *Server) autoEditPropertyMetadata(ctx context.Context, p *Property) erro
 		return fmt.Errorf("autoproperty failed to edit property metadata: %w", err)
 	}
 
-	fmt.Printf("AutoProperty: Successfully edited metadata for property %s\n", p.Address)
+	zlog.Info().Msgf("AutoProperty: Successfully edited metadata for property %s", p.Address)
 	return nil
 }
 
 // RunAutoProperty registers properties and continuously transfers shares.
 func (s *Server) RunAutoProperty(developerUsers, investorUsers []string) {
 	if len(developerUsers) == 0 {
-		fmt.Println("AutoProperty: At least 1 developer is required to run, skipping.")
+		zlog.Info().Msg("AutoProperty: At least 1 developer is required to run, skipping.")
 		return
 	}
 	if len(investorUsers) < 2 {
-		fmt.Println("AutoProperty: At least 2 investors are required to run, skipping.")
+		zlog.Info().Msg("AutoProperty: At least 2 investors are required to run, skipping.")
 		return
 	}
 
@@ -277,28 +278,28 @@ func (s *Server) RunAutoProperty(developerUsers, investorUsers []string) {
 	ctx := context.Background()
 
 	for i := 0; i < 10; i++ {
-		fmt.Println("AutoProperty: Registering property...")
+		zlog.Info().Msg("AutoProperty: Registering property...")
 		p, err := s.registerProperty(ctx, developerUsers)
 		if err != nil {
-			fmt.Println(err)
+			zlog.Error().Err(err).Msg("autoproperty register property")
 		} else {
 			properties = append(properties, p)
 
 			// Also edit the property's metadata with placeholder info.
-			fmt.Println("AutoProperty: Editing property metadata...")
+			zlog.Info().Msg("AutoProperty: Editing property metadata...")
 			if err := s.autoEditPropertyMetadata(ctx, &properties[len(properties)-1]); err != nil {
-				fmt.Println(err)
+				zlog.Error().Err(err).Msg("autoproperty edit metadata")
 			}
 		}
 
 		if len(properties) > 0 {
-			fmt.Println("AutoProperty: Creating transfer...")
+			zlog.Info().Msg("AutoProperty: Creating transfer...")
 			randIdx := rand.Intn(len(properties))
 			err := s.transferShares(ctx, &properties[randIdx], investorUsers)
 			if err != nil {
-				fmt.Println(err)
+				zlog.Error().Err(err).Msg("autoproperty transfer")
 			}
 		}
 	}
-	fmt.Println("AutoProperty: Done")
-} 
+	zlog.Info().Msg("AutoProperty: Done")
+}
