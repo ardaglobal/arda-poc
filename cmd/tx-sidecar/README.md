@@ -320,7 +320,7 @@ If the transaction type (as stored by the sidecar) is `register_property` or `tr
 **Example `curl` Request:**
 
 ```bash
-curl http://localhost:8080/transaction/5135771E0459ED85468EDF464C69BB6B335F43665B9E4DC96E609F72E2F9DC87
+curl http://localhost:8080/transaction/4778E3F24B96F69CB9C475DEEFF72C560F5E24DFC35F84DB1A141ACD9C574465
 ```
 
 **Success Response (for `register_property`):**

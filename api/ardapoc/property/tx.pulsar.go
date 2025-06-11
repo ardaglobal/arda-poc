@@ -3576,6 +3576,1422 @@ func (x *fastReflection_MsgTransferSharesResponse) ProtoMethods() *protoiface.Me
 	}
 }
 
+var (
+	md_MsgEditPropertyMetadata                          protoreflect.MessageDescriptor
+	fd_MsgEditPropertyMetadata_creator                  protoreflect.FieldDescriptor
+	fd_MsgEditPropertyMetadata_property_id              protoreflect.FieldDescriptor
+	fd_MsgEditPropertyMetadata_property_name            protoreflect.FieldDescriptor
+	fd_MsgEditPropertyMetadata_property_type            protoreflect.FieldDescriptor
+	fd_MsgEditPropertyMetadata_parcel_number            protoreflect.FieldDescriptor
+	fd_MsgEditPropertyMetadata_parcel_size              protoreflect.FieldDescriptor
+	fd_MsgEditPropertyMetadata_construction_information protoreflect.FieldDescriptor
+	fd_MsgEditPropertyMetadata_zoning_classification    protoreflect.FieldDescriptor
+	fd_MsgEditPropertyMetadata_owner_information        protoreflect.FieldDescriptor
+	fd_MsgEditPropertyMetadata_tenant_id                protoreflect.FieldDescriptor
+	fd_MsgEditPropertyMetadata_unit_number              protoreflect.FieldDescriptor
+)
+
+func init() {
+	file_ardapoc_property_tx_proto_init()
+	md_MsgEditPropertyMetadata = File_ardapoc_property_tx_proto.Messages().ByName("MsgEditPropertyMetadata")
+	fd_MsgEditPropertyMetadata_creator = md_MsgEditPropertyMetadata.Fields().ByName("creator")
+	fd_MsgEditPropertyMetadata_property_id = md_MsgEditPropertyMetadata.Fields().ByName("property_id")
+	fd_MsgEditPropertyMetadata_property_name = md_MsgEditPropertyMetadata.Fields().ByName("property_name")
+	fd_MsgEditPropertyMetadata_property_type = md_MsgEditPropertyMetadata.Fields().ByName("property_type")
+	fd_MsgEditPropertyMetadata_parcel_number = md_MsgEditPropertyMetadata.Fields().ByName("parcel_number")
+	fd_MsgEditPropertyMetadata_parcel_size = md_MsgEditPropertyMetadata.Fields().ByName("parcel_size")
+	fd_MsgEditPropertyMetadata_construction_information = md_MsgEditPropertyMetadata.Fields().ByName("construction_information")
+	fd_MsgEditPropertyMetadata_zoning_classification = md_MsgEditPropertyMetadata.Fields().ByName("zoning_classification")
+	fd_MsgEditPropertyMetadata_owner_information = md_MsgEditPropertyMetadata.Fields().ByName("owner_information")
+	fd_MsgEditPropertyMetadata_tenant_id = md_MsgEditPropertyMetadata.Fields().ByName("tenant_id")
+	fd_MsgEditPropertyMetadata_unit_number = md_MsgEditPropertyMetadata.Fields().ByName("unit_number")
+}
+
+var _ protoreflect.Message = (*fastReflection_MsgEditPropertyMetadata)(nil)
+
+type fastReflection_MsgEditPropertyMetadata MsgEditPropertyMetadata
+
+func (x *MsgEditPropertyMetadata) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_MsgEditPropertyMetadata)(x)
+}
+
+func (x *MsgEditPropertyMetadata) slowProtoReflect() protoreflect.Message {
+	mi := &file_ardapoc_property_tx_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+var _fastReflection_MsgEditPropertyMetadata_messageType fastReflection_MsgEditPropertyMetadata_messageType
+var _ protoreflect.MessageType = fastReflection_MsgEditPropertyMetadata_messageType{}
+
+type fastReflection_MsgEditPropertyMetadata_messageType struct{}
+
+func (x fastReflection_MsgEditPropertyMetadata_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_MsgEditPropertyMetadata)(nil)
+}
+func (x fastReflection_MsgEditPropertyMetadata_messageType) New() protoreflect.Message {
+	return new(fastReflection_MsgEditPropertyMetadata)
+}
+func (x fastReflection_MsgEditPropertyMetadata_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgEditPropertyMetadata
+}
+
+// Descriptor returns message descriptor, which contains only the protobuf
+// type information for the message.
+func (x *fastReflection_MsgEditPropertyMetadata) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgEditPropertyMetadata
+}
+
+// Type returns the message type, which encapsulates both Go and protobuf
+// type information. If the Go type information is not needed,
+// it is recommended that the message descriptor be used instead.
+func (x *fastReflection_MsgEditPropertyMetadata) Type() protoreflect.MessageType {
+	return _fastReflection_MsgEditPropertyMetadata_messageType
+}
+
+// New returns a newly allocated and mutable empty message.
+func (x *fastReflection_MsgEditPropertyMetadata) New() protoreflect.Message {
+	return new(fastReflection_MsgEditPropertyMetadata)
+}
+
+// Interface unwraps the message reflection interface and
+// returns the underlying ProtoMessage interface.
+func (x *fastReflection_MsgEditPropertyMetadata) Interface() protoreflect.ProtoMessage {
+	return (*MsgEditPropertyMetadata)(x)
+}
+
+// Range iterates over every populated field in an undefined order,
+// calling f for each field descriptor and value encountered.
+// Range returns immediately if f returns false.
+// While iterating, mutating operations may only be performed
+// on the current field descriptor.
+func (x *fastReflection_MsgEditPropertyMetadata) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if x.Creator != "" {
+		value := protoreflect.ValueOfString(x.Creator)
+		if !f(fd_MsgEditPropertyMetadata_creator, value) {
+			return
+		}
+	}
+	if x.PropertyId != "" {
+		value := protoreflect.ValueOfString(x.PropertyId)
+		if !f(fd_MsgEditPropertyMetadata_property_id, value) {
+			return
+		}
+	}
+	if x.PropertyName != "" {
+		value := protoreflect.ValueOfString(x.PropertyName)
+		if !f(fd_MsgEditPropertyMetadata_property_name, value) {
+			return
+		}
+	}
+	if x.PropertyType != "" {
+		value := protoreflect.ValueOfString(x.PropertyType)
+		if !f(fd_MsgEditPropertyMetadata_property_type, value) {
+			return
+		}
+	}
+	if x.ParcelNumber != "" {
+		value := protoreflect.ValueOfString(x.ParcelNumber)
+		if !f(fd_MsgEditPropertyMetadata_parcel_number, value) {
+			return
+		}
+	}
+	if x.ParcelSize != "" {
+		value := protoreflect.ValueOfString(x.ParcelSize)
+		if !f(fd_MsgEditPropertyMetadata_parcel_size, value) {
+			return
+		}
+	}
+	if x.ConstructionInformation != "" {
+		value := protoreflect.ValueOfString(x.ConstructionInformation)
+		if !f(fd_MsgEditPropertyMetadata_construction_information, value) {
+			return
+		}
+	}
+	if x.ZoningClassification != "" {
+		value := protoreflect.ValueOfString(x.ZoningClassification)
+		if !f(fd_MsgEditPropertyMetadata_zoning_classification, value) {
+			return
+		}
+	}
+	if x.OwnerInformation != "" {
+		value := protoreflect.ValueOfString(x.OwnerInformation)
+		if !f(fd_MsgEditPropertyMetadata_owner_information, value) {
+			return
+		}
+	}
+	if x.TenantId != "" {
+		value := protoreflect.ValueOfString(x.TenantId)
+		if !f(fd_MsgEditPropertyMetadata_tenant_id, value) {
+			return
+		}
+	}
+	if x.UnitNumber != "" {
+		value := protoreflect.ValueOfString(x.UnitNumber)
+		if !f(fd_MsgEditPropertyMetadata_unit_number, value) {
+			return
+		}
+	}
+}
+
+// Has reports whether a field is populated.
+//
+// Some fields have the property of nullability where it is possible to
+// distinguish between the default value of a field and whether the field
+// was explicitly populated with the default value. Singular message fields,
+// member fields of a oneof, and proto2 scalar fields are nullable. Such
+// fields are populated only if explicitly set.
+//
+// In other cases (aside from the nullable cases above),
+// a proto3 scalar field is populated if it contains a non-zero value, and
+// a repeated field is populated if it is non-empty.
+func (x *fastReflection_MsgEditPropertyMetadata) Has(fd protoreflect.FieldDescriptor) bool {
+	switch fd.FullName() {
+	case "ardapoc.property.MsgEditPropertyMetadata.creator":
+		return x.Creator != ""
+	case "ardapoc.property.MsgEditPropertyMetadata.property_id":
+		return x.PropertyId != ""
+	case "ardapoc.property.MsgEditPropertyMetadata.property_name":
+		return x.PropertyName != ""
+	case "ardapoc.property.MsgEditPropertyMetadata.property_type":
+		return x.PropertyType != ""
+	case "ardapoc.property.MsgEditPropertyMetadata.parcel_number":
+		return x.ParcelNumber != ""
+	case "ardapoc.property.MsgEditPropertyMetadata.parcel_size":
+		return x.ParcelSize != ""
+	case "ardapoc.property.MsgEditPropertyMetadata.construction_information":
+		return x.ConstructionInformation != ""
+	case "ardapoc.property.MsgEditPropertyMetadata.zoning_classification":
+		return x.ZoningClassification != ""
+	case "ardapoc.property.MsgEditPropertyMetadata.owner_information":
+		return x.OwnerInformation != ""
+	case "ardapoc.property.MsgEditPropertyMetadata.tenant_id":
+		return x.TenantId != ""
+	case "ardapoc.property.MsgEditPropertyMetadata.unit_number":
+		return x.UnitNumber != ""
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.property.MsgEditPropertyMetadata"))
+		}
+		panic(fmt.Errorf("message ardapoc.property.MsgEditPropertyMetadata does not contain field %s", fd.FullName()))
+	}
+}
+
+// Clear clears the field such that a subsequent Has call reports false.
+//
+// Clearing an extension field clears both the extension type and value
+// associated with the given field number.
+//
+// Clear is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_MsgEditPropertyMetadata) Clear(fd protoreflect.FieldDescriptor) {
+	switch fd.FullName() {
+	case "ardapoc.property.MsgEditPropertyMetadata.creator":
+		x.Creator = ""
+	case "ardapoc.property.MsgEditPropertyMetadata.property_id":
+		x.PropertyId = ""
+	case "ardapoc.property.MsgEditPropertyMetadata.property_name":
+		x.PropertyName = ""
+	case "ardapoc.property.MsgEditPropertyMetadata.property_type":
+		x.PropertyType = ""
+	case "ardapoc.property.MsgEditPropertyMetadata.parcel_number":
+		x.ParcelNumber = ""
+	case "ardapoc.property.MsgEditPropertyMetadata.parcel_size":
+		x.ParcelSize = ""
+	case "ardapoc.property.MsgEditPropertyMetadata.construction_information":
+		x.ConstructionInformation = ""
+	case "ardapoc.property.MsgEditPropertyMetadata.zoning_classification":
+		x.ZoningClassification = ""
+	case "ardapoc.property.MsgEditPropertyMetadata.owner_information":
+		x.OwnerInformation = ""
+	case "ardapoc.property.MsgEditPropertyMetadata.tenant_id":
+		x.TenantId = ""
+	case "ardapoc.property.MsgEditPropertyMetadata.unit_number":
+		x.UnitNumber = ""
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.property.MsgEditPropertyMetadata"))
+		}
+		panic(fmt.Errorf("message ardapoc.property.MsgEditPropertyMetadata does not contain field %s", fd.FullName()))
+	}
+}
+
+// Get retrieves the value for a field.
+//
+// For unpopulated scalars, it returns the default value, where
+// the default value of a bytes scalar is guaranteed to be a copy.
+// For unpopulated composite types, it returns an empty, read-only view
+// of the value; to obtain a mutable reference, use Mutable.
+func (x *fastReflection_MsgEditPropertyMetadata) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+	switch descriptor.FullName() {
+	case "ardapoc.property.MsgEditPropertyMetadata.creator":
+		value := x.Creator
+		return protoreflect.ValueOfString(value)
+	case "ardapoc.property.MsgEditPropertyMetadata.property_id":
+		value := x.PropertyId
+		return protoreflect.ValueOfString(value)
+	case "ardapoc.property.MsgEditPropertyMetadata.property_name":
+		value := x.PropertyName
+		return protoreflect.ValueOfString(value)
+	case "ardapoc.property.MsgEditPropertyMetadata.property_type":
+		value := x.PropertyType
+		return protoreflect.ValueOfString(value)
+	case "ardapoc.property.MsgEditPropertyMetadata.parcel_number":
+		value := x.ParcelNumber
+		return protoreflect.ValueOfString(value)
+	case "ardapoc.property.MsgEditPropertyMetadata.parcel_size":
+		value := x.ParcelSize
+		return protoreflect.ValueOfString(value)
+	case "ardapoc.property.MsgEditPropertyMetadata.construction_information":
+		value := x.ConstructionInformation
+		return protoreflect.ValueOfString(value)
+	case "ardapoc.property.MsgEditPropertyMetadata.zoning_classification":
+		value := x.ZoningClassification
+		return protoreflect.ValueOfString(value)
+	case "ardapoc.property.MsgEditPropertyMetadata.owner_information":
+		value := x.OwnerInformation
+		return protoreflect.ValueOfString(value)
+	case "ardapoc.property.MsgEditPropertyMetadata.tenant_id":
+		value := x.TenantId
+		return protoreflect.ValueOfString(value)
+	case "ardapoc.property.MsgEditPropertyMetadata.unit_number":
+		value := x.UnitNumber
+		return protoreflect.ValueOfString(value)
+	default:
+		if descriptor.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.property.MsgEditPropertyMetadata"))
+		}
+		panic(fmt.Errorf("message ardapoc.property.MsgEditPropertyMetadata does not contain field %s", descriptor.FullName()))
+	}
+}
+
+// Set stores the value for a field.
+//
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType.
+// When setting a composite type, it is unspecified whether the stored value
+// aliases the source's memory in any way. If the composite value is an
+// empty, read-only value, then it panics.
+//
+// Set is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_MsgEditPropertyMetadata) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+	switch fd.FullName() {
+	case "ardapoc.property.MsgEditPropertyMetadata.creator":
+		x.Creator = value.Interface().(string)
+	case "ardapoc.property.MsgEditPropertyMetadata.property_id":
+		x.PropertyId = value.Interface().(string)
+	case "ardapoc.property.MsgEditPropertyMetadata.property_name":
+		x.PropertyName = value.Interface().(string)
+	case "ardapoc.property.MsgEditPropertyMetadata.property_type":
+		x.PropertyType = value.Interface().(string)
+	case "ardapoc.property.MsgEditPropertyMetadata.parcel_number":
+		x.ParcelNumber = value.Interface().(string)
+	case "ardapoc.property.MsgEditPropertyMetadata.parcel_size":
+		x.ParcelSize = value.Interface().(string)
+	case "ardapoc.property.MsgEditPropertyMetadata.construction_information":
+		x.ConstructionInformation = value.Interface().(string)
+	case "ardapoc.property.MsgEditPropertyMetadata.zoning_classification":
+		x.ZoningClassification = value.Interface().(string)
+	case "ardapoc.property.MsgEditPropertyMetadata.owner_information":
+		x.OwnerInformation = value.Interface().(string)
+	case "ardapoc.property.MsgEditPropertyMetadata.tenant_id":
+		x.TenantId = value.Interface().(string)
+	case "ardapoc.property.MsgEditPropertyMetadata.unit_number":
+		x.UnitNumber = value.Interface().(string)
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.property.MsgEditPropertyMetadata"))
+		}
+		panic(fmt.Errorf("message ardapoc.property.MsgEditPropertyMetadata does not contain field %s", fd.FullName()))
+	}
+}
+
+// Mutable returns a mutable reference to a composite type.
+//
+// If the field is unpopulated, it may allocate a composite value.
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType
+// if not already stored.
+// It panics if the field does not contain a composite type.
+//
+// Mutable is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_MsgEditPropertyMetadata) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "ardapoc.property.MsgEditPropertyMetadata.creator":
+		panic(fmt.Errorf("field creator of message ardapoc.property.MsgEditPropertyMetadata is not mutable"))
+	case "ardapoc.property.MsgEditPropertyMetadata.property_id":
+		panic(fmt.Errorf("field property_id of message ardapoc.property.MsgEditPropertyMetadata is not mutable"))
+	case "ardapoc.property.MsgEditPropertyMetadata.property_name":
+		panic(fmt.Errorf("field property_name of message ardapoc.property.MsgEditPropertyMetadata is not mutable"))
+	case "ardapoc.property.MsgEditPropertyMetadata.property_type":
+		panic(fmt.Errorf("field property_type of message ardapoc.property.MsgEditPropertyMetadata is not mutable"))
+	case "ardapoc.property.MsgEditPropertyMetadata.parcel_number":
+		panic(fmt.Errorf("field parcel_number of message ardapoc.property.MsgEditPropertyMetadata is not mutable"))
+	case "ardapoc.property.MsgEditPropertyMetadata.parcel_size":
+		panic(fmt.Errorf("field parcel_size of message ardapoc.property.MsgEditPropertyMetadata is not mutable"))
+	case "ardapoc.property.MsgEditPropertyMetadata.construction_information":
+		panic(fmt.Errorf("field construction_information of message ardapoc.property.MsgEditPropertyMetadata is not mutable"))
+	case "ardapoc.property.MsgEditPropertyMetadata.zoning_classification":
+		panic(fmt.Errorf("field zoning_classification of message ardapoc.property.MsgEditPropertyMetadata is not mutable"))
+	case "ardapoc.property.MsgEditPropertyMetadata.owner_information":
+		panic(fmt.Errorf("field owner_information of message ardapoc.property.MsgEditPropertyMetadata is not mutable"))
+	case "ardapoc.property.MsgEditPropertyMetadata.tenant_id":
+		panic(fmt.Errorf("field tenant_id of message ardapoc.property.MsgEditPropertyMetadata is not mutable"))
+	case "ardapoc.property.MsgEditPropertyMetadata.unit_number":
+		panic(fmt.Errorf("field unit_number of message ardapoc.property.MsgEditPropertyMetadata is not mutable"))
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.property.MsgEditPropertyMetadata"))
+		}
+		panic(fmt.Errorf("message ardapoc.property.MsgEditPropertyMetadata does not contain field %s", fd.FullName()))
+	}
+}
+
+// NewField returns a new value that is assignable to the field
+// for the given descriptor. For scalars, this returns the default value.
+// For lists, maps, and messages, this returns a new, empty, mutable value.
+func (x *fastReflection_MsgEditPropertyMetadata) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "ardapoc.property.MsgEditPropertyMetadata.creator":
+		return protoreflect.ValueOfString("")
+	case "ardapoc.property.MsgEditPropertyMetadata.property_id":
+		return protoreflect.ValueOfString("")
+	case "ardapoc.property.MsgEditPropertyMetadata.property_name":
+		return protoreflect.ValueOfString("")
+	case "ardapoc.property.MsgEditPropertyMetadata.property_type":
+		return protoreflect.ValueOfString("")
+	case "ardapoc.property.MsgEditPropertyMetadata.parcel_number":
+		return protoreflect.ValueOfString("")
+	case "ardapoc.property.MsgEditPropertyMetadata.parcel_size":
+		return protoreflect.ValueOfString("")
+	case "ardapoc.property.MsgEditPropertyMetadata.construction_information":
+		return protoreflect.ValueOfString("")
+	case "ardapoc.property.MsgEditPropertyMetadata.zoning_classification":
+		return protoreflect.ValueOfString("")
+	case "ardapoc.property.MsgEditPropertyMetadata.owner_information":
+		return protoreflect.ValueOfString("")
+	case "ardapoc.property.MsgEditPropertyMetadata.tenant_id":
+		return protoreflect.ValueOfString("")
+	case "ardapoc.property.MsgEditPropertyMetadata.unit_number":
+		return protoreflect.ValueOfString("")
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.property.MsgEditPropertyMetadata"))
+		}
+		panic(fmt.Errorf("message ardapoc.property.MsgEditPropertyMetadata does not contain field %s", fd.FullName()))
+	}
+}
+
+// WhichOneof reports which field within the oneof is populated,
+// returning nil if none are populated.
+// It panics if the oneof descriptor does not belong to this message.
+func (x *fastReflection_MsgEditPropertyMetadata) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+	switch d.FullName() {
+	default:
+		panic(fmt.Errorf("%s is not a oneof field in ardapoc.property.MsgEditPropertyMetadata", d.FullName()))
+	}
+	panic("unreachable")
+}
+
+// GetUnknown retrieves the entire list of unknown fields.
+// The caller may only mutate the contents of the RawFields
+// if the mutated bytes are stored back into the message with SetUnknown.
+func (x *fastReflection_MsgEditPropertyMetadata) GetUnknown() protoreflect.RawFields {
+	return x.unknownFields
+}
+
+// SetUnknown stores an entire list of unknown fields.
+// The raw fields must be syntactically valid according to the wire format.
+// An implementation may panic if this is not the case.
+// Once stored, the caller must not mutate the content of the RawFields.
+// An empty RawFields may be passed to clear the fields.
+//
+// SetUnknown is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_MsgEditPropertyMetadata) SetUnknown(fields protoreflect.RawFields) {
+	x.unknownFields = fields
+}
+
+// IsValid reports whether the message is valid.
+//
+// An invalid message is an empty, read-only value.
+//
+// An invalid message often corresponds to a nil pointer of the concrete
+// message type, but the details are implementation dependent.
+// Validity is not part of the protobuf data model, and may not
+// be preserved in marshaling or other operations.
+func (x *fastReflection_MsgEditPropertyMetadata) IsValid() bool {
+	return x != nil
+}
+
+// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
+// This method may return nil.
+//
+// The returned methods type is identical to
+// "google.golang.org/protobuf/runtime/protoiface".Methods.
+// Consult the protoiface package documentation for details.
+func (x *fastReflection_MsgEditPropertyMetadata) ProtoMethods() *protoiface.Methods {
+	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
+		x := input.Message.Interface().(*MsgEditPropertyMetadata)
+		if x == nil {
+			return protoiface.SizeOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Size:              0,
+			}
+		}
+		options := runtime.SizeInputToOptions(input)
+		_ = options
+		var n int
+		var l int
+		_ = l
+		l = len(x.Creator)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.PropertyId)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.PropertyName)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.PropertyType)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.ParcelNumber)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.ParcelSize)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.ConstructionInformation)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.ZoningClassification)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.OwnerInformation)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.TenantId)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.UnitNumber)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.unknownFields != nil {
+			n += len(x.unknownFields)
+		}
+		return protoiface.SizeOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Size:              n,
+		}
+	}
+
+	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
+		x := input.Message.Interface().(*MsgEditPropertyMetadata)
+		if x == nil {
+			return protoiface.MarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Buf:               input.Buf,
+			}, nil
+		}
+		options := runtime.MarshalInputToOptions(input)
+		_ = options
+		size := options.Size(x)
+		dAtA := make([]byte, size)
+		i := len(dAtA)
+		_ = i
+		var l int
+		_ = l
+		if x.unknownFields != nil {
+			i -= len(x.unknownFields)
+			copy(dAtA[i:], x.unknownFields)
+		}
+		if len(x.UnitNumber) > 0 {
+			i -= len(x.UnitNumber)
+			copy(dAtA[i:], x.UnitNumber)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.UnitNumber)))
+			i--
+			dAtA[i] = 0x5a
+		}
+		if len(x.TenantId) > 0 {
+			i -= len(x.TenantId)
+			copy(dAtA[i:], x.TenantId)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.TenantId)))
+			i--
+			dAtA[i] = 0x52
+		}
+		if len(x.OwnerInformation) > 0 {
+			i -= len(x.OwnerInformation)
+			copy(dAtA[i:], x.OwnerInformation)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.OwnerInformation)))
+			i--
+			dAtA[i] = 0x4a
+		}
+		if len(x.ZoningClassification) > 0 {
+			i -= len(x.ZoningClassification)
+			copy(dAtA[i:], x.ZoningClassification)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.ZoningClassification)))
+			i--
+			dAtA[i] = 0x42
+		}
+		if len(x.ConstructionInformation) > 0 {
+			i -= len(x.ConstructionInformation)
+			copy(dAtA[i:], x.ConstructionInformation)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.ConstructionInformation)))
+			i--
+			dAtA[i] = 0x3a
+		}
+		if len(x.ParcelSize) > 0 {
+			i -= len(x.ParcelSize)
+			copy(dAtA[i:], x.ParcelSize)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.ParcelSize)))
+			i--
+			dAtA[i] = 0x32
+		}
+		if len(x.ParcelNumber) > 0 {
+			i -= len(x.ParcelNumber)
+			copy(dAtA[i:], x.ParcelNumber)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.ParcelNumber)))
+			i--
+			dAtA[i] = 0x2a
+		}
+		if len(x.PropertyType) > 0 {
+			i -= len(x.PropertyType)
+			copy(dAtA[i:], x.PropertyType)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.PropertyType)))
+			i--
+			dAtA[i] = 0x22
+		}
+		if len(x.PropertyName) > 0 {
+			i -= len(x.PropertyName)
+			copy(dAtA[i:], x.PropertyName)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.PropertyName)))
+			i--
+			dAtA[i] = 0x1a
+		}
+		if len(x.PropertyId) > 0 {
+			i -= len(x.PropertyId)
+			copy(dAtA[i:], x.PropertyId)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.PropertyId)))
+			i--
+			dAtA[i] = 0x12
+		}
+		if len(x.Creator) > 0 {
+			i -= len(x.Creator)
+			copy(dAtA[i:], x.Creator)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Creator)))
+			i--
+			dAtA[i] = 0xa
+		}
+		if input.Buf != nil {
+			input.Buf = append(input.Buf, dAtA...)
+		} else {
+			input.Buf = dAtA
+		}
+		return protoiface.MarshalOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Buf:               input.Buf,
+		}, nil
+	}
+	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
+		x := input.Message.Interface().(*MsgEditPropertyMetadata)
+		if x == nil {
+			return protoiface.UnmarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Flags:             input.Flags,
+			}, nil
+		}
+		options := runtime.UnmarshalInputToOptions(input)
+		_ = options
+		dAtA := input.Buf
+		l := len(dAtA)
+		iNdEx := 0
+		for iNdEx < l {
+			preIndex := iNdEx
+			var wire uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				wire |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			fieldNum := int32(wire >> 3)
+			wireType := int(wire & 0x7)
+			if wireType == 4 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgEditPropertyMetadata: wiretype end group for non-group")
+			}
+			if fieldNum <= 0 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgEditPropertyMetadata: illegal tag %d (wire type %d)", fieldNum, wire)
+			}
+			switch fieldNum {
+			case 1:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Creator = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 2:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field PropertyId", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.PropertyId = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 3:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field PropertyName", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.PropertyName = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 4:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field PropertyType", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.PropertyType = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 5:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field ParcelNumber", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.ParcelNumber = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 6:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field ParcelSize", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.ParcelSize = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 7:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field ConstructionInformation", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.ConstructionInformation = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 8:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field ZoningClassification", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.ZoningClassification = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 9:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field OwnerInformation", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.OwnerInformation = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 10:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field TenantId", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.TenantId = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 11:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field UnitNumber", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.UnitNumber = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			default:
+				iNdEx = preIndex
+				skippy, err := runtime.Skip(dAtA[iNdEx:])
+				if err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				if (skippy < 0) || (iNdEx+skippy) < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if (iNdEx + skippy) > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if !options.DiscardUnknown {
+					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+				}
+				iNdEx += skippy
+			}
+		}
+
+		if iNdEx > l {
+			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+		}
+		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
+	}
+	return &protoiface.Methods{
+		NoUnkeyedLiterals: struct{}{},
+		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
+		Size:              size,
+		Marshal:           marshal,
+		Unmarshal:         unmarshal,
+		Merge:             nil,
+		CheckInitialized:  nil,
+	}
+}
+
+var (
+	md_MsgEditPropertyMetadataResponse protoreflect.MessageDescriptor
+)
+
+func init() {
+	file_ardapoc_property_tx_proto_init()
+	md_MsgEditPropertyMetadataResponse = File_ardapoc_property_tx_proto.Messages().ByName("MsgEditPropertyMetadataResponse")
+}
+
+var _ protoreflect.Message = (*fastReflection_MsgEditPropertyMetadataResponse)(nil)
+
+type fastReflection_MsgEditPropertyMetadataResponse MsgEditPropertyMetadataResponse
+
+func (x *MsgEditPropertyMetadataResponse) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_MsgEditPropertyMetadataResponse)(x)
+}
+
+func (x *MsgEditPropertyMetadataResponse) slowProtoReflect() protoreflect.Message {
+	mi := &file_ardapoc_property_tx_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+var _fastReflection_MsgEditPropertyMetadataResponse_messageType fastReflection_MsgEditPropertyMetadataResponse_messageType
+var _ protoreflect.MessageType = fastReflection_MsgEditPropertyMetadataResponse_messageType{}
+
+type fastReflection_MsgEditPropertyMetadataResponse_messageType struct{}
+
+func (x fastReflection_MsgEditPropertyMetadataResponse_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_MsgEditPropertyMetadataResponse)(nil)
+}
+func (x fastReflection_MsgEditPropertyMetadataResponse_messageType) New() protoreflect.Message {
+	return new(fastReflection_MsgEditPropertyMetadataResponse)
+}
+func (x fastReflection_MsgEditPropertyMetadataResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgEditPropertyMetadataResponse
+}
+
+// Descriptor returns message descriptor, which contains only the protobuf
+// type information for the message.
+func (x *fastReflection_MsgEditPropertyMetadataResponse) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgEditPropertyMetadataResponse
+}
+
+// Type returns the message type, which encapsulates both Go and protobuf
+// type information. If the Go type information is not needed,
+// it is recommended that the message descriptor be used instead.
+func (x *fastReflection_MsgEditPropertyMetadataResponse) Type() protoreflect.MessageType {
+	return _fastReflection_MsgEditPropertyMetadataResponse_messageType
+}
+
+// New returns a newly allocated and mutable empty message.
+func (x *fastReflection_MsgEditPropertyMetadataResponse) New() protoreflect.Message {
+	return new(fastReflection_MsgEditPropertyMetadataResponse)
+}
+
+// Interface unwraps the message reflection interface and
+// returns the underlying ProtoMessage interface.
+func (x *fastReflection_MsgEditPropertyMetadataResponse) Interface() protoreflect.ProtoMessage {
+	return (*MsgEditPropertyMetadataResponse)(x)
+}
+
+// Range iterates over every populated field in an undefined order,
+// calling f for each field descriptor and value encountered.
+// Range returns immediately if f returns false.
+// While iterating, mutating operations may only be performed
+// on the current field descriptor.
+func (x *fastReflection_MsgEditPropertyMetadataResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+}
+
+// Has reports whether a field is populated.
+//
+// Some fields have the property of nullability where it is possible to
+// distinguish between the default value of a field and whether the field
+// was explicitly populated with the default value. Singular message fields,
+// member fields of a oneof, and proto2 scalar fields are nullable. Such
+// fields are populated only if explicitly set.
+//
+// In other cases (aside from the nullable cases above),
+// a proto3 scalar field is populated if it contains a non-zero value, and
+// a repeated field is populated if it is non-empty.
+func (x *fastReflection_MsgEditPropertyMetadataResponse) Has(fd protoreflect.FieldDescriptor) bool {
+	switch fd.FullName() {
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.property.MsgEditPropertyMetadataResponse"))
+		}
+		panic(fmt.Errorf("message ardapoc.property.MsgEditPropertyMetadataResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// Clear clears the field such that a subsequent Has call reports false.
+//
+// Clearing an extension field clears both the extension type and value
+// associated with the given field number.
+//
+// Clear is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_MsgEditPropertyMetadataResponse) Clear(fd protoreflect.FieldDescriptor) {
+	switch fd.FullName() {
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.property.MsgEditPropertyMetadataResponse"))
+		}
+		panic(fmt.Errorf("message ardapoc.property.MsgEditPropertyMetadataResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// Get retrieves the value for a field.
+//
+// For unpopulated scalars, it returns the default value, where
+// the default value of a bytes scalar is guaranteed to be a copy.
+// For unpopulated composite types, it returns an empty, read-only view
+// of the value; to obtain a mutable reference, use Mutable.
+func (x *fastReflection_MsgEditPropertyMetadataResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+	switch descriptor.FullName() {
+	default:
+		if descriptor.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.property.MsgEditPropertyMetadataResponse"))
+		}
+		panic(fmt.Errorf("message ardapoc.property.MsgEditPropertyMetadataResponse does not contain field %s", descriptor.FullName()))
+	}
+}
+
+// Set stores the value for a field.
+//
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType.
+// When setting a composite type, it is unspecified whether the stored value
+// aliases the source's memory in any way. If the composite value is an
+// empty, read-only value, then it panics.
+//
+// Set is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_MsgEditPropertyMetadataResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+	switch fd.FullName() {
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.property.MsgEditPropertyMetadataResponse"))
+		}
+		panic(fmt.Errorf("message ardapoc.property.MsgEditPropertyMetadataResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// Mutable returns a mutable reference to a composite type.
+//
+// If the field is unpopulated, it may allocate a composite value.
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType
+// if not already stored.
+// It panics if the field does not contain a composite type.
+//
+// Mutable is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_MsgEditPropertyMetadataResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.property.MsgEditPropertyMetadataResponse"))
+		}
+		panic(fmt.Errorf("message ardapoc.property.MsgEditPropertyMetadataResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// NewField returns a new value that is assignable to the field
+// for the given descriptor. For scalars, this returns the default value.
+// For lists, maps, and messages, this returns a new, empty, mutable value.
+func (x *fastReflection_MsgEditPropertyMetadataResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.property.MsgEditPropertyMetadataResponse"))
+		}
+		panic(fmt.Errorf("message ardapoc.property.MsgEditPropertyMetadataResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// WhichOneof reports which field within the oneof is populated,
+// returning nil if none are populated.
+// It panics if the oneof descriptor does not belong to this message.
+func (x *fastReflection_MsgEditPropertyMetadataResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+	switch d.FullName() {
+	default:
+		panic(fmt.Errorf("%s is not a oneof field in ardapoc.property.MsgEditPropertyMetadataResponse", d.FullName()))
+	}
+	panic("unreachable")
+}
+
+// GetUnknown retrieves the entire list of unknown fields.
+// The caller may only mutate the contents of the RawFields
+// if the mutated bytes are stored back into the message with SetUnknown.
+func (x *fastReflection_MsgEditPropertyMetadataResponse) GetUnknown() protoreflect.RawFields {
+	return x.unknownFields
+}
+
+// SetUnknown stores an entire list of unknown fields.
+// The raw fields must be syntactically valid according to the wire format.
+// An implementation may panic if this is not the case.
+// Once stored, the caller must not mutate the content of the RawFields.
+// An empty RawFields may be passed to clear the fields.
+//
+// SetUnknown is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_MsgEditPropertyMetadataResponse) SetUnknown(fields protoreflect.RawFields) {
+	x.unknownFields = fields
+}
+
+// IsValid reports whether the message is valid.
+//
+// An invalid message is an empty, read-only value.
+//
+// An invalid message often corresponds to a nil pointer of the concrete
+// message type, but the details are implementation dependent.
+// Validity is not part of the protobuf data model, and may not
+// be preserved in marshaling or other operations.
+func (x *fastReflection_MsgEditPropertyMetadataResponse) IsValid() bool {
+	return x != nil
+}
+
+// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
+// This method may return nil.
+//
+// The returned methods type is identical to
+// "google.golang.org/protobuf/runtime/protoiface".Methods.
+// Consult the protoiface package documentation for details.
+func (x *fastReflection_MsgEditPropertyMetadataResponse) ProtoMethods() *protoiface.Methods {
+	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
+		x := input.Message.Interface().(*MsgEditPropertyMetadataResponse)
+		if x == nil {
+			return protoiface.SizeOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Size:              0,
+			}
+		}
+		options := runtime.SizeInputToOptions(input)
+		_ = options
+		var n int
+		var l int
+		_ = l
+		if x.unknownFields != nil {
+			n += len(x.unknownFields)
+		}
+		return protoiface.SizeOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Size:              n,
+		}
+	}
+
+	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
+		x := input.Message.Interface().(*MsgEditPropertyMetadataResponse)
+		if x == nil {
+			return protoiface.MarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Buf:               input.Buf,
+			}, nil
+		}
+		options := runtime.MarshalInputToOptions(input)
+		_ = options
+		size := options.Size(x)
+		dAtA := make([]byte, size)
+		i := len(dAtA)
+		_ = i
+		var l int
+		_ = l
+		if x.unknownFields != nil {
+			i -= len(x.unknownFields)
+			copy(dAtA[i:], x.unknownFields)
+		}
+		if input.Buf != nil {
+			input.Buf = append(input.Buf, dAtA...)
+		} else {
+			input.Buf = dAtA
+		}
+		return protoiface.MarshalOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Buf:               input.Buf,
+		}, nil
+	}
+	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
+		x := input.Message.Interface().(*MsgEditPropertyMetadataResponse)
+		if x == nil {
+			return protoiface.UnmarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Flags:             input.Flags,
+			}, nil
+		}
+		options := runtime.UnmarshalInputToOptions(input)
+		_ = options
+		dAtA := input.Buf
+		l := len(dAtA)
+		iNdEx := 0
+		for iNdEx < l {
+			preIndex := iNdEx
+			var wire uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				wire |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			fieldNum := int32(wire >> 3)
+			wireType := int(wire & 0x7)
+			if wireType == 4 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgEditPropertyMetadataResponse: wiretype end group for non-group")
+			}
+			if fieldNum <= 0 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgEditPropertyMetadataResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			}
+			switch fieldNum {
+			default:
+				iNdEx = preIndex
+				skippy, err := runtime.Skip(dAtA[iNdEx:])
+				if err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				if (skippy < 0) || (iNdEx+skippy) < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if (iNdEx + skippy) > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if !options.DiscardUnknown {
+					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+				}
+				iNdEx += skippy
+			}
+		}
+
+		if iNdEx > l {
+			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+		}
+		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
+	}
+	return &protoiface.Methods{
+		NoUnkeyedLiterals: struct{}{},
+		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
+		Size:              size,
+		Marshal:           marshal,
+		Unmarshal:         unmarshal,
+		Merge:             nil,
+		CheckInitialized:  nil,
+	}
+}
+
 // Code generated by protoc-gen-go. DO NOT EDIT.
 // versions:
 // 	protoc-gen-go v1.27.0
@@ -3865,6 +5281,147 @@ func (*MsgTransferSharesResponse) Descriptor() ([]byte, []int) {
 	return file_ardapoc_property_tx_proto_rawDescGZIP(), []int{5}
 }
 
+type MsgEditPropertyMetadata struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Creator                 string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	PropertyId              string `protobuf:"bytes,2,opt,name=property_id,json=propertyId,proto3" json:"property_id,omitempty"`
+	PropertyName            string `protobuf:"bytes,3,opt,name=property_name,json=propertyName,proto3" json:"property_name,omitempty"`
+	PropertyType            string `protobuf:"bytes,4,opt,name=property_type,json=propertyType,proto3" json:"property_type,omitempty"`
+	ParcelNumber            string `protobuf:"bytes,5,opt,name=parcel_number,json=parcelNumber,proto3" json:"parcel_number,omitempty"`
+	ParcelSize              string `protobuf:"bytes,6,opt,name=parcel_size,json=parcelSize,proto3" json:"parcel_size,omitempty"`
+	ConstructionInformation string `protobuf:"bytes,7,opt,name=construction_information,json=constructionInformation,proto3" json:"construction_information,omitempty"`
+	ZoningClassification    string `protobuf:"bytes,8,opt,name=zoning_classification,json=zoningClassification,proto3" json:"zoning_classification,omitempty"`
+	OwnerInformation        string `protobuf:"bytes,9,opt,name=owner_information,json=ownerInformation,proto3" json:"owner_information,omitempty"`
+	TenantId                string `protobuf:"bytes,10,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+	UnitNumber              string `protobuf:"bytes,11,opt,name=unit_number,json=unitNumber,proto3" json:"unit_number,omitempty"`
+}
+
+func (x *MsgEditPropertyMetadata) Reset() {
+	*x = MsgEditPropertyMetadata{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_ardapoc_property_tx_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MsgEditPropertyMetadata) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MsgEditPropertyMetadata) ProtoMessage() {}
+
+// Deprecated: Use MsgEditPropertyMetadata.ProtoReflect.Descriptor instead.
+func (*MsgEditPropertyMetadata) Descriptor() ([]byte, []int) {
+	return file_ardapoc_property_tx_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *MsgEditPropertyMetadata) GetCreator() string {
+	if x != nil {
+		return x.Creator
+	}
+	return ""
+}
+
+func (x *MsgEditPropertyMetadata) GetPropertyId() string {
+	if x != nil {
+		return x.PropertyId
+	}
+	return ""
+}
+
+func (x *MsgEditPropertyMetadata) GetPropertyName() string {
+	if x != nil {
+		return x.PropertyName
+	}
+	return ""
+}
+
+func (x *MsgEditPropertyMetadata) GetPropertyType() string {
+	if x != nil {
+		return x.PropertyType
+	}
+	return ""
+}
+
+func (x *MsgEditPropertyMetadata) GetParcelNumber() string {
+	if x != nil {
+		return x.ParcelNumber
+	}
+	return ""
+}
+
+func (x *MsgEditPropertyMetadata) GetParcelSize() string {
+	if x != nil {
+		return x.ParcelSize
+	}
+	return ""
+}
+
+func (x *MsgEditPropertyMetadata) GetConstructionInformation() string {
+	if x != nil {
+		return x.ConstructionInformation
+	}
+	return ""
+}
+
+func (x *MsgEditPropertyMetadata) GetZoningClassification() string {
+	if x != nil {
+		return x.ZoningClassification
+	}
+	return ""
+}
+
+func (x *MsgEditPropertyMetadata) GetOwnerInformation() string {
+	if x != nil {
+		return x.OwnerInformation
+	}
+	return ""
+}
+
+func (x *MsgEditPropertyMetadata) GetTenantId() string {
+	if x != nil {
+		return x.TenantId
+	}
+	return ""
+}
+
+func (x *MsgEditPropertyMetadata) GetUnitNumber() string {
+	if x != nil {
+		return x.UnitNumber
+	}
+	return ""
+}
+
+type MsgEditPropertyMetadataResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *MsgEditPropertyMetadataResponse) Reset() {
+	*x = MsgEditPropertyMetadataResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_ardapoc_property_tx_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MsgEditPropertyMetadataResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MsgEditPropertyMetadataResponse) ProtoMessage() {}
+
+// Deprecated: Use MsgEditPropertyMetadataResponse.ProtoReflect.Descriptor instead.
+func (*MsgEditPropertyMetadataResponse) Descriptor() ([]byte, []int) {
+	return file_ardapoc_property_tx_proto_rawDescGZIP(), []int{7}
+}
+
 var File_ardapoc_property_tx_proto protoreflect.FileDescriptor
 
 var file_ardapoc_property_tx_proto_rawDesc = []byte{
@@ -3922,43 +5479,84 @@ var file_ardapoc_property_tx_proto_rawDesc = []byte{
 	0x20, 0x03, 0x28, 0x04, 0x52, 0x08, 0x74, 0x6f, 0x53, 0x68, 0x61, 0x72, 0x65, 0x73, 0x3a, 0x0c,
 	0x82, 0xe7, 0xb0, 0x2a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x1b, 0x0a, 0x19,
 	0x4d, 0x73, 0x67, 0x54, 0x72, 0x61, 0x6e, 0x73, 0x66, 0x65, 0x72, 0x53, 0x68, 0x61, 0x72, 0x65,
-	0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0x96, 0x03, 0x0a, 0x03, 0x4d, 0x73,
-	0x67, 0x12, 0x5c, 0x0a, 0x0c, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d,
-	0x73, 0x12, 0x21, 0x2e, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x70, 0x72, 0x6f, 0x70,
-	0x65, 0x72, 0x74, 0x79, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61,
-	0x72, 0x61, 0x6d, 0x73, 0x1a, 0x29, 0x2e, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x70,
+	0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0xcd, 0x03, 0x0a, 0x17, 0x4d, 0x73,
+	0x67, 0x45, 0x64, 0x69, 0x74, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x4d, 0x65, 0x74,
+	0x61, 0x64, 0x61, 0x74, 0x61, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x12,
+	0x1f, 0x0a, 0x0b, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x5f, 0x69, 0x64, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x49, 0x64,
+	0x12, 0x23, 0x0a, 0x0d, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x5f, 0x6e, 0x61, 0x6d,
+	0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74,
+	0x79, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x23, 0x0a, 0x0d, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74,
+	0x79, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x70, 0x72,
+	0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x54, 0x79, 0x70, 0x65, 0x12, 0x23, 0x0a, 0x0d, 0x70, 0x61,
+	0x72, 0x63, 0x65, 0x6c, 0x5f, 0x6e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x18, 0x05, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x0c, 0x70, 0x61, 0x72, 0x63, 0x65, 0x6c, 0x4e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x12,
+	0x1f, 0x0a, 0x0b, 0x70, 0x61, 0x72, 0x63, 0x65, 0x6c, 0x5f, 0x73, 0x69, 0x7a, 0x65, 0x18, 0x06,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x61, 0x72, 0x63, 0x65, 0x6c, 0x53, 0x69, 0x7a, 0x65,
+	0x12, 0x39, 0x0a, 0x18, 0x63, 0x6f, 0x6e, 0x73, 0x74, 0x72, 0x75, 0x63, 0x74, 0x69, 0x6f, 0x6e,
+	0x5f, 0x69, 0x6e, 0x66, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x07, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x17, 0x63, 0x6f, 0x6e, 0x73, 0x74, 0x72, 0x75, 0x63, 0x74, 0x69, 0x6f, 0x6e,
+	0x49, 0x6e, 0x66, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x33, 0x0a, 0x15, 0x7a,
+	0x6f, 0x6e, 0x69, 0x6e, 0x67, 0x5f, 0x63, 0x6c, 0x61, 0x73, 0x73, 0x69, 0x66, 0x69, 0x63, 0x61,
+	0x74, 0x69, 0x6f, 0x6e, 0x18, 0x08, 0x20, 0x01, 0x28, 0x09, 0x52, 0x14, 0x7a, 0x6f, 0x6e, 0x69,
+	0x6e, 0x67, 0x43, 0x6c, 0x61, 0x73, 0x73, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e,
+	0x12, 0x2b, 0x0a, 0x11, 0x6f, 0x77, 0x6e, 0x65, 0x72, 0x5f, 0x69, 0x6e, 0x66, 0x6f, 0x72, 0x6d,
+	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x09, 0x20, 0x01, 0x28, 0x09, 0x52, 0x10, 0x6f, 0x77, 0x6e,
+	0x65, 0x72, 0x49, 0x6e, 0x66, 0x6f, 0x72, 0x6d, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x1b, 0x0a,
+	0x09, 0x74, 0x65, 0x6e, 0x61, 0x6e, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x08, 0x74, 0x65, 0x6e, 0x61, 0x6e, 0x74, 0x49, 0x64, 0x12, 0x1f, 0x0a, 0x0b, 0x75, 0x6e,
+	0x69, 0x74, 0x5f, 0x6e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x18, 0x0b, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x0a, 0x75, 0x6e, 0x69, 0x74, 0x4e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x3a, 0x0c, 0x82, 0xe7, 0xb0,
+	0x2a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x21, 0x0a, 0x1f, 0x4d, 0x73, 0x67,
+	0x45, 0x64, 0x69, 0x74, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x4d, 0x65, 0x74, 0x61,
+	0x64, 0x61, 0x74, 0x61, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0xb7, 0x04, 0x0a,
+	0x03, 0x4d, 0x73, 0x67, 0x12, 0x5c, 0x0a, 0x0c, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61,
+	0x72, 0x61, 0x6d, 0x73, 0x12, 0x21, 0x2e, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x70,
 	0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74,
-	0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
-	0x96, 0x01, 0x0a, 0x10, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x50, 0x72, 0x6f, 0x70,
-	0x65, 0x72, 0x74, 0x79, 0x12, 0x25, 0x2e, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x70,
-	0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73,
-	0x74, 0x65, 0x72, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x1a, 0x2d, 0x2e, 0x61, 0x72,
-	0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x2e, 0x4d,
-	0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72,
-	0x74, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x2c, 0x82, 0xd3, 0xe4, 0x93,
-	0x02, 0x26, 0x3a, 0x01, 0x2a, 0x22, 0x21, 0x2f, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x6e, 0x61, 0x75,
-	0x74, 0x2f, 0x61, 0x72, 0x64, 0x61, 0x2f, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x2f,
-	0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x12, 0x90, 0x01, 0x0a, 0x0e, 0x54, 0x72, 0x61,
-	0x6e, 0x73, 0x66, 0x65, 0x72, 0x53, 0x68, 0x61, 0x72, 0x65, 0x73, 0x12, 0x23, 0x2e, 0x61, 0x72,
-	0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x2e, 0x4d,
-	0x73, 0x67, 0x54, 0x72, 0x61, 0x6e, 0x73, 0x66, 0x65, 0x72, 0x53, 0x68, 0x61, 0x72, 0x65, 0x73,
-	0x1a, 0x2b, 0x2e, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x70, 0x72, 0x6f, 0x70, 0x65,
-	0x72, 0x74, 0x79, 0x2e, 0x4d, 0x73, 0x67, 0x54, 0x72, 0x61, 0x6e, 0x73, 0x66, 0x65, 0x72, 0x53,
-	0x68, 0x61, 0x72, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x2c, 0x82,
+	0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x1a, 0x29, 0x2e, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f,
+	0x63, 0x2e, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70,
+	0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x12, 0x96, 0x01, 0x0a, 0x10, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x50,
+	0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x12, 0x25, 0x2e, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f,
+	0x63, 0x2e, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65,
+	0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x1a, 0x2d,
+	0x2e, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74,
+	0x79, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x50, 0x72, 0x6f,
+	0x70, 0x65, 0x72, 0x74, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x2c, 0x82,
 	0xd3, 0xe4, 0x93, 0x02, 0x26, 0x3a, 0x01, 0x2a, 0x22, 0x21, 0x2f, 0x63, 0x6f, 0x73, 0x6d, 0x6f,
 	0x6e, 0x61, 0x75, 0x74, 0x2f, 0x61, 0x72, 0x64, 0x61, 0x2f, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72,
-	0x74, 0x79, 0x2f, 0x74, 0x72, 0x61, 0x6e, 0x73, 0x66, 0x65, 0x72, 0x1a, 0x05, 0x80, 0xe7, 0xb0,
-	0x2a, 0x01, 0x42, 0x9e, 0x01, 0x0a, 0x14, 0x63, 0x6f, 0x6d, 0x2e, 0x61, 0x72, 0x64, 0x61, 0x70,
-	0x6f, 0x63, 0x2e, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x42, 0x07, 0x54, 0x78, 0x50,
-	0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x1c, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2f,
-	0x61, 0x70, 0x69, 0x2f, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2f, 0x70, 0x72, 0x6f, 0x70,
-	0x65, 0x72, 0x74, 0x79, 0xa2, 0x02, 0x03, 0x41, 0x50, 0x58, 0xaa, 0x02, 0x10, 0x41, 0x72, 0x64,
-	0x61, 0x70, 0x6f, 0x63, 0x2e, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0xca, 0x02, 0x10,
-	0x41, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x5c, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79,
-	0xe2, 0x02, 0x1c, 0x41, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x5c, 0x50, 0x72, 0x6f, 0x70, 0x65,
-	0x72, 0x74, 0x79, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea,
-	0x02, 0x11, 0x41, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x3a, 0x3a, 0x50, 0x72, 0x6f, 0x70, 0x65,
-	0x72, 0x74, 0x79, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x74, 0x79, 0x2f, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x12, 0x90, 0x01, 0x0a, 0x0e,
+	0x54, 0x72, 0x61, 0x6e, 0x73, 0x66, 0x65, 0x72, 0x53, 0x68, 0x61, 0x72, 0x65, 0x73, 0x12, 0x23,
+	0x2e, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74,
+	0x79, 0x2e, 0x4d, 0x73, 0x67, 0x54, 0x72, 0x61, 0x6e, 0x73, 0x66, 0x65, 0x72, 0x53, 0x68, 0x61,
+	0x72, 0x65, 0x73, 0x1a, 0x2b, 0x2e, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x70, 0x72,
+	0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x2e, 0x4d, 0x73, 0x67, 0x54, 0x72, 0x61, 0x6e, 0x73, 0x66,
+	0x65, 0x72, 0x53, 0x68, 0x61, 0x72, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x22, 0x2c, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x26, 0x3a, 0x01, 0x2a, 0x22, 0x21, 0x2f, 0x63, 0x6f,
+	0x73, 0x6d, 0x6f, 0x6e, 0x61, 0x75, 0x74, 0x2f, 0x61, 0x72, 0x64, 0x61, 0x2f, 0x70, 0x72, 0x6f,
+	0x70, 0x65, 0x72, 0x74, 0x79, 0x2f, 0x74, 0x72, 0x61, 0x6e, 0x73, 0x66, 0x65, 0x72, 0x12, 0x9e,
+	0x01, 0x0a, 0x14, 0x45, 0x64, 0x69, 0x74, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x4d,
+	0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x12, 0x29, 0x2e, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f,
+	0x63, 0x2e, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x2e, 0x4d, 0x73, 0x67, 0x45, 0x64,
+	0x69, 0x74, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61,
+	0x74, 0x61, 0x1a, 0x31, 0x2e, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x70, 0x72, 0x6f,
+	0x70, 0x65, 0x72, 0x74, 0x79, 0x2e, 0x4d, 0x73, 0x67, 0x45, 0x64, 0x69, 0x74, 0x50, 0x72, 0x6f,
+	0x70, 0x65, 0x72, 0x74, 0x79, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x28, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x22, 0x3a, 0x01, 0x2a,
+	0x22, 0x1d, 0x2f, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x6e, 0x61, 0x75, 0x74, 0x2f, 0x61, 0x72, 0x64,
+	0x61, 0x2f, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x2f, 0x65, 0x64, 0x69, 0x74, 0x1a,
+	0x05, 0x80, 0xe7, 0xb0, 0x2a, 0x01, 0x42, 0x9e, 0x01, 0x0a, 0x14, 0x63, 0x6f, 0x6d, 0x2e, 0x61,
+	0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x42,
+	0x07, 0x54, 0x78, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x1c, 0x61, 0x72, 0x64, 0x61,
+	0x70, 0x6f, 0x63, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2f,
+	0x70, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0xa2, 0x02, 0x03, 0x41, 0x50, 0x58, 0xaa, 0x02,
+	0x10, 0x41, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x50, 0x72, 0x6f, 0x70, 0x65, 0x72, 0x74,
+	0x79, 0xca, 0x02, 0x10, 0x41, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x5c, 0x50, 0x72, 0x6f, 0x70,
+	0x65, 0x72, 0x74, 0x79, 0xe2, 0x02, 0x1c, 0x41, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x5c, 0x50,
+	0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64,
+	0x61, 0x74, 0x61, 0xea, 0x02, 0x11, 0x41, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x3a, 0x3a, 0x50,
+	0x72, 0x6f, 0x70, 0x65, 0x72, 0x74, 0x79, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -3973,26 +5571,30 @@ func file_ardapoc_property_tx_proto_rawDescGZIP() []byte {
 	return file_ardapoc_property_tx_proto_rawDescData
 }
 
-var file_ardapoc_property_tx_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_ardapoc_property_tx_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_ardapoc_property_tx_proto_goTypes = []interface{}{
-	(*MsgUpdateParams)(nil),             // 0: ardapoc.property.MsgUpdateParams
-	(*MsgUpdateParamsResponse)(nil),     // 1: ardapoc.property.MsgUpdateParamsResponse
-	(*MsgRegisterProperty)(nil),         // 2: ardapoc.property.MsgRegisterProperty
-	(*MsgRegisterPropertyResponse)(nil), // 3: ardapoc.property.MsgRegisterPropertyResponse
-	(*MsgTransferShares)(nil),           // 4: ardapoc.property.MsgTransferShares
-	(*MsgTransferSharesResponse)(nil),   // 5: ardapoc.property.MsgTransferSharesResponse
-	(*Params)(nil),                      // 6: ardapoc.property.Params
+	(*MsgUpdateParams)(nil),                 // 0: ardapoc.property.MsgUpdateParams
+	(*MsgUpdateParamsResponse)(nil),         // 1: ardapoc.property.MsgUpdateParamsResponse
+	(*MsgRegisterProperty)(nil),             // 2: ardapoc.property.MsgRegisterProperty
+	(*MsgRegisterPropertyResponse)(nil),     // 3: ardapoc.property.MsgRegisterPropertyResponse
+	(*MsgTransferShares)(nil),               // 4: ardapoc.property.MsgTransferShares
+	(*MsgTransferSharesResponse)(nil),       // 5: ardapoc.property.MsgTransferSharesResponse
+	(*MsgEditPropertyMetadata)(nil),         // 6: ardapoc.property.MsgEditPropertyMetadata
+	(*MsgEditPropertyMetadataResponse)(nil), // 7: ardapoc.property.MsgEditPropertyMetadataResponse
+	(*Params)(nil),                          // 8: ardapoc.property.Params
 }
 var file_ardapoc_property_tx_proto_depIdxs = []int32{
-	6, // 0: ardapoc.property.MsgUpdateParams.params:type_name -> ardapoc.property.Params
+	8, // 0: ardapoc.property.MsgUpdateParams.params:type_name -> ardapoc.property.Params
 	0, // 1: ardapoc.property.Msg.UpdateParams:input_type -> ardapoc.property.MsgUpdateParams
 	2, // 2: ardapoc.property.Msg.RegisterProperty:input_type -> ardapoc.property.MsgRegisterProperty
 	4, // 3: ardapoc.property.Msg.TransferShares:input_type -> ardapoc.property.MsgTransferShares
-	1, // 4: ardapoc.property.Msg.UpdateParams:output_type -> ardapoc.property.MsgUpdateParamsResponse
-	3, // 5: ardapoc.property.Msg.RegisterProperty:output_type -> ardapoc.property.MsgRegisterPropertyResponse
-	5, // 6: ardapoc.property.Msg.TransferShares:output_type -> ardapoc.property.MsgTransferSharesResponse
-	4, // [4:7] is the sub-list for method output_type
-	1, // [1:4] is the sub-list for method input_type
+	6, // 4: ardapoc.property.Msg.EditPropertyMetadata:input_type -> ardapoc.property.MsgEditPropertyMetadata
+	1, // 5: ardapoc.property.Msg.UpdateParams:output_type -> ardapoc.property.MsgUpdateParamsResponse
+	3, // 6: ardapoc.property.Msg.RegisterProperty:output_type -> ardapoc.property.MsgRegisterPropertyResponse
+	5, // 7: ardapoc.property.Msg.TransferShares:output_type -> ardapoc.property.MsgTransferSharesResponse
+	7, // 8: ardapoc.property.Msg.EditPropertyMetadata:output_type -> ardapoc.property.MsgEditPropertyMetadataResponse
+	5, // [5:9] is the sub-list for method output_type
+	1, // [1:5] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
 	1, // [1:1] is the sub-list for extension extendee
 	0, // [0:1] is the sub-list for field type_name
@@ -4077,6 +5679,30 @@ func file_ardapoc_property_tx_proto_init() {
 				return nil
 			}
 		}
+		file_ardapoc_property_tx_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*MsgEditPropertyMetadata); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_ardapoc_property_tx_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*MsgEditPropertyMetadataResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -4084,7 +5710,7 @@ func file_ardapoc_property_tx_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_ardapoc_property_tx_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

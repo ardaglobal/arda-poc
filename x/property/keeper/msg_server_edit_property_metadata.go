@@ -21,7 +21,7 @@ func (k msgServer) EditPropertyMetadata(goCtx context.Context, msg *types.MsgEdi
 	property.PropertyName = msg.PropertyName
 	property.PropertyType = msg.PropertyType
 	property.ParcelNumber = msg.ParcelNumber
-	property.Size_ = msg.Size
+	property.ParcelSize = msg.ParcelSize
 	property.ConstructionInformation = msg.ConstructionInformation
 	property.ZoningClassification = msg.ZoningClassification
 	property.OwnerInformation = msg.OwnerInformation
