@@ -19,9 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Msg_UpdateParams_FullMethodName     = "/ardapoc.property.Msg/UpdateParams"
-	Msg_RegisterProperty_FullMethodName = "/ardapoc.property.Msg/RegisterProperty"
-	Msg_TransferShares_FullMethodName   = "/ardapoc.property.Msg/TransferShares"
+	Msg_UpdateParams_FullMethodName         = "/ardapoc.property.Msg/UpdateParams"
+	Msg_RegisterProperty_FullMethodName     = "/ardapoc.property.Msg/RegisterProperty"
+	Msg_TransferShares_FullMethodName       = "/ardapoc.property.Msg/TransferShares"
+	Msg_EditPropertyMetadata_FullMethodName = "/ardapoc.property.Msg/EditPropertyMetadata"
 )
 
 // MsgClient is the client API for Msg service.
@@ -33,6 +34,7 @@ type MsgClient interface {
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
 	RegisterProperty(ctx context.Context, in *MsgRegisterProperty, opts ...grpc.CallOption) (*MsgRegisterPropertyResponse, error)
 	TransferShares(ctx context.Context, in *MsgTransferShares, opts ...grpc.CallOption) (*MsgTransferSharesResponse, error)
+	EditPropertyMetadata(ctx context.Context, in *MsgEditPropertyMetadata, opts ...grpc.CallOption) (*MsgEditPropertyMetadataResponse, error)
 }
 
 type msgClient struct {
@@ -70,6 +72,15 @@ func (c *msgClient) TransferShares(ctx context.Context, in *MsgTransferShares, o
 	return out, nil
 }
 
+func (c *msgClient) EditPropertyMetadata(ctx context.Context, in *MsgEditPropertyMetadata, opts ...grpc.CallOption) (*MsgEditPropertyMetadataResponse, error) {
+	out := new(MsgEditPropertyMetadataResponse)
+	err := c.cc.Invoke(ctx, Msg_EditPropertyMetadata_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility
@@ -79,6 +90,7 @@ type MsgServer interface {
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
 	RegisterProperty(context.Context, *MsgRegisterProperty) (*MsgRegisterPropertyResponse, error)
 	TransferShares(context.Context, *MsgTransferShares) (*MsgTransferSharesResponse, error)
+	EditPropertyMetadata(context.Context, *MsgEditPropertyMetadata) (*MsgEditPropertyMetadataResponse, error)
 	mustEmbedUnimplementedMsgServer()
 }
 
@@ -94,6 +106,9 @@ func (UnimplementedMsgServer) RegisterProperty(context.Context, *MsgRegisterProp
 }
 func (UnimplementedMsgServer) TransferShares(context.Context, *MsgTransferShares) (*MsgTransferSharesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TransferShares not implemented")
+}
+func (UnimplementedMsgServer) EditPropertyMetadata(context.Context, *MsgEditPropertyMetadata) (*MsgEditPropertyMetadataResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EditPropertyMetadata not implemented")
 }
 func (UnimplementedMsgServer) mustEmbedUnimplementedMsgServer() {}
 
@@ -162,6 +177,24 @@ func _Msg_TransferShares_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_EditPropertyMetadata_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgEditPropertyMetadata)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).EditPropertyMetadata(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_EditPropertyMetadata_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).EditPropertyMetadata(ctx, req.(*MsgEditPropertyMetadata))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Msg_ServiceDesc is the grpc.ServiceDesc for Msg service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -180,6 +213,10 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "TransferShares",
 			Handler:    _Msg_TransferShares_Handler,
+		},
+		{
+			MethodName: "EditPropertyMetadata",
+			Handler:    _Msg_EditPropertyMetadata_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

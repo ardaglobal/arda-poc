@@ -28,6 +28,21 @@ type TransferSharesRequest struct {
 	Gas        string   `json:"gas,omitempty"`
 }
 
+// EditPropertyMetadataRequest defines the request body for editing property metadata.
+type EditPropertyMetadataRequest struct {
+	PropertyID              string `json:"property_id"`
+	PropertyName            string `json:"property_name"`
+	PropertyType            string `json:"property_type"`
+	ParcelNumber            string `json:"parcel_number"`
+	Size                    string `json:"size"`
+	ConstructionInformation string `json:"construction_information"`
+	ZoningClassification    string `json:"zoning_classification"`
+	OwnerInformation        string `json:"owner_information"`
+	TenantID                string `json:"tenant_id"`
+	UnitNumber              string `json:"unit_number"`
+	Gas                     string `json:"gas,omitempty"`
+}
+
 func (s *Server) registerPropertyHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -80,4 +95,36 @@ func (s *Server) transferSharesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.buildSignAndBroadcast(w, r, fromName, req.Gas, "transfer_shares", msgBuilder)
-} 
+}
+
+func (s *Server) editPropertyMetadataHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req EditPropertyMetadataRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	fromName := "ERES"
+	msgBuilder := func(fromAddr string) sdk.Msg {
+		return propertytypes.NewMsgEditPropertyMetadata(
+			fromAddr,
+			req.PropertyID,
+			req.PropertyName,
+			req.PropertyType,
+			req.ParcelNumber,
+			req.Size,
+			req.ConstructionInformation,
+			req.ZoningClassification,
+			req.OwnerInformation,
+			req.TenantID,
+			req.UnitNumber,
+		)
+	}
+
+	s.buildSignAndBroadcast(w, r, fromName, req.Gas, "edit_property_metadata", msgBuilder)
+}

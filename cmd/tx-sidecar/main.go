@@ -3,11 +3,16 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
+
+	fiberadaptor "github.com/gofiber/adaptor/v2"
+	fiber "github.com/gofiber/fiber/v2"
+	fibercors "github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/rs/zerolog"
+	zlog "github.com/rs/zerolog/log"
 
 	"cosmossdk.io/math"
 	"google.golang.org/grpc"
@@ -22,6 +27,10 @@ import (
 
 	sidecarclient "github.com/ardaglobal/arda-poc/pkg/client"
 )
+
+func init() {
+	zlog.Logger = zlog.Output(zerolog.ConsoleWriter{Out: os.Stdout})
+}
 
 // Config structs for parsing config.yml
 type FaucetConfig struct {
@@ -60,7 +69,7 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 	file, err := os.ReadFile(usersFile)
 	if err == nil {
 		if err := json.Unmarshal(file, &users); err != nil {
-			log.Printf("Warning: failed to unmarshal users file, starting with empty user map: %v", err)
+			zlog.Warn().Msgf("failed to unmarshal users file, starting with empty user map: %v", err)
 		}
 	} else if !os.IsNotExist(err) {
 		return nil, fmt.Errorf("failed to read users file: %w", err)
@@ -78,7 +87,7 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 			// User exists in keyring but not in users.json, add them.
 			addr, err := record.GetAddress()
 			if err != nil {
-				log.Printf("Warning: failed to get address for key '%s', skipping sync: %v", record.Name, err)
+				zlog.Warn().Msgf("failed to get address for key '%s', skipping sync: %v", record.Name, err)
 				continue
 			}
 			users[record.Name] = UserData{
@@ -87,7 +96,7 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 				Mnemonic: "", // Mnemonic is not available from keyring listing
 				Role:     "user",
 			}
-			log.Printf("Syncing key '%s' from keyring to users.json", record.Name)
+			zlog.Info().Msgf("Syncing key '%s' from keyring to users.json", record.Name)
 			usersFileNeedsSave = true
 		}
 	}
@@ -108,7 +117,7 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 	loginData, err := os.ReadFile(loginsFile)
 	if err == nil {
 		if err := json.Unmarshal(loginData, &logins); err != nil {
-			log.Printf("Warning: failed to unmarshal logins file, starting with empty login map: %v", err)
+			zlog.Warn().Msgf("failed to unmarshal logins file, starting with empty login map: %v", err)
 		}
 	} else if !os.IsNotExist(err) {
 		return nil, fmt.Errorf("failed to read logins file: %w", err)
@@ -119,7 +128,7 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 	txData, err := os.ReadFile(transactionsFile)
 	if err == nil {
 		if err := json.Unmarshal(txData, &transactions); err != nil {
-			log.Printf("Warning: failed to unmarshal transactions file, starting with empty list: %v", err)
+			zlog.Warn().Msgf("failed to unmarshal transactions file, starting with empty list: %v", err)
 		}
 	} else if !os.IsNotExist(err) {
 		return nil, fmt.Errorf("failed to read transactions file: %w", err)
@@ -158,16 +167,16 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 	if _, err := s.clientCtx.Keyring.Key(s.faucetName); err != nil {
 		return nil, fmt.Errorf("faucet user '%s' from config.yml not found in keyring: %w", s.faucetName, err)
 	}
-	log.Printf("Using '%s' as the faucet account.", s.faucetName)
+	zlog.Info().Msgf("Using '%s' as the faucet account.", s.faucetName)
 
 	// Ensure faucet user has the 'faucet' role.
 	if faucetUserData, ok := s.users[s.faucetName]; ok {
 		if faucetUserData.Role != "faucet" {
-			log.Printf("Updating role of faucet user '%s' to 'faucet'.", s.faucetName)
+			zlog.Info().Msgf("Updating role of faucet user '%s' to 'faucet'.", s.faucetName)
 			faucetUserData.Role = "faucet"
 			s.users[s.faucetName] = faucetUserData
 			if err := s.saveUsersToFile(); err != nil {
-				log.Printf("Warning: failed to save users file after updating faucet role: %v", err)
+				zlog.Warn().Msgf("failed to save users file after updating faucet role: %v", err)
 			}
 		}
 	}
@@ -190,57 +199,55 @@ type FaucetRequest struct {
 	Gas     string `json:"gas,omitempty"`
 }
 
-// corsHandler wraps a handler to include CORS headers.
-func corsHandler(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-
-		// Handle pre-flight requests
-		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-
-		h.ServeHTTP(w, r)
-	})
-}
-
 func main() {
 	// This context is for the main application, not for individual requests.
 	clientCtx, err := sidecarclient.NewClientContext()
 	if err != nil {
-		log.Fatalf("Failed to create client context: %v", err)
+		zlog.Fatal().Msgf("Failed to create client context: %v", err)
 	}
 
 	parsedURL, err := url.Parse(clientCtx.NodeURI)
 	if err != nil {
-		log.Fatalf("Failed to parse node URI: %v", err)
+		zlog.Fatal().Msgf("Failed to parse node URI: %v", err)
 	}
 	host := strings.Split(parsedURL.Host, ":")[0]
 	grpcAddr := fmt.Sprintf("%s:9090", host)
 
 	server, err := NewServer(clientCtx, grpcAddr)
 	if err != nil {
-		log.Fatalf("Failed to create server: %v", err)
+		zlog.Fatal().Msgf("Failed to create server: %v", err)
 	}
 	defer server.Close()
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/register-property", server.registerPropertyHandler)
-	mux.HandleFunc("/transfer-shares", server.transferSharesHandler)
-	mux.HandleFunc("/users", server.listUsersHandler)
-	mux.HandleFunc("/login", server.loginHandler)
-	mux.HandleFunc("/logout", server.logoutHandler)
-	mux.HandleFunc("/faucet", server.faucetHandler)
-	mux.HandleFunc("/transactions", server.listTransactionsHandler)
-	mux.HandleFunc("/transaction/", server.getTransactionHandler)
-	mux.HandleFunc("/kyc-user", server.kycUserHandler)
+	developerUsers := make([]string, 0)
+	investorUsers := make([]string, 0)
+	for name, user := range server.users {
+		switch user.Role {
+		case "developer":
+			developerUsers = append(developerUsers, name)
+		case "investor":
+			investorUsers = append(investorUsers, name)
+		}
+	}
+	go server.RunAutoProperty(developerUsers, investorUsers)
 
-	fmt.Println("Starting transaction sidecar server on :8080...")
-	if err := http.ListenAndServe(":8080", corsHandler(mux)); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
+	app := fiber.New()
+	app.Use(fibercors.New())
+
+	app.Post("/register-property", fiberadaptor.HTTPHandlerFunc(server.registerPropertyHandler))
+	app.Post("/transfer-shares", fiberadaptor.HTTPHandlerFunc(server.transferSharesHandler))
+	app.Post("/edit-property", fiberadaptor.HTTPHandlerFunc(server.editPropertyMetadataHandler))
+	app.Get("/users", fiberadaptor.HTTPHandlerFunc(server.listUsersHandler))
+	app.Post("/login", fiberadaptor.HTTPHandlerFunc(server.loginHandler))
+	app.Post("/logout", fiberadaptor.HTTPHandlerFunc(server.logoutHandler))
+	app.Post("/faucet", fiberadaptor.HTTPHandlerFunc(server.faucetHandler))
+	app.Get("/transactions", fiberadaptor.HTTPHandlerFunc(server.listTransactionsHandler))
+	app.Get("/transaction/*", fiberadaptor.HTTPHandlerFunc(server.getTransactionHandler))
+	app.Post("/kyc-user", fiberadaptor.HTTPHandlerFunc(server.kycUserHandler))
+
+	zlog.Info().Msg("Starting transaction sidecar server on :8080...")
+	if err := app.Listen(":8080"); err != nil {
+		zlog.Fatal().Msgf("Failed to start server: %v", err)
 	}
 }
 

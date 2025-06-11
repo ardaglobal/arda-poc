@@ -1,5 +1,7 @@
 package types
 
+import "strings"
+
 const (
 	// ModuleName defines the module name
 	ModuleName = "property"
@@ -14,7 +16,7 @@ const (
 	KeyPrefixProperty = "Property/value/"
 
 	// PropertyShareDenomPrefix defines the prefix for property share denoms
-	PropertyShareDenomPrefix = "property_"
+	PropertyShareDenomPrefix = "prop"
 )
 
 var (
@@ -26,7 +28,7 @@ func KeyPrefix(p string) []byte {
 }
 
 // PropertyShareDenom returns the bank denom used for the given property ID.
-func PropertyShareDenom(_ string) string {
-	// return PropertyShareDenomPrefix + id
-	return PropertyShareDenomPrefix
+func PropertyShareDenom(id string) string {
+	id = strings.ReplaceAll(id, " ", "")
+	return PropertyShareDenomPrefix + id
 }

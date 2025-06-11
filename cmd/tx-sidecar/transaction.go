@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -15,6 +14,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	zlog "github.com/rs/zerolog/log"
 )
 
 // TrackedTx stores information about a transaction that has been broadcast.
@@ -26,18 +26,29 @@ type TrackedTx struct {
 
 // buildSignAndBroadcast handles the common logic for creating, signing, and broadcasting a transaction.
 func (s *Server) buildSignAndBroadcast(w http.ResponseWriter, r *http.Request, fromName, gasStr, txType string, msgBuilder func(fromAddr string) sdk.Msg) {
+	txHash, err := s.buildSignAndBroadcastInternal(r.Context(), fromName, gasStr, txType, msgBuilder)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{"tx_hash": txHash})
+}
+
+// buildSignAndBroadcastInternal handles the core logic for creating, signing, and broadcasting a transaction
+// without being tied to an HTTP handler.
+func (s *Server) buildSignAndBroadcastInternal(ctx context.Context, fromName, gasStr, txType string, msgBuilder func(fromAddr string) sdk.Msg) (string, error) {
 	clientCtx := s.clientCtx
 	// 1. Set the signer
 	fromAddrRec, err := clientCtx.Keyring.Key(fromName)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to get key for '%s'", fromName), http.StatusInternalServerError)
-		return
+		return "", fmt.Errorf("failed to get key for '%s': %w", fromName, err)
 	}
 
 	fromAddress, err := fromAddrRec.GetAddress()
 	if err != nil {
-		http.Error(w, "Failed to get address from key", http.StatusInternalServerError)
-		return
+		return "", fmt.Errorf("failed to get address from key: %w", err)
 	}
 	clientCtx = clientCtx.WithFrom(fromName).WithFromAddress(fromAddress)
 
@@ -49,37 +60,31 @@ func (s *Server) buildSignAndBroadcast(w http.ResponseWriter, r *http.Request, f
 		WithChainID(clientCtx.ChainID).
 		WithKeybase(clientCtx.Keyring).
 		WithTxConfig(clientCtx.TxConfig).
-		WithGasAdjustment(1.5).
+		WithGasAdjustment(2.0).
 		WithGasPrices("0.025uarda") // NOTE: This may need to be configurable depending on the chain's requirements.
 
-	acc, err := s.authClient.Account(r.Context(), &authtypes.QueryAccountRequest{Address: fromAddress.String()})
+	acc, err := s.authClient.Account(ctx, &authtypes.QueryAccountRequest{Address: fromAddress.String()})
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to get account: %v", err), http.StatusInternalServerError)
-		return
+		return "", fmt.Errorf("failed to get account: %w", err)
 	}
 
 	var accI authtypes.AccountI
 	if err := clientCtx.InterfaceRegistry.UnpackAny(acc.Account, &accI); err != nil {
-		http.Error(w, fmt.Sprintf("Failed to unpack account into interface: %v", err), http.StatusInternalServerError)
-		return
+		return "", fmt.Errorf("failed to unpack account into interface: %w", err)
 	}
 
 	baseAcc, ok := accI.(*authtypes.BaseAccount)
 	if !ok {
-		http.Error(w, "account is not a BaseAccount", http.StatusInternalServerError)
-		return
+		return "", fmt.Errorf("account is not a BaseAccount")
 	}
 
 	txf = txf.WithAccountNumber(baseAcc.AccountNumber).WithSequence(baseAcc.Sequence)
 
-	// We are removing auto gas calculation for now as it can be unreliable in this context.
-	// Using a generous default. This can be overridden by the request if needed.
-	var gas uint64 = 300000
+	var gas uint64 = 400000
 	if gasStr != "" && gasStr != "auto" {
 		parsedGas, err := strconv.ParseUint(gasStr, 10, 64)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("invalid gas value provided: %s", gasStr), http.StatusBadRequest)
-			return
+			return "", fmt.Errorf("invalid gas value provided: %s", gasStr)
 		}
 		gas = parsedGas
 	}
@@ -87,110 +92,94 @@ func (s *Server) buildSignAndBroadcast(w http.ResponseWriter, r *http.Request, f
 
 	txb, err := txf.BuildUnsignedTx(msg)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to build unsigned tx: %v", err), http.StatusInternalServerError)
-		return
+		return "", fmt.Errorf("failed to build unsigned tx: %w", err)
 	}
 
-	err = tx.Sign(r.Context(), txf, fromName, txb, true)
+	err = tx.Sign(ctx, txf, fromName, txb, true)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to sign tx: %v", err), http.StatusInternalServerError)
-		return
+		return "", fmt.Errorf("failed to sign tx: %w", err)
 	}
 
 	txBytes, err := clientCtx.TxConfig.TxEncoder()(txb.GetTx())
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to encode tx: %v", err), http.StatusInternalServerError)
-		return
+		return "", fmt.Errorf("failed to encode tx: %w", err)
 	}
 
 	// Use SYNC broadcast mode and then poll for the transaction to be included in a block.
 	res, err := s.txClient.BroadcastTx(
-		r.Context(),
+		ctx,
 		&txtypes.BroadcastTxRequest{
 			Mode:    txtypes.BroadcastMode_BROADCAST_MODE_SYNC,
 			TxBytes: txBytes,
 		},
 	)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to broadcast tx: %v", err), http.StatusInternalServerError)
-		return
+		return "", fmt.Errorf("failed to broadcast tx: %w", err)
 	}
 
 	// In sync mode, a non-zero code means the transaction failed validation (CheckTx).
 	if res.TxResponse.Code != 0 {
-		http.Error(w, fmt.Sprintf("Transaction failed on CheckTx with code %d: %s", res.TxResponse.Code, res.TxResponse.RawLog), http.StatusInternalServerError)
-		return
+		return "", fmt.Errorf("transaction failed with code %d: %s", res.TxResponse.Code, res.TxResponse.RawLog)
 	}
 
 	// Poll for the transaction to be included in a block.
 	txHash := res.TxResponse.TxHash
-	pollCtx, cancel := context.WithTimeout(r.Context(), 15*time.Second)
+	zlog.Info().Msgf("Transaction broadcasted with hash: %s. Polling for confirmation...", txHash)
+
+	// This is a simplified polling mechanism. In a production system, you might want
+	// a more robust solution, possibly involving a message queue or a dedicated transaction tracker.
+	pollCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
 
 	for {
-		select {
-		case <-pollCtx.Done():
-			http.Error(w, fmt.Sprintf("Timed out waiting for transaction confirmation for hash %s. It may have failed or is still pending.", txHash), http.StatusInternalServerError)
-			return
-		default:
-			getTxRes, err := s.txClient.GetTx(pollCtx, &txtypes.GetTxRequest{Hash: txHash})
-			if err == nil {
-				// Transaction found.
-				if getTxRes.TxResponse.Code != 0 {
-					// It was included in a block but failed during execution.
-					http.Error(w, fmt.Sprintf("Transaction failed in block with code %d: %s", getTxRes.TxResponse.Code, getTxRes.TxResponse.RawLog), http.StatusInternalServerError)
-				} else {
-					// Success.
-					txHash := getTxRes.TxResponse.TxHash
-					s.addTransaction(txType, txHash)
-					w.Header().Set("Content-Type", "application/json")
-					json.NewEncoder(w).Encode(map[string]string{
-						"tx_hash": txHash,
-					})
-					fmt.Printf("Successfully processed tx with hash: %s\n", txHash)
-				}
-				return // Exit polling.
+		txRes, err := s.txClient.GetTx(pollCtx, &txtypes.GetTxRequest{Hash: txHash})
+		if err != nil {
+			if strings.Contains(err.Error(), "not found") {
+				// Transaction not yet in a block, wait and retry.
+				time.Sleep(2 * time.Second)
+				continue
 			}
-
-			// Continue polling if the transaction is not yet found.
-			time.Sleep(1 * time.Second)
+			return "", fmt.Errorf("failed to poll for tx confirmation: %w", err)
 		}
+
+		// Transaction is confirmed.
+		zlog.Info().Msgf("Transaction %s confirmed in block %d.", txHash, txRes.TxResponse.Height)
+		s.trackTransaction(txType, txHash)
+		return txHash, nil
 	}
 }
 
-func (s *Server) addTransaction(txType, txHash string) {
-	tx := TrackedTx{
-		Timestamp: time.Now().UTC(),
+// trackTransaction adds a new transaction to the server's list and saves it to a file.
+func (s *Server) trackTransaction(txType, txHash string) {
+	newTx := TrackedTx{
+		Timestamp: time.Now(),
 		Type:      txType,
 		TxHash:    txHash,
 	}
-	s.transactions = append(s.transactions, tx)
-	if err := s.saveTransactionsToFile(); err != nil {
-		log.Printf("Warning: failed to save transactions to file: %v", err)
-	}
+
+	s.transactions = append(s.transactions, newTx)
+	s.saveTransactionsToFile()
 }
 
-func (s *Server) saveTransactionsToFile() error {
+// saveTransactionsToFile saves the current list of transactions to tx.json.
+func (s *Server) saveTransactionsToFile() {
 	data, err := json.MarshalIndent(s.transactions, "", "  ")
 	if err != nil {
-		return fmt.Errorf("failed to marshal transactions: %w", err)
+		zlog.Warn().Msgf("failed to marshal transactions: %v", err)
+		return
 	}
-	return os.WriteFile(s.transactionsFile, data, 0644)
+	if err := os.WriteFile(s.transactionsFile, data, 0644); err != nil {
+		zlog.Warn().Msgf("failed to write transactions file: %v", err)
+	}
 }
 
+// listTransactionsHandler returns the list of tracked transactions.
 func (s *Server) listTransactionsHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
-	}
-
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(s.transactions); err != nil {
-		http.Error(w, "Failed to encode transactions to JSON", http.StatusInternalServerError)
-		return
-	}
+	json.NewEncoder(w).Encode(s.transactions)
 }
 
+// getTransactionHandler returns a specific transaction by its hash.
 func (s *Server) getTransactionHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -233,7 +222,7 @@ func (s *Server) getTransactionHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Process the response based on the transaction type from tx.json
 	switch trackedTx.Type {
-	case "register_property", "transfer_shares":
+	case "register_property", "transfer_shares", "edit_property_metadata":
 		// Build a richer response object, modeled after the provided txout.json example.
 		response := make(map[string]interface{})
 
@@ -263,7 +252,7 @@ func (s *Server) getTransactionHandler(w http.ResponseWriter, r *http.Request) {
 		for _, msg := range sdkTx.GetMsgs() {
 			jsonBytes, err := s.clientCtx.Codec.MarshalJSON(msg)
 			if err != nil {
-				log.Printf("Warning: failed to marshal message to JSON: %v", err)
+				zlog.Warn().Msgf("failed to marshal message to JSON: %v", err)
 				http.Error(w, "Failed to marshal a transaction message to JSON", http.StatusInternalServerError)
 				return
 			}
@@ -286,4 +275,4 @@ func (s *Server) getTransactionHandler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(getTxRes.TxResponse)
 	}
-} 
+}

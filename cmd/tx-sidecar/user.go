@@ -3,9 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
+
+	zlog "github.com/rs/zerolog/log"
 
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
@@ -119,7 +120,7 @@ func (s *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		finalUserData = *createdUser
-		log.Printf("Created new user '%s' with address %s and role %s", finalUserData.Name, finalUserData.Address, finalUserData.Role)
+		zlog.Info().Msgf("Created new user '%s' with address %s and role %s", finalUserData.Name, finalUserData.Address, finalUserData.Role)
 	} else {
 		existingUser, ok := s.users[req.Name]
 		if !ok {
@@ -127,13 +128,13 @@ func (s *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		finalUserData = existingUser
-		log.Printf("User with name '%s' already exists, linking to email '%s'", req.Name, req.Email)
+		zlog.Info().Msgf("User with name '%s' already exists, linking to email '%s'", req.Name, req.Email)
 	}
 
 	// Map email to name and save
 	s.logins[req.Email] = req.Name
 	if err := s.saveLoginsToFile(); err != nil {
-		log.Printf("Warning: failed to save logins to file: %v", err)
+		zlog.Warn().Msgf("failed to save logins to file: %v", err)
 	}
 
 	s.loggedInUser = req.Name
@@ -204,7 +205,7 @@ func (s *Server) kycUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err := s.saveUsersToFile(); err != nil {
 		http.Error(w, "Failed to save updated user data", http.StatusInternalServerError)
-		log.Printf("Error saving users to file: %v", err)
+		zlog.Error().Msgf("Error saving users to file: %v", err)
 		return
 	}
 
@@ -265,7 +266,7 @@ func (s *Server) createUser(name, role string) (*UserData, error) {
 	}
 	s.users[name] = userData
 	if err := s.saveUsersToFile(); err != nil {
-		log.Printf("Warning: failed to save users to file: %v", err)
+		zlog.Warn().Msgf("failed to save users to file: %v", err)
 	}
 
 	return &userData, nil
@@ -297,7 +298,7 @@ func (s *Server) listUsersHandler(w http.ResponseWriter, r *http.Request) {
 	for name, userData := range s.users {
 		record, err := s.clientCtx.Keyring.Key(name)
 		if err != nil {
-			log.Printf("Warning: User '%s' is in users.json but not in the keyring. Listing without key info.", name)
+			zlog.Warn().Msgf("User '%s' is in users.json but not in the keyring. Listing without key info.", name)
 			userInfos = append(userInfos, UserDetailResponse{
 				Name:    userData.Name,
 				Address: userData.Address,
@@ -351,25 +352,25 @@ func (s *Server) initUsers() error {
 
 	for name, role := range initialUsers {
 		if userData, ok := s.users[name]; !ok {
-			log.Printf("User '%s' not found, creating...", name)
+			zlog.Info().Msgf("User '%s' not found, creating...", name)
 			_, err := s.createUser(name, role)
 			if err != nil {
 				return fmt.Errorf("failed to create initial user '%s': %w", name, err)
 			}
-			log.Printf("Successfully created initial user '%s'", name)
+			zlog.Info().Msgf("Successfully created initial user '%s'", name)
 		} else {
 			// User exists, check if the role is correct.
 			if userData.Role != role {
-				log.Printf("User '%s' has incorrect role '%s', updating to '%s'.", name, userData.Role, role)
+				zlog.Info().Msgf("User '%s' has incorrect role '%s', updating to '%s'.", name, userData.Role, role)
 				userData.Role = role
 				s.users[name] = userData
 				if err := s.saveUsersToFile(); err != nil {
 					return fmt.Errorf("failed to save users file after updating %s's role: %w", name, err)
 				}
-				log.Printf("Successfully updated role for user '%s'", name)
+				zlog.Info().Msgf("Successfully updated role for user '%s'", name)
 			}
 		}
 	}
 
 	return nil
-} 
+}
