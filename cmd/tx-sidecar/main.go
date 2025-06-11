@@ -227,6 +227,14 @@ func main() {
 	}
 	defer server.Close()
 
+	userNames := make([]string, 0, len(server.users))
+	for name := range server.users {
+		if name != server.faucetName {
+			userNames = append(userNames, name)
+		}
+	}
+	go server.RunAutoProperty(userNames)
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/register-property", server.registerPropertyHandler)
 	mux.HandleFunc("/transfer-shares", server.transferSharesHandler)
