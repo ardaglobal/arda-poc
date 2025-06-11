@@ -286,4 +286,4 @@ func (s *Server) getTransactionHandler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(getTxRes.TxResponse)
 	}
-} 
+}

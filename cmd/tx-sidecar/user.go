@@ -372,4 +372,4 @@ func (s *Server) initUsers() error {
 	}
 
 	return nil
-} 
+}

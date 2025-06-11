@@ -80,4 +80,4 @@ func (s *Server) transferSharesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.buildSignAndBroadcast(w, r, fromName, req.Gas, "transfer_shares", msgBuilder)
-} 
+}

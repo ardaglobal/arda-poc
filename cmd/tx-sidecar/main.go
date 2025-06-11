@@ -9,6 +9,10 @@ import (
 	"os"
 	"strings"
 
+	fiberadaptor "github.com/gofiber/adaptor/v2"
+	fiber "github.com/gofiber/fiber/v2"
+	fibercors "github.com/gofiber/fiber/v2/middleware/cors"
+
 	"cosmossdk.io/math"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -190,23 +194,6 @@ type FaucetRequest struct {
 	Gas     string `json:"gas,omitempty"`
 }
 
-// corsHandler wraps a handler to include CORS headers.
-func corsHandler(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-
-		// Handle pre-flight requests
-		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-
-		h.ServeHTTP(w, r)
-	})
-}
-
 func main() {
 	// This context is for the main application, not for individual requests.
 	clientCtx, err := sidecarclient.NewClientContext()
@@ -227,19 +214,21 @@ func main() {
 	}
 	defer server.Close()
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/register-property", server.registerPropertyHandler)
-	mux.HandleFunc("/transfer-shares", server.transferSharesHandler)
-	mux.HandleFunc("/users", server.listUsersHandler)
-	mux.HandleFunc("/login", server.loginHandler)
-	mux.HandleFunc("/logout", server.logoutHandler)
-	mux.HandleFunc("/faucet", server.faucetHandler)
-	mux.HandleFunc("/transactions", server.listTransactionsHandler)
-	mux.HandleFunc("/transaction/", server.getTransactionHandler)
-	mux.HandleFunc("/kyc-user", server.kycUserHandler)
+	app := fiber.New()
+	app.Use(fibercors.New())
+
+	app.Post("/register-property", fiberadaptor.HTTPHandlerFunc(server.registerPropertyHandler))
+	app.Post("/transfer-shares", fiberadaptor.HTTPHandlerFunc(server.transferSharesHandler))
+	app.Get("/users", fiberadaptor.HTTPHandlerFunc(server.listUsersHandler))
+	app.Post("/login", fiberadaptor.HTTPHandlerFunc(server.loginHandler))
+	app.Post("/logout", fiberadaptor.HTTPHandlerFunc(server.logoutHandler))
+	app.Post("/faucet", fiberadaptor.HTTPHandlerFunc(server.faucetHandler))
+	app.Get("/transactions", fiberadaptor.HTTPHandlerFunc(server.listTransactionsHandler))
+	app.Get("/transaction/*", fiberadaptor.HTTPHandlerFunc(server.getTransactionHandler))
+	app.Post("/kyc-user", fiberadaptor.HTTPHandlerFunc(server.kycUserHandler))
 
 	fmt.Println("Starting transaction sidecar server on :8080...")
-	if err := http.ListenAndServe(":8080", corsHandler(mux)); err != nil {
+	if err := app.Listen(":8080"); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 }
