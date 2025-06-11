@@ -30,6 +30,12 @@ service Msg {
       body: "*"
     };
   }
+  rpc EditPropertyMetadata (MsgEditPropertyMetadata) returns (MsgEditPropertyMetadataResponse) {
+    option (google.api.http) = {
+      post: "/cosmonaut/arda/property/edit"
+      body: "*"
+    };
+  }
 }
 // MsgUpdateParams is the Msg/UpdateParams request type.
 message MsgUpdateParams {
@@ -72,4 +78,21 @@ message MsgTransferShares {
 }
 
 message MsgTransferSharesResponse {}
+
+message MsgEditPropertyMetadata {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string property_id = 2;
+  string property_name = 3;
+  string property_type = 4;
+  string parcel_number = 5;
+  string parcel_size = 6;
+  string construction_information = 7;
+  string zoning_classification = 8;
+  string owner_information = 9;
+  string tenant_id = 10;
+  string unit_number = 11;
+}
+
+message MsgEditPropertyMetadataResponse {}
 

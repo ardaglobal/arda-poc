@@ -242,6 +242,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/register-property", server.registerPropertyHandler)
 	mux.HandleFunc("/transfer-shares", server.transferSharesHandler)
+	mux.HandleFunc("/edit-property", server.editPropertyMetadataHandler)
 	mux.HandleFunc("/users", server.listUsersHandler)
 	mux.HandleFunc("/login", server.loginHandler)
 	mux.HandleFunc("/logout", server.logoutHandler)

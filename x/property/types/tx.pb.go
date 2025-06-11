@@ -365,6 +365,166 @@ func (m *MsgTransferSharesResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgTransferSharesResponse proto.InternalMessageInfo
 
+type MsgEditPropertyMetadata struct {
+	Creator                 string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	PropertyId              string `protobuf:"bytes,2,opt,name=property_id,json=propertyId,proto3" json:"property_id,omitempty"`
+	PropertyName            string `protobuf:"bytes,3,opt,name=property_name,json=propertyName,proto3" json:"property_name,omitempty"`
+	PropertyType            string `protobuf:"bytes,4,opt,name=property_type,json=propertyType,proto3" json:"property_type,omitempty"`
+	ParcelNumber            string `protobuf:"bytes,5,opt,name=parcel_number,json=parcelNumber,proto3" json:"parcel_number,omitempty"`
+	ParcelSize              string `protobuf:"bytes,6,opt,name=parcel_size,json=parcelSize,proto3" json:"parcel_size,omitempty"`
+	ConstructionInformation string `protobuf:"bytes,7,opt,name=construction_information,json=constructionInformation,proto3" json:"construction_information,omitempty"`
+	ZoningClassification    string `protobuf:"bytes,8,opt,name=zoning_classification,json=zoningClassification,proto3" json:"zoning_classification,omitempty"`
+	OwnerInformation        string `protobuf:"bytes,9,opt,name=owner_information,json=ownerInformation,proto3" json:"owner_information,omitempty"`
+	TenantId                string `protobuf:"bytes,10,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+	UnitNumber              string `protobuf:"bytes,11,opt,name=unit_number,json=unitNumber,proto3" json:"unit_number,omitempty"`
+}
+
+func (m *MsgEditPropertyMetadata) Reset()         { *m = MsgEditPropertyMetadata{} }
+func (m *MsgEditPropertyMetadata) String() string { return proto.CompactTextString(m) }
+func (*MsgEditPropertyMetadata) ProtoMessage()    {}
+func (*MsgEditPropertyMetadata) Descriptor() ([]byte, []int) {
+	return fileDescriptor_f04653f7920feaa8, []int{6}
+}
+func (m *MsgEditPropertyMetadata) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgEditPropertyMetadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgEditPropertyMetadata.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgEditPropertyMetadata) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgEditPropertyMetadata.Merge(m, src)
+}
+func (m *MsgEditPropertyMetadata) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgEditPropertyMetadata) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgEditPropertyMetadata.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgEditPropertyMetadata proto.InternalMessageInfo
+
+func (m *MsgEditPropertyMetadata) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgEditPropertyMetadata) GetPropertyId() string {
+	if m != nil {
+		return m.PropertyId
+	}
+	return ""
+}
+
+func (m *MsgEditPropertyMetadata) GetPropertyName() string {
+	if m != nil {
+		return m.PropertyName
+	}
+	return ""
+}
+
+func (m *MsgEditPropertyMetadata) GetPropertyType() string {
+	if m != nil {
+		return m.PropertyType
+	}
+	return ""
+}
+
+func (m *MsgEditPropertyMetadata) GetParcelNumber() string {
+	if m != nil {
+		return m.ParcelNumber
+	}
+	return ""
+}
+
+func (m *MsgEditPropertyMetadata) GetParcelSize() string {
+	if m != nil {
+		return m.ParcelSize
+	}
+	return ""
+}
+
+func (m *MsgEditPropertyMetadata) GetConstructionInformation() string {
+	if m != nil {
+		return m.ConstructionInformation
+	}
+	return ""
+}
+
+func (m *MsgEditPropertyMetadata) GetZoningClassification() string {
+	if m != nil {
+		return m.ZoningClassification
+	}
+	return ""
+}
+
+func (m *MsgEditPropertyMetadata) GetOwnerInformation() string {
+	if m != nil {
+		return m.OwnerInformation
+	}
+	return ""
+}
+
+func (m *MsgEditPropertyMetadata) GetTenantId() string {
+	if m != nil {
+		return m.TenantId
+	}
+	return ""
+}
+
+func (m *MsgEditPropertyMetadata) GetUnitNumber() string {
+	if m != nil {
+		return m.UnitNumber
+	}
+	return ""
+}
+
+type MsgEditPropertyMetadataResponse struct {
+}
+
+func (m *MsgEditPropertyMetadataResponse) Reset()         { *m = MsgEditPropertyMetadataResponse{} }
+func (m *MsgEditPropertyMetadataResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgEditPropertyMetadataResponse) ProtoMessage()    {}
+func (*MsgEditPropertyMetadataResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_f04653f7920feaa8, []int{7}
+}
+func (m *MsgEditPropertyMetadataResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgEditPropertyMetadataResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgEditPropertyMetadataResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgEditPropertyMetadataResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgEditPropertyMetadataResponse.Merge(m, src)
+}
+func (m *MsgEditPropertyMetadataResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgEditPropertyMetadataResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgEditPropertyMetadataResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgEditPropertyMetadataResponse proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*MsgUpdateParams)(nil), "ardapoc.property.MsgUpdateParams")
 	proto.RegisterType((*MsgUpdateParamsResponse)(nil), "ardapoc.property.MsgUpdateParamsResponse")
@@ -372,52 +532,68 @@ func init() {
 	proto.RegisterType((*MsgRegisterPropertyResponse)(nil), "ardapoc.property.MsgRegisterPropertyResponse")
 	proto.RegisterType((*MsgTransferShares)(nil), "ardapoc.property.MsgTransferShares")
 	proto.RegisterType((*MsgTransferSharesResponse)(nil), "ardapoc.property.MsgTransferSharesResponse")
+	proto.RegisterType((*MsgEditPropertyMetadata)(nil), "ardapoc.property.MsgEditPropertyMetadata")
+	proto.RegisterType((*MsgEditPropertyMetadataResponse)(nil), "ardapoc.property.MsgEditPropertyMetadataResponse")
 }
 
 func init() { proto.RegisterFile("ardapoc/property/tx.proto", fileDescriptor_f04653f7920feaa8) }
 
 var fileDescriptor_f04653f7920feaa8 = []byte{
-	// 629 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x54, 0xb1, 0x6f, 0xd3, 0x4e,
-	0x18, 0xcd, 0xd5, 0x69, 0x7e, 0xbf, 0x1c, 0x15, 0xb4, 0xa6, 0xa2, 0x8e, 0x4b, 0xdd, 0x34, 0x08,
-	0x14, 0x02, 0x8d, 0x45, 0x91, 0x18, 0xca, 0x44, 0xb7, 0x0e, 0x51, 0x2b, 0x17, 0x16, 0x84, 0x84,
-	0xae, 0xc9, 0xf5, 0x6a, 0x29, 0xf6, 0x59, 0x77, 0x97, 0xd2, 0x6c, 0xa8, 0x23, 0x53, 0x25, 0xa4,
-	0xfe, 0x0d, 0x8c, 0x19, 0x60, 0xe1, 0x2f, 0xe8, 0x58, 0xd1, 0x85, 0x09, 0xa1, 0x04, 0x29, 0xff,
-	0x06, 0xf2, 0xdd, 0x39, 0x71, 0x9d, 0x08, 0xca, 0x92, 0xf8, 0x7d, 0xef, 0x7d, 0xf7, 0xbd, 0x67,
-	0x7f, 0x36, 0x2c, 0x21, 0xd6, 0x42, 0x11, 0x6d, 0xba, 0x11, 0xa3, 0x11, 0x66, 0xa2, 0xeb, 0x8a,
-	0xe3, 0x7a, 0xc4, 0xa8, 0xa0, 0xe6, 0xbc, 0xa6, 0xea, 0x09, 0x65, 0x2f, 0xa0, 0xc0, 0x0f, 0xa9,
-	0x2b, 0x7f, 0x95, 0xc8, 0x5e, 0x6a, 0x52, 0x1e, 0x50, 0xee, 0x06, 0x9c, 0xb8, 0x47, 0x4f, 0xe2,
-	0x3f, 0x4d, 0x94, 0x14, 0xf1, 0x56, 0x22, 0x57, 0x01, 0x4d, 0x2d, 0x12, 0x4a, 0xa8, 0xaa, 0xc7,
-	0x57, 0xba, 0xba, 0x32, 0xe1, 0x24, 0x42, 0x0c, 0x05, 0x49, 0xd3, 0x5d, 0x42, 0x29, 0x69, 0x63,
-	0x17, 0x45, 0xbe, 0x8b, 0xc2, 0x90, 0x0a, 0x24, 0x7c, 0x1a, 0x6a, 0xb6, 0xf2, 0x15, 0xc0, 0x5b,
-	0x0d, 0x4e, 0x5e, 0x45, 0x2d, 0x24, 0xf0, 0xae, 0xec, 0x33, 0x9f, 0xc1, 0x22, 0xea, 0x88, 0x43,
-	0xca, 0x7c, 0xd1, 0xb5, 0x40, 0x19, 0x54, 0x8b, 0x5b, 0xd6, 0xb7, 0xcf, 0xeb, 0x8b, 0xda, 0xcb,
-	0x8b, 0x56, 0x8b, 0x61, 0xce, 0xf7, 0x04, 0xf3, 0x43, 0xe2, 0x8d, 0xa5, 0xe6, 0x73, 0x58, 0x50,
-	0x93, 0xad, 0x99, 0x32, 0xa8, 0xde, 0xd8, 0xb0, 0xea, 0xd9, 0x1b, 0x51, 0x57, 0x13, 0xb6, 0x8a,
-	0xe7, 0x3f, 0x56, 0x73, 0x9f, 0x86, 0xbd, 0x1a, 0xf0, 0x74, 0xcb, 0xe6, 0xc6, 0xc9, 0xb0, 0x57,
-	0x1b, 0x1f, 0xf6, 0x61, 0xd8, 0xab, 0xad, 0xc6, 0xed, 0xee, 0xf1, 0x38, 0x57, 0xc6, 0x68, 0xa5,
-	0x04, 0x97, 0x32, 0x25, 0x0f, 0xf3, 0x88, 0x86, 0x1c, 0x57, 0xbe, 0x00, 0x78, 0xbb, 0xc1, 0x89,
-	0x87, 0x89, 0xcf, 0x05, 0x66, 0xbb, 0xfa, 0x08, 0xd3, 0x82, 0xff, 0x35, 0x19, 0x46, 0x82, 0x32,
-	0x95, 0xcc, 0x4b, 0x60, 0xcc, 0x20, 0x95, 0x4c, 0xda, 0x2f, 0x7a, 0x09, 0x34, 0xef, 0xc0, 0x02,
-	0xc3, 0xc4, 0xa7, 0xa1, 0x65, 0x48, 0x42, 0x23, 0x73, 0x11, 0xce, 0x1e, 0xa1, 0x76, 0x07, 0x5b,
-	0xf9, 0x32, 0xa8, 0xe6, 0x3d, 0x05, 0x62, 0x35, 0x7d, 0x17, 0x62, 0xc6, 0xad, 0xd9, 0xb2, 0x11,
-	0xab, 0x15, 0x8a, 0xeb, 0xfc, 0x10, 0x31, 0xcc, 0xad, 0x42, 0xd9, 0xa8, 0xe6, 0x3d, 0x8d, 0x36,
-	0xe7, 0xe2, 0xe0, 0x89, 0x8b, 0xca, 0x0a, 0x5c, 0x9e, 0x62, 0x7b, 0x14, 0xeb, 0x12, 0xc0, 0x85,
-	0x06, 0x27, 0x2f, 0x19, 0x0a, 0xf9, 0x01, 0x66, 0x7b, 0xf2, 0x88, 0x3f, 0x84, 0x72, 0x20, 0x4c,
-	0xee, 0xde, 0x76, 0x4b, 0xe7, 0x4a, 0x55, 0x62, 0xfe, 0x80, 0xd1, 0x60, 0x47, 0x19, 0x36, 0xa4,
-	0xe1, 0x54, 0x25, 0xe1, 0xd5, 0x1c, 0x2b, 0x2f, 0x8d, 0xa7, 0x2a, 0xa6, 0x0d, 0xff, 0x17, 0x74,
-	0x27, 0x1d, 0x77, 0x84, 0x15, 0xb7, 0x97, 0x8e, 0x3c, 0xc2, 0x99, 0xd0, 0xcb, 0xb0, 0x34, 0x11,
-	0x2a, 0x89, 0xbc, 0x71, 0x66, 0x40, 0xa3, 0xc1, 0x89, 0xf9, 0x06, 0xce, 0x5d, 0xd9, 0xd2, 0xb5,
-	0xc9, 0xed, 0xca, 0x2c, 0x83, 0xfd, 0xf0, 0xaf, 0x92, 0x64, 0x8a, 0x79, 0x06, 0xe0, 0xfc, 0xc4,
-	0xb2, 0xdc, 0x9f, 0xda, 0x9f, 0x95, 0xd9, 0xeb, 0xd7, 0x92, 0x8d, 0x9e, 0xe1, 0xe3, 0x93, 0xcb,
-	0x5f, 0x1f, 0x67, 0x1e, 0x6c, 0x82, 0x5a, 0x65, 0x4d, 0xbd, 0xdf, 0x21, 0xea, 0x08, 0x57, 0x2e,
-	0xfb, 0x68, 0xd5, 0x99, 0xee, 0x36, 0x4f, 0x01, 0xbc, 0x99, 0x79, 0xdc, 0xf7, 0xa6, 0xce, 0xbb,
-	0x2a, 0xb2, 0x1f, 0x5d, 0x43, 0xf4, 0x6f, 0x96, 0x84, 0xee, 0xb5, 0x67, 0xdf, 0xc7, 0x6f, 0xee,
-	0xd6, 0xf6, 0x79, 0xdf, 0x01, 0x17, 0x7d, 0x07, 0xfc, 0xec, 0x3b, 0xe0, 0x74, 0xe0, 0xe4, 0x2e,
-	0x06, 0x4e, 0xee, 0xfb, 0xc0, 0xc9, 0xbd, 0x76, 0x89, 0x2f, 0x0e, 0x3b, 0xfb, 0xf5, 0x26, 0x0d,
-	0xe4, 0x19, 0xa4, 0x4d, 0xf7, 0x51, 0x5b, 0x5e, 0xae, 0xc7, 0x1f, 0xaa, 0xd4, 0x2b, 0x2d, 0xba,
-	0x11, 0xe6, 0xfb, 0x05, 0xf9, 0x31, 0x7a, 0xfa, 0x3b, 0x00, 0x00, 0xff, 0xff, 0x69, 0xc8, 0xe3,
-	0x4c, 0x55, 0x05, 0x00, 0x00,
+	// 860 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x55, 0x4f, 0x6f, 0x1b, 0x45,
+	0x1c, 0xcd, 0xd6, 0x8e, 0x1b, 0x4f, 0x02, 0x24, 0x8b, 0x21, 0x9b, 0x0d, 0x71, 0x1c, 0x57, 0x20,
+	0xe3, 0x12, 0xaf, 0x9a, 0x4a, 0x48, 0x84, 0x13, 0x41, 0x1c, 0x7c, 0x70, 0x5b, 0xad, 0xcb, 0x05,
+	0x21, 0x59, 0xe3, 0xdd, 0xf1, 0x66, 0x24, 0xef, 0xcc, 0x6a, 0x66, 0x5c, 0xea, 0x9c, 0x50, 0x8f,
+	0x9c, 0x2a, 0x21, 0x71, 0xe4, 0xcc, 0x31, 0x07, 0x10, 0x12, 0x9f, 0xa0, 0x17, 0xa4, 0x8a, 0x5e,
+	0x38, 0x21, 0x94, 0x20, 0xe5, 0x6b, 0xa0, 0xf9, 0xb3, 0xeb, 0xf5, 0xda, 0x0d, 0xe1, 0x62, 0xef,
+	0xef, 0xbd, 0xf7, 0xdb, 0x79, 0x6f, 0x66, 0x67, 0x06, 0xec, 0x40, 0x16, 0xc2, 0x84, 0x06, 0x5e,
+	0xc2, 0x68, 0x82, 0x98, 0x98, 0x7a, 0xe2, 0x69, 0x27, 0x61, 0x54, 0x50, 0x7b, 0xd3, 0x50, 0x9d,
+	0x94, 0x72, 0xb7, 0x60, 0x8c, 0x09, 0xf5, 0xd4, 0xaf, 0x16, 0xb9, 0xdb, 0x01, 0xe5, 0x31, 0xe5,
+	0x5e, 0xcc, 0x23, 0xef, 0xc9, 0x3d, 0xf9, 0x67, 0x88, 0x1d, 0x4d, 0x0c, 0x54, 0xe5, 0xe9, 0xc2,
+	0x50, 0xb5, 0x88, 0x46, 0x54, 0xe3, 0xf2, 0xc9, 0xa0, 0x7b, 0x0b, 0x4e, 0x12, 0xc8, 0x60, 0x9c,
+	0x36, 0xbd, 0x17, 0x51, 0x1a, 0x8d, 0x91, 0x07, 0x13, 0xec, 0x41, 0x42, 0xa8, 0x80, 0x02, 0x53,
+	0x62, 0xd8, 0xe6, 0x6f, 0x16, 0x78, 0xab, 0xc7, 0xa3, 0x2f, 0x93, 0x10, 0x0a, 0xf4, 0x48, 0xf5,
+	0xd9, 0x1f, 0x83, 0x2a, 0x9c, 0x88, 0x53, 0xca, 0xb0, 0x98, 0x3a, 0x56, 0xc3, 0x6a, 0x55, 0x4f,
+	0x9c, 0x3f, 0x7e, 0x3e, 0xac, 0x19, 0x2f, 0x9f, 0x85, 0x21, 0x43, 0x9c, 0xf7, 0x05, 0xc3, 0x24,
+	0xf2, 0x67, 0x52, 0xfb, 0x53, 0x50, 0xd1, 0x23, 0x3b, 0xb7, 0x1a, 0x56, 0x6b, 0xfd, 0xc8, 0xe9,
+	0x14, 0x27, 0xa2, 0xa3, 0x47, 0x38, 0xa9, 0xbe, 0xf8, 0x6b, 0x7f, 0xe5, 0xa7, 0xab, 0xf3, 0xb6,
+	0xe5, 0x9b, 0x96, 0xe3, 0xa3, 0x67, 0x57, 0xe7, 0xed, 0xd9, 0xcb, 0xbe, 0xbb, 0x3a, 0x6f, 0xef,
+	0xcb, 0x76, 0xef, 0xe9, 0x2c, 0x57, 0xc1, 0x68, 0x73, 0x07, 0x6c, 0x17, 0x20, 0x1f, 0xf1, 0x84,
+	0x12, 0x8e, 0x9a, 0xbf, 0x58, 0xe0, 0xed, 0x1e, 0x8f, 0x7c, 0x14, 0x61, 0x2e, 0x10, 0x7b, 0x64,
+	0x5e, 0x61, 0x3b, 0xe0, 0x76, 0xc0, 0x10, 0x14, 0x94, 0xe9, 0x64, 0x7e, 0x5a, 0x4a, 0x06, 0xea,
+	0x64, 0xca, 0x7e, 0xd5, 0x4f, 0x4b, 0xfb, 0x5d, 0x50, 0x61, 0x28, 0xc2, 0x94, 0x38, 0x25, 0x45,
+	0x98, 0xca, 0xae, 0x81, 0xd5, 0x27, 0x70, 0x3c, 0x41, 0x4e, 0xb9, 0x61, 0xb5, 0xca, 0xbe, 0x2e,
+	0xa4, 0x9a, 0x7e, 0x43, 0x10, 0xe3, 0xce, 0x6a, 0xa3, 0x24, 0xd5, 0xba, 0x92, 0x38, 0x3f, 0x85,
+	0x0c, 0x71, 0xa7, 0xd2, 0x28, 0xb5, 0xca, 0xbe, 0xa9, 0x8e, 0x37, 0x64, 0xf0, 0xd4, 0x45, 0x73,
+	0x0f, 0xec, 0x2e, 0xb1, 0x9d, 0xc5, 0x7a, 0x65, 0x81, 0xad, 0x1e, 0x8f, 0x1e, 0x33, 0x48, 0xf8,
+	0x08, 0xb1, 0xbe, 0x7a, 0xc5, 0x35, 0xa1, 0xea, 0x00, 0xa4, 0xb3, 0xd7, 0x0d, 0x4d, 0xae, 0x1c,
+	0x22, 0xf9, 0x11, 0xa3, 0xf1, 0x43, 0x6d, 0xb8, 0xa4, 0x0c, 0xe7, 0x90, 0x94, 0xd7, 0xe3, 0x38,
+	0x65, 0x65, 0x3c, 0x87, 0xd8, 0x2e, 0x58, 0x13, 0xf4, 0x61, 0x3e, 0x6e, 0x56, 0x6b, 0xae, 0x9f,
+	0x8f, 0x9c, 0xd5, 0x85, 0xd0, 0xbb, 0x60, 0x67, 0x21, 0x54, 0x16, 0xf9, 0xf7, 0x92, 0x5a, 0xe5,
+	0x2f, 0x42, 0x2c, 0xd2, 0xe9, 0xe8, 0x21, 0x01, 0x43, 0x28, 0xe0, 0x35, 0xc1, 0xf7, 0xc1, 0x7a,
+	0x1a, 0x73, 0x80, 0x97, 0x25, 0xbf, 0x03, 0xde, 0xc8, 0x04, 0x04, 0xc6, 0xc8, 0xac, 0xed, 0x46,
+	0x0a, 0x3e, 0x80, 0x31, 0x9a, 0x13, 0x89, 0x69, 0xa2, 0x57, 0x3a, 0x27, 0x7a, 0x3c, 0x4d, 0xb4,
+	0x08, 0xb2, 0x00, 0x8d, 0x07, 0x64, 0x12, 0x0f, 0x11, 0x73, 0x56, 0x8d, 0x48, 0x81, 0x0f, 0x14,
+	0xa6, 0xfc, 0x68, 0x11, 0xc7, 0x67, 0xc8, 0xa9, 0x18, 0x3f, 0x0a, 0xea, 0xe3, 0x33, 0x64, 0x7f,
+	0x02, 0x9c, 0x80, 0x12, 0x2e, 0xd8, 0x24, 0x90, 0xfb, 0x73, 0x80, 0xc9, 0x88, 0xb2, 0x58, 0xed,
+	0x55, 0xe7, 0xb6, 0x52, 0x6f, 0xe7, 0xf9, 0xee, 0x8c, 0xb6, 0xef, 0x83, 0x77, 0xce, 0x28, 0xc1,
+	0x24, 0x1a, 0x04, 0x63, 0xc8, 0x39, 0x1e, 0xe1, 0x40, 0xf7, 0xad, 0xa9, 0xbe, 0x9a, 0x26, 0x3f,
+	0x9f, 0xe3, 0xec, 0xbb, 0x60, 0x4b, 0x7d, 0x98, 0x73, 0x03, 0x55, 0x55, 0xc3, 0xa6, 0x22, 0xf2,
+	0x23, 0xec, 0x82, 0xaa, 0x40, 0x04, 0x12, 0x21, 0xe7, 0x12, 0x28, 0xd1, 0x9a, 0x06, 0xba, 0xa1,
+	0x8c, 0x36, 0x21, 0x58, 0xa4, 0xe9, 0xd7, 0x75, 0x34, 0x09, 0xe9, 0xec, 0x85, 0xc5, 0x3e, 0x00,
+	0xfb, 0xaf, 0x59, 0xce, 0x74, 0xc9, 0x8f, 0x7e, 0x2d, 0x83, 0x52, 0x8f, 0x47, 0xf6, 0xd7, 0x60,
+	0x63, 0xee, 0x60, 0x3a, 0x58, 0x3c, 0x50, 0x0a, 0xfb, 0xdf, 0xfd, 0xf0, 0x3f, 0x25, 0xe9, 0x28,
+	0xf6, 0x0f, 0x16, 0xd8, 0x5c, 0x38, 0x1f, 0xde, 0x5f, 0xda, 0x5f, 0x94, 0xb9, 0x87, 0x37, 0x92,
+	0x65, 0xdf, 0xf0, 0x47, 0xcf, 0x5e, 0xfd, 0xf3, 0xfd, 0xad, 0x0f, 0x8e, 0xad, 0x76, 0xf3, 0x40,
+	0x1f, 0xe9, 0x04, 0x4e, 0x84, 0xa7, 0xce, 0xb7, 0xec, 0x74, 0x63, 0xa6, 0xdb, 0x7e, 0x6e, 0x81,
+	0x37, 0x0b, 0x3b, 0xfc, 0xce, 0xd2, 0xf1, 0xe6, 0x45, 0xee, 0xdd, 0x1b, 0x88, 0xfe, 0x9f, 0x25,
+	0x61, 0x7a, 0xed, 0x1f, 0x2d, 0x50, 0x5b, 0xba, 0x03, 0x97, 0xcf, 0xf7, 0x32, 0xa9, 0x7b, 0xef,
+	0xc6, 0xd2, 0xcc, 0x64, 0x4b, 0x99, 0x6c, 0x4a, 0x93, 0x7b, 0xaf, 0x35, 0x89, 0x42, 0x2c, 0xdc,
+	0xd5, 0x6f, 0xe5, 0x6d, 0x72, 0xd2, 0x7d, 0x71, 0x51, 0xb7, 0x5e, 0x5e, 0xd4, 0xad, 0xbf, 0x2f,
+	0xea, 0xd6, 0xf3, 0xcb, 0xfa, 0xca, 0xcb, 0xcb, 0xfa, 0xca, 0x9f, 0x97, 0xf5, 0x95, 0xaf, 0xbc,
+	0x08, 0x8b, 0xd3, 0xc9, 0xb0, 0x13, 0xd0, 0x58, 0xf5, 0x47, 0x63, 0x3a, 0x84, 0x63, 0xf5, 0x78,
+	0x28, 0x2f, 0xcf, 0xdc, 0x35, 0x23, 0x77, 0x3a, 0x1f, 0x56, 0xd4, 0x05, 0x79, 0xff, 0xdf, 0x00,
+	0x00, 0x00, 0xff, 0xff, 0x12, 0xfc, 0x91, 0x27, 0xe9, 0x07, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -437,6 +613,7 @@ type MsgClient interface {
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
 	RegisterProperty(ctx context.Context, in *MsgRegisterProperty, opts ...grpc.CallOption) (*MsgRegisterPropertyResponse, error)
 	TransferShares(ctx context.Context, in *MsgTransferShares, opts ...grpc.CallOption) (*MsgTransferSharesResponse, error)
+	EditPropertyMetadata(ctx context.Context, in *MsgEditPropertyMetadata, opts ...grpc.CallOption) (*MsgEditPropertyMetadataResponse, error)
 }
 
 type msgClient struct {
@@ -474,6 +651,15 @@ func (c *msgClient) TransferShares(ctx context.Context, in *MsgTransferShares, o
 	return out, nil
 }
 
+func (c *msgClient) EditPropertyMetadata(ctx context.Context, in *MsgEditPropertyMetadata, opts ...grpc.CallOption) (*MsgEditPropertyMetadataResponse, error) {
+	out := new(MsgEditPropertyMetadataResponse)
+	err := c.cc.Invoke(ctx, "/ardapoc.property.Msg/EditPropertyMetadata", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	// UpdateParams defines a (governance) operation for updating the module
@@ -481,6 +667,7 @@ type MsgServer interface {
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
 	RegisterProperty(context.Context, *MsgRegisterProperty) (*MsgRegisterPropertyResponse, error)
 	TransferShares(context.Context, *MsgTransferShares) (*MsgTransferSharesResponse, error)
+	EditPropertyMetadata(context.Context, *MsgEditPropertyMetadata) (*MsgEditPropertyMetadataResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -495,6 +682,9 @@ func (*UnimplementedMsgServer) RegisterProperty(ctx context.Context, req *MsgReg
 }
 func (*UnimplementedMsgServer) TransferShares(ctx context.Context, req *MsgTransferShares) (*MsgTransferSharesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TransferShares not implemented")
+}
+func (*UnimplementedMsgServer) EditPropertyMetadata(ctx context.Context, req *MsgEditPropertyMetadata) (*MsgEditPropertyMetadataResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EditPropertyMetadata not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -555,6 +745,24 @@ func _Msg_TransferShares_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_EditPropertyMetadata_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgEditPropertyMetadata)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).EditPropertyMetadata(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ardapoc.property.Msg/EditPropertyMetadata",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).EditPropertyMetadata(ctx, req.(*MsgEditPropertyMetadata))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var Msg_serviceDesc = _Msg_serviceDesc
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "ardapoc.property.Msg",
@@ -571,6 +779,10 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "TransferShares",
 			Handler:    _Msg_TransferShares_Handler,
+		},
+		{
+			MethodName: "EditPropertyMetadata",
+			Handler:    _Msg_EditPropertyMetadata_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -853,6 +1065,129 @@ func (m *MsgTransferSharesResponse) MarshalToSizedBuffer(dAtA []byte) (int, erro
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgEditPropertyMetadata) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgEditPropertyMetadata) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgEditPropertyMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.UnitNumber) > 0 {
+		i -= len(m.UnitNumber)
+		copy(dAtA[i:], m.UnitNumber)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.UnitNumber)))
+		i--
+		dAtA[i] = 0x5a
+	}
+	if len(m.TenantId) > 0 {
+		i -= len(m.TenantId)
+		copy(dAtA[i:], m.TenantId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.TenantId)))
+		i--
+		dAtA[i] = 0x52
+	}
+	if len(m.OwnerInformation) > 0 {
+		i -= len(m.OwnerInformation)
+		copy(dAtA[i:], m.OwnerInformation)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.OwnerInformation)))
+		i--
+		dAtA[i] = 0x4a
+	}
+	if len(m.ZoningClassification) > 0 {
+		i -= len(m.ZoningClassification)
+		copy(dAtA[i:], m.ZoningClassification)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.ZoningClassification)))
+		i--
+		dAtA[i] = 0x42
+	}
+	if len(m.ConstructionInformation) > 0 {
+		i -= len(m.ConstructionInformation)
+		copy(dAtA[i:], m.ConstructionInformation)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.ConstructionInformation)))
+		i--
+		dAtA[i] = 0x3a
+	}
+	if len(m.ParcelSize) > 0 {
+		i -= len(m.ParcelSize)
+		copy(dAtA[i:], m.ParcelSize)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.ParcelSize)))
+		i--
+		dAtA[i] = 0x32
+	}
+	if len(m.ParcelNumber) > 0 {
+		i -= len(m.ParcelNumber)
+		copy(dAtA[i:], m.ParcelNumber)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.ParcelNumber)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if len(m.PropertyType) > 0 {
+		i -= len(m.PropertyType)
+		copy(dAtA[i:], m.PropertyType)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.PropertyType)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.PropertyName) > 0 {
+		i -= len(m.PropertyName)
+		copy(dAtA[i:], m.PropertyName)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.PropertyName)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.PropertyId) > 0 {
+		i -= len(m.PropertyId)
+		copy(dAtA[i:], m.PropertyId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.PropertyId)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgEditPropertyMetadataResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgEditPropertyMetadataResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgEditPropertyMetadataResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTx(v)
 	base := offset
@@ -978,6 +1313,68 @@ func (m *MsgTransferShares) Size() (n int) {
 }
 
 func (m *MsgTransferSharesResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgEditPropertyMetadata) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.PropertyId)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.PropertyName)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.PropertyType)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.ParcelNumber)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.ParcelSize)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.ConstructionInformation)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.ZoningClassification)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.OwnerInformation)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.TenantId)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.UnitNumber)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgEditPropertyMetadataResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1837,6 +2234,458 @@ func (m *MsgTransferSharesResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: MsgTransferSharesResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgEditPropertyMetadata) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgEditPropertyMetadata: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgEditPropertyMetadata: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PropertyId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PropertyId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PropertyName", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PropertyName = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PropertyType", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PropertyType = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ParcelNumber", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ParcelNumber = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ParcelSize", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ParcelSize = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ConstructionInformation", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ConstructionInformation = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ZoningClassification", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ZoningClassification = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 9:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OwnerInformation", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.OwnerInformation = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 10:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TenantId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TenantId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UnitNumber", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.UnitNumber = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgEditPropertyMetadataResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgEditPropertyMetadataResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgEditPropertyMetadataResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:

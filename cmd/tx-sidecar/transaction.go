@@ -181,19 +181,98 @@ func (s *Server) listTransactionsHandler(w http.ResponseWriter, r *http.Request)
 
 // getTransactionHandler returns a specific transaction by its hash.
 func (s *Server) getTransactionHandler(w http.ResponseWriter, r *http.Request) {
-	txHash := strings.TrimPrefix(r.URL.Path, "/transaction/")
-	if txHash == "" {
-		http.Error(w, "Transaction hash must be provided", http.StatusBadRequest)
+	if r.Method != http.MethodGet {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
 
+	txHash := strings.TrimPrefix(r.URL.Path, "/transaction/")
+	if txHash == "" {
+		http.Error(w, "Transaction hash must be provided in the path", http.StatusBadRequest)
+		return
+	}
+
+	// Find our internal transaction type from the cache.
+	var trackedTx TrackedTx
+	found := false
 	for _, tx := range s.transactions {
 		if tx.TxHash == txHash {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(tx)
-			return
+			trackedTx = tx
+			found = true
+			break
 		}
 	}
 
-	http.Error(w, "Transaction not found", http.StatusNotFound)
+	if !found {
+		http.Error(w, "Transaction not found in local cache", http.StatusNotFound)
+		return
+	}
+
+	// Query the blockchain for the full transaction details
+	getTxRes, err := s.txClient.GetTx(r.Context(), &txtypes.GetTxRequest{Hash: txHash})
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to get transaction from blockchain: %v", err), http.StatusNotFound)
+		return
+	}
+
+	if getTxRes.TxResponse.Code != 0 {
+		http.Error(w, fmt.Sprintf("Transaction failed on-chain with code %d: %s", getTxRes.TxResponse.Code, getTxRes.TxResponse.RawLog), http.StatusInternalServerError)
+		return
+	}
+
+	// Process the response based on the transaction type from tx.json
+	switch trackedTx.Type {
+	case "register_property", "transfer_shares":
+		// Build a richer response object, modeled after the provided txout.json example.
+		response := make(map[string]interface{})
+
+		// Add core TxResponse fields, ensuring height is a string.
+		response["height"] = strconv.FormatInt(getTxRes.TxResponse.Height, 10)
+		response["txhash"] = getTxRes.TxResponse.TxHash
+		response["timestamp"] = getTxRes.TxResponse.Timestamp
+
+		// Filter for and include only the 'submission' event, and stringify it.
+		var submissionEvents sdk.StringEvents
+		for _, event := range getTxRes.TxResponse.Events {
+			if event.Type == "submission" {
+				submissionEvents = append(submissionEvents, sdk.StringifyEvent(event))
+			}
+		}
+		response["events"] = submissionEvents
+
+		// Decode the transaction from the response to access its messages.
+		sdkTx, err := s.clientCtx.TxConfig.TxDecoder()(getTxRes.TxResponse.Tx.Value)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Failed to decode tx: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		// Marshal each message into its JSON representation.
+		var messages []json.RawMessage
+		for _, msg := range sdkTx.GetMsgs() {
+			jsonBytes, err := s.clientCtx.Codec.MarshalJSON(msg)
+			if err != nil {
+				log.Printf("Warning: failed to marshal message to JSON: %v", err)
+				http.Error(w, "Failed to marshal a transaction message to JSON", http.StatusInternalServerError)
+				return
+			}
+			messages = append(messages, json.RawMessage(jsonBytes))
+		}
+
+		// Construct the "tx" object with the message bodies.
+		response["tx"] = map[string]interface{}{
+			"body": map[string]interface{}{
+				"messages": messages,
+			},
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		}
+
+	default:
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(getTxRes.TxResponse)
+	}
 } 
