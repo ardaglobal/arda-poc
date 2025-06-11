@@ -104,11 +104,5 @@ func (k msgServer) RegisterProperty(goCtx context.Context, msg *types.MsgRegiste
 		}
 	}
 
-	// Mint USDArda tokens equivalent to property value to owners
-	// TODO: potentialy remove this with mortgage module
-	if err := k.usdardaKeeper.Mint(ctx, property, property.Value); err != nil {
-		return nil, err
-	}
-
 	return &types.MsgRegisterPropertyResponse{}, nil
 }

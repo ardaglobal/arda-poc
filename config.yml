@@ -6,6 +6,7 @@ accounts:
   - name: ERES
     coins:
       - 200000000000000uarda
+      - 200000000usdarda
   - name: Bank
     coins:
       - 200000000000000uarda
@@ -13,33 +14,43 @@ accounts:
   - name: AIX
     coins:
       - 100000000uarda
+      - 1000000usdarda
   - name: DLD
     coins:
       - 100000000000000uarda
+      - 200000000usdarda
   - name: Fatima_Developers
     coins:
       - 100000000uarda
+      - 1000000usdarda
   - name: matt
     coins:
       - 100000000uarda
+      - 1000000usdarda
   - name: oli
     coins:
       - 100000000uarda
+      - 1000000usdarda
   - name: toby
     coins:
       - 100000000uarda
+      - 1000000usdarda
   - name: fawad
     coins:
       - 100000000uarda
+      - 1000000usdarda
   - name: siddiq
     coins:
       - 100000000uarda
+      - 1000000usdarda
   - name: mohammad
     coins:
       - 100000000uarda
+      - 1000000usdarda
   - name: ahmed
     coins:
       - 100000000uarda
+      - 1000000usdarda
 client:
   openapi:
     path: docs/static/openapi.yml
