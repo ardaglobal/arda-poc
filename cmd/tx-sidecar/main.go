@@ -20,7 +20,6 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
-	"github.com/ardaglobal/arda-poc/pkg/autoproperty"
 	sidecarclient "github.com/ardaglobal/arda-poc/pkg/client"
 )
 
@@ -234,7 +233,7 @@ func main() {
 			userNames = append(userNames, name)
 		}
 	}
-	go autoproperty.Run(userNames)
+	go server.RunAutoProperty(userNames)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/register-property", server.registerPropertyHandler)
