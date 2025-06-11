@@ -227,6 +227,18 @@ func main() {
 	}
 	defer server.Close()
 
+	developerUsers := make([]string, 0)
+	investorUsers := make([]string, 0)
+	for name, user := range server.users {
+		switch user.Role {
+		case "developer":
+			developerUsers = append(developerUsers, name)
+		case "investor":
+			investorUsers = append(investorUsers, name)
+		}
+	}
+	go server.RunAutoProperty(developerUsers, investorUsers)
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/register-property", server.registerPropertyHandler)
 	mux.HandleFunc("/transfer-shares", server.transferSharesHandler)
