@@ -126,6 +126,32 @@ The login flow is as follows:
   "role": "investor"
 }
 ```
+
+### `POST /edit-property`
+
+Updates the metadata for an existing property.
+
+**Request Body:**
+
+```json
+{
+  "property_id": "123 main st, anytown, usa",
+  "property_name": "My House",
+  "property_type": "residential",
+  "parcel_number": "PN-1",
+  "size": "1000sqft",
+  "construction_information": "built 2020",
+  "zoning_classification": "R1",
+  "owner_information": "John Doe",
+  "tenant_id": "",
+  "unit_number": "1A",
+  "gas": "auto"
+}
+```
+
+**Success Response:**
+
+A successful broadcast will return the transaction hash just like other endpoints.
 * `name` (string, optional): Required when registering a new user or linking an email to an existing user for the first time.
 * `role` (string, optional): The user's role. Defaults to `user`. Allowed values: `user`, `investor`, `developer`, `regulator`, `admin`, `faucet`.
 

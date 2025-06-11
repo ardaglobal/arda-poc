@@ -365,6 +365,36 @@ func (m *MsgTransferSharesResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgTransferSharesResponse proto.InternalMessageInfo
 
+type MsgEditPropertyMetadata struct {
+	Creator                 string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	PropertyId              string `protobuf:"bytes,2,opt,name=propertyId,proto3" json:"propertyId,omitempty"`
+	PropertyName            string `protobuf:"bytes,3,opt,name=property_name,json=propertyName,proto3" json:"property_name,omitempty"`
+	PropertyType            string `protobuf:"bytes,4,opt,name=property_type,json=propertyType,proto3" json:"property_type,omitempty"`
+	ParcelNumber            string `protobuf:"bytes,5,opt,name=parcel_number,json=parcelNumber,proto3" json:"parcel_number,omitempty"`
+	Size                    string `protobuf:"bytes,6,opt,name=size,proto3" json:"size,omitempty"`
+	ConstructionInformation string `protobuf:"bytes,7,opt,name=construction_information,json=constructionInformation,proto3" json:"construction_information,omitempty"`
+	ZoningClassification    string `protobuf:"bytes,8,opt,name=zoning_classification,json=zoningClassification,proto3" json:"zoning_classification,omitempty"`
+	OwnerInformation        string `protobuf:"bytes,9,opt,name=owner_information,json=ownerInformation,proto3" json:"owner_information,omitempty"`
+	TenantId                string `protobuf:"bytes,10,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+	UnitNumber              string `protobuf:"bytes,11,opt,name=unit_number,json=unitNumber,proto3" json:"unit_number,omitempty"`
+}
+
+func (m *MsgEditPropertyMetadata) Reset()         { *m = MsgEditPropertyMetadata{} }
+func (m *MsgEditPropertyMetadata) String() string { return proto.CompactTextString(m) }
+func (*MsgEditPropertyMetadata) ProtoMessage()    {}
+func (*MsgEditPropertyMetadata) Descriptor() ([]byte, []int) {
+	return fileDescriptor_f04653f7920feaa8, []int{6}
+}
+
+type MsgEditPropertyMetadataResponse struct{}
+
+func (m *MsgEditPropertyMetadataResponse) Reset()         { *m = MsgEditPropertyMetadataResponse{} }
+func (m *MsgEditPropertyMetadataResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgEditPropertyMetadataResponse) ProtoMessage()    {}
+func (*MsgEditPropertyMetadataResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_f04653f7920feaa8, []int{7}
+}
+
 func init() {
 	proto.RegisterType((*MsgUpdateParams)(nil), "ardapoc.property.MsgUpdateParams")
 	proto.RegisterType((*MsgUpdateParamsResponse)(nil), "ardapoc.property.MsgUpdateParamsResponse")
@@ -372,6 +402,8 @@ func init() {
 	proto.RegisterType((*MsgRegisterPropertyResponse)(nil), "ardapoc.property.MsgRegisterPropertyResponse")
 	proto.RegisterType((*MsgTransferShares)(nil), "ardapoc.property.MsgTransferShares")
 	proto.RegisterType((*MsgTransferSharesResponse)(nil), "ardapoc.property.MsgTransferSharesResponse")
+	proto.RegisterType((*MsgEditPropertyMetadata)(nil), "ardapoc.property.MsgEditPropertyMetadata")
+	proto.RegisterType((*MsgEditPropertyMetadataResponse)(nil), "ardapoc.property.MsgEditPropertyMetadataResponse")
 }
 
 func init() { proto.RegisterFile("ardapoc/property/tx.proto", fileDescriptor_f04653f7920feaa8) }
@@ -437,6 +469,7 @@ type MsgClient interface {
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
 	RegisterProperty(ctx context.Context, in *MsgRegisterProperty, opts ...grpc.CallOption) (*MsgRegisterPropertyResponse, error)
 	TransferShares(ctx context.Context, in *MsgTransferShares, opts ...grpc.CallOption) (*MsgTransferSharesResponse, error)
+	EditPropertyMetadata(ctx context.Context, in *MsgEditPropertyMetadata, opts ...grpc.CallOption) (*MsgEditPropertyMetadataResponse, error)
 }
 
 type msgClient struct {
@@ -474,6 +507,15 @@ func (c *msgClient) TransferShares(ctx context.Context, in *MsgTransferShares, o
 	return out, nil
 }
 
+func (c *msgClient) EditPropertyMetadata(ctx context.Context, in *MsgEditPropertyMetadata, opts ...grpc.CallOption) (*MsgEditPropertyMetadataResponse, error) {
+	out := new(MsgEditPropertyMetadataResponse)
+	err := c.cc.Invoke(ctx, "/ardapoc.property.Msg/EditPropertyMetadata", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	// UpdateParams defines a (governance) operation for updating the module
@@ -481,6 +523,7 @@ type MsgServer interface {
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
 	RegisterProperty(context.Context, *MsgRegisterProperty) (*MsgRegisterPropertyResponse, error)
 	TransferShares(context.Context, *MsgTransferShares) (*MsgTransferSharesResponse, error)
+	EditPropertyMetadata(context.Context, *MsgEditPropertyMetadata) (*MsgEditPropertyMetadataResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -495,6 +538,9 @@ func (*UnimplementedMsgServer) RegisterProperty(ctx context.Context, req *MsgReg
 }
 func (*UnimplementedMsgServer) TransferShares(ctx context.Context, req *MsgTransferShares) (*MsgTransferSharesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TransferShares not implemented")
+}
+func (*UnimplementedMsgServer) EditPropertyMetadata(ctx context.Context, req *MsgEditPropertyMetadata) (*MsgEditPropertyMetadataResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EditPropertyMetadata not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -555,6 +601,24 @@ func _Msg_TransferShares_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_EditPropertyMetadata_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgEditPropertyMetadata)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).EditPropertyMetadata(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ardapoc.property.Msg/EditPropertyMetadata",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).EditPropertyMetadata(ctx, req.(*MsgEditPropertyMetadata))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var Msg_serviceDesc = _Msg_serviceDesc
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "ardapoc.property.Msg",
@@ -571,6 +635,10 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "TransferShares",
 			Handler:    _Msg_TransferShares_Handler,
+		},
+		{
+			MethodName: "EditPropertyMetadata",
+			Handler:    _Msg_EditPropertyMetadata_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
