@@ -242,6 +242,8 @@ func (s *Server) requestMortgageHandler(w http.ResponseWriter, r *http.Request) 
 	json.NewEncoder(w).Encode(newReq)
 }
 
+// getMortgageRequestsHandler allows a logged-in user to retrieve their pending mortgage requests.
+// This includes requests where they are the lender and requests where they are the requester (lendee).
 func (s *Server) getMortgageRequestsHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -251,19 +253,20 @@ func (s *Server) getMortgageRequestsHandler(w http.ResponseWriter, r *http.Reque
 	zlog.Info().Str("handler", "getMortgageRequestsHandler").Str("loggedInUser", s.loggedInUser).Msg("received request")
 
 	if s.loggedInUser == "" {
-		http.Error(w, "No user is logged in. A lender must be logged in to view their requests.", http.StatusUnauthorized)
+		http.Error(w, "No user is logged in. A user must be logged in to view their requests.", http.StatusUnauthorized)
 		return
 	}
 
-	var requestsForLender []MortgageRequest
+	userRequests := make([]MortgageRequest, 0)
 	for _, req := range s.mortgageRequests {
-		if req.Lender == s.loggedInUser && req.Status == "pending" {
-			requestsForLender = append(requestsForLender, req)
+		// A user can see requests if they are the lender OR the requester.
+		if req.Status == "pending" && (req.Lender == s.loggedInUser || req.Requester == s.loggedInUser) {
+			userRequests = append(userRequests, req)
 		}
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(requestsForLender)
+	json.NewEncoder(w).Encode(userRequests)
 }
 
 func (s *Server) saveMortgageRequestsToFile() error {

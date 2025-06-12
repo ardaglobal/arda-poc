@@ -167,11 +167,11 @@ Returns the created request object with a unique ID and a "pending" status.
 
 ### `GET /mortgage-requests`
 
-Allows a logged-in user (the lender) to retrieve a list of all pending mortgage requests that have been submitted to them.
+Allows a logged-in user to retrieve a list of all their pending mortgage requests, both those they have made (as the lendee) and those made to them (as the lender).
 
 **Example `curl` Request:**
 
-*Assumes the lender ("Bank") is logged in.*
+*Assumes a user is logged in.*
 ```bash
 curl http://localhost:8080/mortgage-requests
 ```
