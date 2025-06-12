@@ -51,11 +51,13 @@ type UserDetailResponse struct {
 }
 
 // loginHandler handles user login and registration
-// @Summary User login
+// @Summary User login, registration, and linking
+// @Description Handles user login, registration, and linking. If a user with the given email exists, they are logged in. If the email does not exist and a name is provided, a new user account and key are created. If the email does not exist but a user with the given name does exist, the email is linked to the existing user account.
 // @Accept json
 // @Produce json
 // @Param request body LoginRequest true "login info"
 // @Success 200 {object} LoginResponse
+// @Success 201 {object} LoginResponse
 // @Router /login [post]
 func (s *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -159,8 +161,9 @@ func (s *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
 
 // logoutHandler logs out the current user
 // @Summary User logout
+// @Description Logs out the currently authenticated user.
 // @Produce json
-// @Success 200 {object} map[string]string
+// @Success 200 {object} map[string]string{status=string,message=string}
 // @Router /logout [post]
 func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -186,10 +189,11 @@ func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 
 // kycUserHandler marks a user as KYC'd
 // @Summary KYC user
+// @Description Updates a user's role from `user` to `investor`, marking them as KYC'd. If the user's role is not `user`, it is considered a no-op.
 // @Accept json
 // @Produce json
 // @Param request body KYCRequest true "KYC request"
-// @Success 200 {object} map[string]string
+// @Success 200 {object} map[string]string{status=string,message=string}
 // @Router /kyc-user [post]
 func (s *Server) kycUserHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -315,6 +319,7 @@ func (s *Server) saveLoginsToFile() error {
 
 // listUsersHandler lists all users
 // @Summary List users
+// @Description Lists all registered users and their key details.
 // @Produce json
 // @Success 200 {array} UserDetailResponse
 // @Router /users [get]

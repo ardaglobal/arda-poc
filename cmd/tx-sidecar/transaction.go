@@ -175,6 +175,7 @@ func (s *Server) saveTransactionsToFile() {
 
 // listTransactionsHandler returns the list of tracked transactions
 // @Summary List transactions
+// @Description Lists all transaction hashes that have been successfully processed and stored by the sidecar.
 // @Produce json
 // @Success 200 {array} TrackedTx
 // @Router /transactions [get]
@@ -186,6 +187,7 @@ func (s *Server) listTransactionsHandler(w http.ResponseWriter, r *http.Request)
 
 // getTransactionHandler returns a specific transaction by its hash
 // @Summary Get transaction
+// @Description Queries the blockchain for a specific transaction by its hash and returns details. For certain transaction types like 'register_property', it returns a richer, decoded response.
 // @Produce json
 // @Param hash path string true "Transaction hash"
 // @Success 200 {object} interface{}

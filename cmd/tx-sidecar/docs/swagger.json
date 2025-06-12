@@ -8,8 +8,55 @@
     },
     "basePath": "/",
     "paths": {
+        "/create-mortgage": {
+            "post": {
+                "description": "Submits a transaction to create a new mortgage, effectively approving a pending request. This must be called by the **lender**, who must be logged in. The sidecar will use the logged-in user's account to sign the transaction, funding the mortgage from their account. The details in the request body should match the details from a pending mortgage request.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create a mortgage (lender)",
+                "parameters": [
+                    {
+                        "description": "mortgage details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.CreateMortgageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "allOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "tx_hash": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/edit-property": {
             "post": {
+                "description": "Updates the metadata for an existing property.",
                 "consumes": [
                     "application/json"
                 ],
@@ -34,40 +81,19 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/faucet": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Faucet transfer",
-                "parameters": [
-                    {
-                        "description": "faucet request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/main.FaucetRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
+                                "allOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "tx_hash": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                ]
                             }
                         }
                     }
@@ -76,6 +102,7 @@
         },
         "/kyc-user": {
             "post": {
+                "description": "Updates a user's role from `user` to `investor`, marking them as KYC'd. If the user's role is not `user`, it is considered a no-op.",
                 "consumes": [
                     "application/json"
                 ],
@@ -100,7 +127,22 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
-                                "type": "string"
+                                "allOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "message": {
+                                                "type": "string"
+                                            },
+                                            "status": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                ]
                             }
                         }
                     }
@@ -109,13 +151,14 @@
         },
         "/login": {
             "post": {
+                "description": "Handles user login, registration, and linking. If a user with the given email exists, they are logged in. If the email does not exist and a name is provided, a new user account and key are created. If the email does not exist but a user with the given name does exist, the email is linked to the existing user account.",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "User login",
+                "summary": "User login, registration, and linking",
                 "parameters": [
                     {
                         "description": "login info",
@@ -133,12 +176,19 @@
                         "schema": {
                             "$ref": "#/definitions/main.LoginResponse"
                         }
+                    },
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/main.LoginResponse"
+                        }
                     }
                 }
             }
         },
         "/logout": {
             "post": {
+                "description": "Logs out the currently authenticated user.",
                 "produces": [
                     "application/json"
                 ],
@@ -149,7 +199,42 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
-                                "type": "string"
+                                "allOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "message": {
+                                                "type": "string"
+                                            },
+                                            "status": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/mortgage-requests": {
+            "get": {
+                "description": "Allows a logged-in user to retrieve a list of all their pending mortgage requests, both those they have made (as the lendee) and those made to them (as the lender).",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get pending mortgage requests",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/main.MortgageRequest"
                             }
                         }
                     }
@@ -158,6 +243,7 @@
         },
         "/register-property": {
             "post": {
+                "description": "Submits a transaction to register a new property on the blockchain.",
                 "consumes": [
                     "application/json"
                 ],
@@ -182,8 +268,143 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
-                                "type": "string"
+                                "allOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "tx_hash": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                ]
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "/repay-mortgage": {
+            "post": {
+                "description": "Submits a transaction to repay a portion of an outstanding mortgage. This must be called by the **lendee**, who must be logged in.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Repay a mortgage (lendee)",
+                "parameters": [
+                    {
+                        "description": "repayment details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.RepayMortgageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "allOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "tx_hash": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/request-funds": {
+            "post": {
+                "description": "Requests funds from the built-in bank/faucet. This is only available for development and testing purposes. The bank account must be funded for this to work. On the first run, the sidecar will generate a `bank` account and print its mnemonic phrase to the console. This mnemonic must be used to send funds to the bank address before it can dispense tokens.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Request funds from faucet",
+                "parameters": [
+                    {
+                        "description": "request details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.RequestFundsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "allOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "tx_hash": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/request-mortgage": {
+            "post": {
+                "description": "Allows a logged-in user (the lendee) to request a mortgage from a specified lender. This request is stored by the sidecar and does not submit a transaction. It creates a pending request that the lender can later approve.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Request a mortgage (lendee)",
+                "parameters": [
+                    {
+                        "description": "mortgage request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.NewMortgageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/main.MortgageRequest"
                         }
                     }
                 }
@@ -191,6 +412,7 @@
         },
         "/transaction/{hash}": {
             "get": {
+                "description": "Queries the blockchain for a specific transaction by its hash and returns details. For certain transaction types like 'register_property', it returns a richer, decoded response.",
                 "produces": [
                     "application/json"
                 ],
@@ -214,6 +436,7 @@
         },
         "/transactions": {
             "get": {
+                "description": "Lists all transaction hashes that have been successfully processed and stored by the sidecar.",
                 "produces": [
                     "application/json"
                 ],
@@ -233,6 +456,7 @@
         },
         "/transfer-shares": {
             "post": {
+                "description": "Submits a transaction to transfer property shares between one or more owners.",
                 "consumes": [
                     "application/json"
                 ],
@@ -257,7 +481,19 @@
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
-                                "type": "string"
+                                "allOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "tx_hash": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                ]
                             }
                         }
                     }
@@ -266,6 +502,7 @@
         },
         "/users": {
             "get": {
+                "description": "Lists all registered users and their key details.",
                 "produces": [
                     "application/json"
                 ],
@@ -285,6 +522,32 @@
         }
     },
     "definitions": {
+        "main.CreateMortgageRequest": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "collateral": {
+                    "type": "string"
+                },
+                "gas": {
+                    "type": "string"
+                },
+                "index": {
+                    "type": "string"
+                },
+                "interest_rate": {
+                    "type": "string"
+                },
+                "lendee": {
+                    "type": "string"
+                },
+                "term": {
+                    "type": "string"
+                }
+            }
+        },
         "main.EditPropertyMetadataRequest": {
             "type": "object",
             "properties": {
@@ -319,23 +582,6 @@
                     "type": "string"
                 },
                 "zoning_classification": {
-                    "type": "string"
-                }
-            }
-        },
-        "main.FaucetRequest": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "type": "string"
-                },
-                "amount": {
-                    "type": "integer"
-                },
-                "denom": {
-                    "type": "string"
-                },
-                "gas": {
                     "type": "string"
                 }
             }
@@ -379,6 +625,71 @@
                 }
             }
         },
+        "main.MortgageRequest": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "collateral": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "index": {
+                    "type": "string"
+                },
+                "interest_rate": {
+                    "type": "string"
+                },
+                "lendee_addr": {
+                    "description": "Bech32 address of the lendee.",
+                    "type": "string"
+                },
+                "lender": {
+                    "description": "Name of the user (lender) the request is for.",
+                    "type": "string"
+                },
+                "requester": {
+                    "description": "Name of the user (lendee) who made the request.",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "e.g., \"pending\", \"completed\"",
+                    "type": "string"
+                },
+                "term": {
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.NewMortgageRequest": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "collateral": {
+                    "type": "string"
+                },
+                "index": {
+                    "type": "string"
+                },
+                "interest_rate": {
+                    "type": "string"
+                },
+                "lender": {
+                    "type": "string"
+                },
+                "term": {
+                    "type": "string"
+                }
+            }
+        },
         "main.RegisterPropertyRequest": {
             "type": "object",
             "properties": {
@@ -405,6 +716,37 @@
                 },
                 "value": {
                     "type": "integer"
+                }
+            }
+        },
+        "main.RepayMortgageRequest": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "gas": {
+                    "type": "string"
+                },
+                "mortgage_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.RequestFundsRequest": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "integer"
+                },
+                "denom": {
+                    "type": "string"
+                },
+                "gas": {
+                    "type": "string"
                 }
             }
         },

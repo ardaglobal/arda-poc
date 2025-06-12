@@ -10,7 +10,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"net/url"
 	"os"
 	"strings"
@@ -22,16 +21,13 @@ import (
 	"github.com/rs/zerolog"
 	zlog "github.com/rs/zerolog/log"
 
-	"cosmossdk.io/math"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"gopkg.in/yaml.v3"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
 	_ "github.com/ardaglobal/arda-poc/cmd/tx-sidecar/docs"
 	sidecarclient "github.com/ardaglobal/arda-poc/pkg/client"
@@ -215,14 +211,6 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 // Close is a no-op for this server version but can be used for cleanup.
 func (s *Server) Close() {}
 
-// FaucetRequest defines the request body for requesting funds from the faucet.
-type FaucetRequest struct {
-	Address string `json:"address"`
-	Amount  uint64 `json:"amount"`
-	Denom   string `json:"denom"`
-	Gas     string `json:"gas,omitempty"`
-}
-
 func main() {
 	// This context is for the main application, not for individual requests.
 	clientCtx, err := sidecarclient.NewClientContext()
@@ -281,45 +269,4 @@ func main() {
 	if err := app.Listen(":8080"); err != nil {
 		zlog.Fatal().Msgf("Failed to start server: %v", err)
 	}
-}
-
-// faucetHandler sends tokens from the faucet account
-// @Summary Faucet transfer
-// @Accept json
-// @Produce json
-// @Param request body FaucetRequest true "faucet request"
-// @Success 200 {object} map[string]string
-// @Router /faucet [post]
-func (s *Server) faucetHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
-	}
-
-	var req FaucetRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
-	}
-
-	if req.Amount == 0 || req.Denom == "" || req.Address == "" {
-		http.Error(w, "address, amount, and denom must be provided, and amount must be positive", http.StatusBadRequest)
-		return
-	}
-
-	if _, err := sdk.AccAddressFromBech32(req.Address); err != nil {
-		http.Error(w, fmt.Sprintf("Invalid recipient address: %v", err), http.StatusBadRequest)
-		return
-	}
-
-	fromName := s.faucetName
-	msgBuilder := func(fromAddr string) sdk.Msg {
-		return &banktypes.MsgSend{
-			FromAddress: fromAddr,
-			ToAddress:   req.Address,
-			Amount:      sdk.NewCoins(sdk.NewCoin(req.Denom, math.NewInt(int64(req.Amount)))),
-		}
-	}
-
-	s.buildSignAndBroadcast(w, r, fromName, req.Gas, "faucet", msgBuilder)
 }

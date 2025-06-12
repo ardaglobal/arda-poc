@@ -58,6 +58,14 @@ type RepayMortgageRequest struct {
 	Gas        string `json:"gas,omitempty"`
 }
 
+// createMortgageHandler handles the creation of a mortgage, approving a pending request.
+// @Summary Create a mortgage (lender)
+// @Description Submits a transaction to create a new mortgage, effectively approving a pending request. This must be called by the **lender**, who must be logged in. The sidecar will use the logged-in user's account to sign the transaction, funding the mortgage from their account. The details in the request body should match the details from a pending mortgage request.
+// @Accept json
+// @Produce json
+// @Param request body CreateMortgageRequest true "mortgage details"
+// @Success 200 {object} map[string]string{tx_hash=string}
+// @Router /create-mortgage [post]
 func (s *Server) createMortgageHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -113,6 +121,14 @@ func (s *Server) createMortgageHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"tx_hash": txHash})
 }
 
+// repayMortgageHandler handles the repayment of a mortgage.
+// @Summary Repay a mortgage (lendee)
+// @Description Submits a transaction to repay a portion of an outstanding mortgage. This must be called by the **lendee**, who must be logged in.
+// @Accept json
+// @Produce json
+// @Param request body RepayMortgageRequest true "repayment details"
+// @Success 200 {object} map[string]string{tx_hash=string}
+// @Router /repay-mortgage [post]
 func (s *Server) repayMortgageHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -152,6 +168,14 @@ type RequestFundsRequest struct {
 	Gas     string `json:"gas,omitempty"`
 }
 
+// requestFundsHandler requests funds from the built-in faucet.
+// @Summary Request funds from faucet
+// @Description Requests funds from the built-in bank/faucet. This is only available for development and testing purposes. The bank account must be funded for this to work. On the first run, the sidecar will generate a `bank` account and print its mnemonic phrase to the console. This mnemonic must be used to send funds to the bank address before it can dispense tokens.
+// @Accept json
+// @Produce json
+// @Param request body RequestFundsRequest true "request details"
+// @Success 200 {object} map[string]string{tx_hash=string}
+// @Router /request-funds [post]
 func (s *Server) requestFundsHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -188,6 +212,14 @@ func (s *Server) requestFundsHandler(w http.ResponseWriter, r *http.Request) {
 	s.buildSignAndBroadcast(w, r, fromName, req.Gas, "request_funds", msgBuilder)
 }
 
+// requestMortgageHandler allows a user to request a mortgage from a lender.
+// @Summary Request a mortgage (lendee)
+// @Description Allows a logged-in user (the lendee) to request a mortgage from a specified lender. This request is stored by the sidecar and does not submit a transaction. It creates a pending request that the lender can later approve.
+// @Accept json
+// @Produce json
+// @Param request body NewMortgageRequest true "mortgage request"
+// @Success 201 {object} MortgageRequest
+// @Router /request-mortgage [post]
 func (s *Server) requestMortgageHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -243,7 +275,11 @@ func (s *Server) requestMortgageHandler(w http.ResponseWriter, r *http.Request) 
 }
 
 // getMortgageRequestsHandler allows a logged-in user to retrieve their pending mortgage requests.
-// This includes requests where they are the lender and requests where they are the requester (lendee).
+// @Summary Get pending mortgage requests
+// @Description Allows a logged-in user to retrieve a list of all their pending mortgage requests, both those they have made (as the lendee) and those made to them (as the lender).
+// @Produce json
+// @Success 200 {array} MortgageRequest
+// @Router /mortgage-requests [get]
 func (s *Server) getMortgageRequestsHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)

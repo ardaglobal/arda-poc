@@ -1,5 +1,22 @@
 basePath: /
 definitions:
+  main.CreateMortgageRequest:
+    properties:
+      amount:
+        type: integer
+      collateral:
+        type: string
+      gas:
+        type: string
+      index:
+        type: string
+      interest_rate:
+        type: string
+      lendee:
+        type: string
+      term:
+        type: string
+    type: object
   main.EditPropertyMetadataRequest:
     properties:
       construction_information:
@@ -23,17 +40,6 @@ definitions:
       unit_number:
         type: string
       zoning_classification:
-        type: string
-    type: object
-  main.FaucetRequest:
-    properties:
-      address:
-        type: string
-      amount:
-        type: integer
-      denom:
-        type: string
-      gas:
         type: string
     type: object
   main.KYCRequest:
@@ -61,6 +67,50 @@ definitions:
       user:
         type: string
     type: object
+  main.MortgageRequest:
+    properties:
+      amount:
+        type: integer
+      collateral:
+        type: string
+      id:
+        type: string
+      index:
+        type: string
+      interest_rate:
+        type: string
+      lendee_addr:
+        description: Bech32 address of the lendee.
+        type: string
+      lender:
+        description: Name of the user (lender) the request is for.
+        type: string
+      requester:
+        description: Name of the user (lendee) who made the request.
+        type: string
+      status:
+        description: e.g., "pending", "completed"
+        type: string
+      term:
+        type: string
+      timestamp:
+        type: string
+    type: object
+  main.NewMortgageRequest:
+    properties:
+      amount:
+        type: integer
+      collateral:
+        type: string
+      index:
+        type: string
+      interest_rate:
+        type: string
+      lender:
+        type: string
+      term:
+        type: string
+    type: object
   main.RegisterPropertyRequest:
     properties:
       address:
@@ -79,6 +129,26 @@ definitions:
         type: array
       value:
         type: integer
+    type: object
+  main.RepayMortgageRequest:
+    properties:
+      amount:
+        type: integer
+      gas:
+        type: string
+      mortgage_id:
+        type: string
+    type: object
+  main.RequestFundsRequest:
+    properties:
+      address:
+        type: string
+      amount:
+        type: integer
+      denom:
+        type: string
+      gas:
+        type: string
     type: object
   main.TrackedTx:
     properties:
@@ -131,10 +201,42 @@ info:
   title: Transaction Sidecar API
   version: "1.0"
 paths:
+  /create-mortgage:
+    post:
+      consumes:
+      - application/json
+      description: Submits a transaction to create a new mortgage, effectively approving
+        a pending request. This must be called by the **lender**, who must be logged
+        in. The sidecar will use the logged-in user's account to sign the transaction,
+        funding the mortgage from their account. The details in the request body should
+        match the details from a pending mortgage request.
+      parameters:
+      - description: mortgage details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.CreateMortgageRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              allOf:
+              - type: string
+              - properties:
+                  tx_hash:
+                    type: string
+                type: object
+            type: object
+      summary: Create a mortgage (lender)
   /edit-property:
     post:
       consumes:
       - application/json
+      description: Updates the metadata for an existing property.
       parameters:
       - description: metadata
         in: body
@@ -149,34 +251,20 @@ paths:
           description: OK
           schema:
             additionalProperties:
-              type: string
+              allOf:
+              - type: string
+              - properties:
+                  tx_hash:
+                    type: string
+                type: object
             type: object
       summary: Edit property metadata
-  /faucet:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: faucet request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/main.FaucetRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Faucet transfer
   /kyc-user:
     post:
       consumes:
       - application/json
+      description: Updates a user's role from `user` to `investor`, marking them as
+        KYC'd. If the user's role is not `user`, it is considered a no-op.
       parameters:
       - description: KYC request
         in: body
@@ -191,13 +279,25 @@ paths:
           description: OK
           schema:
             additionalProperties:
-              type: string
+              allOf:
+              - type: string
+              - properties:
+                  message:
+                    type: string
+                  status:
+                    type: string
+                type: object
             type: object
       summary: KYC user
   /login:
     post:
       consumes:
       - application/json
+      description: Handles user login, registration, and linking. If a user with the
+        given email exists, they are logged in. If the email does not exist and a
+        name is provided, a new user account and key are created. If the email does
+        not exist but a user with the given name does exist, the email is linked to
+        the existing user account.
       parameters:
       - description: login info
         in: body
@@ -212,9 +312,14 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/main.LoginResponse'
-      summary: User login
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.LoginResponse'
+      summary: User login, registration, and linking
   /logout:
     post:
+      description: Logs out the currently authenticated user.
       produces:
       - application/json
       responses:
@@ -222,13 +327,36 @@ paths:
           description: OK
           schema:
             additionalProperties:
-              type: string
+              allOf:
+              - type: string
+              - properties:
+                  message:
+                    type: string
+                  status:
+                    type: string
+                type: object
             type: object
       summary: User logout
+  /mortgage-requests:
+    get:
+      description: Allows a logged-in user to retrieve a list of all their pending
+        mortgage requests, both those they have made (as the lendee) and those made
+        to them (as the lender).
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.MortgageRequest'
+            type: array
+      summary: Get pending mortgage requests
   /register-property:
     post:
       consumes:
       - application/json
+      description: Submits a transaction to register a new property on the blockchain.
       parameters:
       - description: property info
         in: body
@@ -243,11 +371,100 @@ paths:
           description: OK
           schema:
             additionalProperties:
-              type: string
+              allOf:
+              - type: string
+              - properties:
+                  tx_hash:
+                    type: string
+                type: object
             type: object
       summary: Register a property
+  /repay-mortgage:
+    post:
+      consumes:
+      - application/json
+      description: Submits a transaction to repay a portion of an outstanding mortgage.
+        This must be called by the **lendee**, who must be logged in.
+      parameters:
+      - description: repayment details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.RepayMortgageRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              allOf:
+              - type: string
+              - properties:
+                  tx_hash:
+                    type: string
+                type: object
+            type: object
+      summary: Repay a mortgage (lendee)
+  /request-funds:
+    post:
+      consumes:
+      - application/json
+      description: Requests funds from the built-in bank/faucet. This is only available
+        for development and testing purposes. The bank account must be funded for
+        this to work. On the first run, the sidecar will generate a `bank` account
+        and print its mnemonic phrase to the console. This mnemonic must be used to
+        send funds to the bank address before it can dispense tokens.
+      parameters:
+      - description: request details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.RequestFundsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              allOf:
+              - type: string
+              - properties:
+                  tx_hash:
+                    type: string
+                type: object
+            type: object
+      summary: Request funds from faucet
+  /request-mortgage:
+    post:
+      consumes:
+      - application/json
+      description: Allows a logged-in user (the lendee) to request a mortgage from
+        a specified lender. This request is stored by the sidecar and does not submit
+        a transaction. It creates a pending request that the lender can later approve.
+      parameters:
+      - description: mortgage request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.NewMortgageRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.MortgageRequest'
+      summary: Request a mortgage (lendee)
   /transaction/{hash}:
     get:
+      description: Queries the blockchain for a specific transaction by its hash and
+        returns details. For certain transaction types like 'register_property', it
+        returns a richer, decoded response.
       parameters:
       - description: Transaction hash
         in: path
@@ -263,6 +480,8 @@ paths:
       summary: Get transaction
   /transactions:
     get:
+      description: Lists all transaction hashes that have been successfully processed
+        and stored by the sidecar.
       produces:
       - application/json
       responses:
@@ -277,6 +496,8 @@ paths:
     post:
       consumes:
       - application/json
+      description: Submits a transaction to transfer property shares between one or
+        more owners.
       parameters:
       - description: transfer details
         in: body
@@ -291,11 +512,17 @@ paths:
           description: OK
           schema:
             additionalProperties:
-              type: string
+              allOf:
+              - type: string
+              - properties:
+                  tx_hash:
+                    type: string
+                type: object
             type: object
       summary: Transfer property shares
   /users:
     get:
+      description: Lists all registered users and their key details.
       produces:
       - application/json
       responses:
