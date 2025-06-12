@@ -374,7 +374,6 @@ func main() {
 	app.Get("/user/list", fiberadaptor.HTTPHandlerFunc(server.listUsersHandler))
 	app.Post("/user/login", fiberadaptor.HTTPHandlerFunc(server.loginHandler))
 	app.Post("/user/logout", fiberadaptor.HTTPHandlerFunc(server.logoutHandler))
-	app.Post("/user/kyc", fiberadaptor.HTTPHandlerFunc(server.kycUserHandler))
 
 	// Property routes
 	app.Post("/property/register", fiberadaptor.HTTPHandlerFunc(server.registerPropertyHandler))
