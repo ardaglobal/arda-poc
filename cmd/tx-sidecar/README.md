@@ -107,9 +107,102 @@ A successful broadcast will return a JSON object containing the transaction hash
 }
 ``` 
 
+## Mortgage Workflow
+
+Creating a mortgage is a two-step process that involves both the lendee (borrower) and the lender.
+
+1.  **Request:** The lendee (who must be logged in) submits a mortgage request, specifying who the lender is.
+2.  **Approve & Create:** The lender (who must be logged in) retrieves their list of pending requests and then calls the `create-mortgage` endpoint to approve and fund a specific request.
+
+### `POST /request-mortgage`
+
+Allows a logged-in user (the lendee) to request a mortgage from a specified lender. This request is stored by the sidecar and does not submit a transaction.
+
+**Request Body:**
+
+```json
+{
+  "lender": "Bank",
+  "index": "mortgage-002",
+  "collateral": "property-456",
+  "amount": 150000,
+  "interest_rate": "4.5",
+  "term": "180 months"
+}
+```
+
+**Example `curl` Request:**
+
+*Assumes the lendee is logged in.*
+```bash
+curl -X POST http://localhost:8080/request-mortgage -H "Content-Type: application/json" -d '{
+  "lender": "Bank",
+  "index": "mortgage-002",
+  "collateral": "property-456",
+  "amount": 150000,
+  "interest_rate": "4.5",
+  "term": "180 months"
+}'
+```
+
+**Success Response:**
+
+Returns the created request object with a unique ID and a "pending" status.
+
+```json
+{
+  "id": "c2a9a8f5-a3f2-4b8e-8d1e-7f6a9e8d3b1a",
+  "requester": "bob",
+  "lender": "Bank",
+  "lendee_addr": "arda13pc7nj66w7cqsgs6kcn8x6n8a3gz76df7e552x",
+  "index": "mortgage-002",
+  "collateral": "property-456",
+  "amount": 150000,
+  "interest_rate": "4.5",
+  "term": "180 months",
+  "status": "pending",
+  "timestamp": "2023-11-01T10:00:00Z"
+}
+```
+
+### `GET /mortgage-requests`
+
+Allows a logged-in user (the lender) to retrieve a list of all pending mortgage requests that have been submitted to them.
+
+**Example `curl` Request:**
+
+*Assumes the lender ("Bank") is logged in.*
+```bash
+curl http://localhost:8080/mortgage-requests
+```
+
+**Success Response:**
+
+Returns an array of pending mortgage request objects.
+
+```json
+[
+  {
+    "id": "c2a9a8f5-a3f2-4b8e-8d1e-7f6a9e8d3b1a",
+    "requester": "bob",
+    "lender": "Bank",
+    "lendee_addr": "arda13pc7nj66w7cqsgs6kcn8x6n8a3gz76df7e552x",
+    "index": "mortgage-002",
+    "collateral": "property-456",
+    "amount": 150000,
+    "interest_rate": "4.5",
+    "term": "180 months",
+    "status": "pending",
+    "timestamp": "2023-11-01T10:00:00Z"
+  }
+]
+```
+
 ### `POST /create-mortgage`
 
-Submits a transaction to create a new mortgage. This must be called by the **lender**, who must be logged in. The sidecar will use the logged-in user's account to sign the transaction, funding the mortgage from their account.
+Submits a transaction to create a new mortgage, effectively approving a pending request. This must be called by the **lender**, who must be logged in. The sidecar will use the logged-in user's account to sign the transaction, funding the mortgage from their account.
+
+The details in the request body should match the details from a pending mortgage request.
 
 **Request Body:**
 
@@ -127,7 +220,7 @@ Submits a transaction to create a new mortgage. This must be called by the **len
 
 **Example `curl` Request:**
 
-*Assumes the lender is already logged into the sidecar.*
+*Assumes the lender is already logged into the sidecar and is using details from the GET `/mortgage-requests` endpoint.*
 ```bash
 curl -X POST http://localhost:8080/create-mortgage -H "Content-Type: application/json" -d '{
   "index": "mortgage-001",
@@ -451,22 +544,4 @@ Requests funds from the built-in bank/faucet. This is only available for develop
 *   `denom` (string): The token denomination (e.g., `uarda`).
 *   `gas` (string, optional): The gas limit for the transaction. Can be a specific number (e.g., `"300000"`) or `"auto"` to use the sidecar's default.
 
-**Example `curl` Request:**
-
-```bash
-curl -X POST -H "Content-Type: application/json" -d '{
-  "address": "arda1nwtujr8y49zeajrqskav5pvgn7dgad7up92pqm",
-  "amount": 1000000,
-  "denom": "uarda"
-}' http://localhost:8080/request-funds
-```
-
-**Success Response:**
-
-A successful broadcast will return a JSON object containing the transaction hash.
-
-```json
-{
-  "tx_hash": "B2C3D4E5F6A1..."
-}
-``` 
+**Example `

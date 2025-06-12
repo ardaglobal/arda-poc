@@ -54,6 +54,8 @@ type Server struct {
 	loggedInUser     string
 	transactions     []TrackedTx
 	transactionsFile string
+	mortgageRequests []MortgageRequest
+	mortgageRequestsFile string
 }
 
 // NewServer creates a new instance of the Server with all its dependencies.
@@ -134,6 +136,17 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		return nil, fmt.Errorf("failed to read transactions file: %w", err)
 	}
 
+	mortgageRequestsFile := "mortgage_requests.json"
+	mortgageRequests := make([]MortgageRequest, 0)
+	mrData, err := os.ReadFile(mortgageRequestsFile)
+	if err == nil {
+		if err := json.Unmarshal(mrData, &mortgageRequests); err != nil {
+			zlog.Warn().Msgf("failed to unmarshal mortgage requests file, starting with empty list: %v", err)
+		}
+	} else if !os.IsNotExist(err) {
+		return nil, fmt.Errorf("failed to read mortgage requests file: %w", err)
+	}
+
 	// Read faucet configuration
 	configPath := "config.yml"
 	configData, err := os.ReadFile(configPath)
@@ -161,6 +174,8 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		faucetName:       appConfig.Faucet.Name,
 		transactions:     transactions,
 		transactionsFile: transactionsFile,
+		mortgageRequests:     mortgageRequests,
+		mortgageRequestsFile: mortgageRequestsFile,
 	}
 
 	// Ensure that the faucet account from config exists in the keyring.
@@ -245,6 +260,8 @@ func main() {
 	app.Post("/kyc-user", fiberadaptor.HTTPHandlerFunc(server.kycUserHandler))
 
 	// Mortgage and Bank endpoints
+	app.Post("/request-mortgage", fiberadaptor.HTTPHandlerFunc(server.requestMortgageHandler))
+	app.Get("/mortgage-requests", fiberadaptor.HTTPHandlerFunc(server.getMortgageRequestsHandler))
 	app.Post("/create-mortgage", fiberadaptor.HTTPHandlerFunc(server.createMortgageHandler))
 	app.Post("/repay-mortgage", fiberadaptor.HTTPHandlerFunc(server.repayMortgageHandler))
 	app.Post("/request-funds", fiberadaptor.HTTPHandlerFunc(server.requestFundsHandler))
