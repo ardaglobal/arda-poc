@@ -235,7 +235,7 @@ func (s *Server) getTransactionHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Process the response based on the transaction type from tx.json
 	switch trackedTx.Type {
-	case "register_property", "transfer_shares", "edit_property_metadata":
+	case "register_property", "transfer_shares", "edit_property_metadata", "create_mortgage", "repay_mortgage", "request_funds":
 		// Build a richer response object, modeled after the provided txout.json example.
 		response := make(map[string]interface{})
 
