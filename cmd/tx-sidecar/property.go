@@ -43,6 +43,13 @@ type EditPropertyMetadataRequest struct {
 	Gas                     string `json:"gas,omitempty"`
 }
 
+// registerPropertyHandler handles property registration
+// @Summary Register a property
+// @Accept json
+// @Produce json
+// @Param request body RegisterPropertyRequest true "property info"
+// @Success 200 {object} map[string]string
+// @Router /register-property [post]
 func (s *Server) registerPropertyHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -70,6 +77,13 @@ func (s *Server) registerPropertyHandler(w http.ResponseWriter, r *http.Request)
 	s.buildSignAndBroadcast(w, r, fromName, req.Gas, "register_property", msgBuilder)
 }
 
+// transferSharesHandler handles share transfer
+// @Summary Transfer property shares
+// @Accept json
+// @Produce json
+// @Param request body TransferSharesRequest true "transfer details"
+// @Success 200 {object} map[string]string
+// @Router /transfer-shares [post]
 func (s *Server) transferSharesHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -97,6 +111,13 @@ func (s *Server) transferSharesHandler(w http.ResponseWriter, r *http.Request) {
 	s.buildSignAndBroadcast(w, r, fromName, req.Gas, "transfer_shares", msgBuilder)
 }
 
+// editPropertyMetadataHandler edits property metadata
+// @Summary Edit property metadata
+// @Accept json
+// @Produce json
+// @Param request body EditPropertyMetadataRequest true "metadata"
+// @Success 200 {object} map[string]string
+// @Router /edit-property [post]
 func (s *Server) editPropertyMetadataHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)

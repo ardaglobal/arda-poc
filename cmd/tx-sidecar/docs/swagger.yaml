@@ -1,0 +1,309 @@
+basePath: /
+definitions:
+  main.EditPropertyMetadataRequest:
+    properties:
+      construction_information:
+        type: string
+      gas:
+        type: string
+      owner_information:
+        type: string
+      parcel_number:
+        type: string
+      property_id:
+        type: string
+      property_name:
+        type: string
+      property_type:
+        type: string
+      size:
+        type: string
+      tenant_id:
+        type: string
+      unit_number:
+        type: string
+      zoning_classification:
+        type: string
+    type: object
+  main.FaucetRequest:
+    properties:
+      address:
+        type: string
+      amount:
+        type: integer
+      denom:
+        type: string
+      gas:
+        type: string
+    type: object
+  main.KYCRequest:
+    properties:
+      name:
+        type: string
+    type: object
+  main.LoginRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      role:
+        type: string
+    type: object
+  main.LoginResponse:
+    properties:
+      message:
+        type: string
+      role:
+        type: string
+      status:
+        type: string
+      user:
+        type: string
+    type: object
+  main.RegisterPropertyRequest:
+    properties:
+      address:
+        type: string
+      gas:
+        type: string
+      owners:
+        items:
+          type: string
+        type: array
+      region:
+        type: string
+      shares:
+        items:
+          type: integer
+        type: array
+      value:
+        type: integer
+    type: object
+  main.TrackedTx:
+    properties:
+      timestamp:
+        type: string
+      tx_hash:
+        type: string
+      type:
+        type: string
+    type: object
+  main.TransferSharesRequest:
+    properties:
+      from_owners:
+        items:
+          type: string
+        type: array
+      from_shares:
+        items:
+          type: integer
+        type: array
+      gas:
+        type: string
+      property_id:
+        type: string
+      to_owners:
+        items:
+          type: string
+        type: array
+      to_shares:
+        items:
+          type: integer
+        type: array
+    type: object
+  main.UserDetailResponse:
+    properties:
+      address:
+        type: string
+      name:
+        type: string
+      pubkey:
+        type: string
+      role:
+        type: string
+      type:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: Simple HTTP service for submitting blockchain transactions.
+  title: Transaction Sidecar API
+  version: "1.0"
+paths:
+  /edit-property:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: metadata
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.EditPropertyMetadataRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Edit property metadata
+  /faucet:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: faucet request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.FaucetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Faucet transfer
+  /kyc-user:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: KYC request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.KYCRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: KYC user
+  /login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: login info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.LoginResponse'
+      summary: User login
+  /logout:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: User logout
+  /register-property:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: property info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.RegisterPropertyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Register a property
+  /transaction/{hash}:
+    get:
+      parameters:
+      - description: Transaction hash
+        in: path
+        name: hash
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema: {}
+      summary: Get transaction
+  /transactions:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.TrackedTx'
+            type: array
+      summary: List transactions
+  /transfer-shares:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: transfer details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.TransferSharesRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Transfer property shares
+  /users:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.UserDetailResponse'
+            type: array
+      summary: List users
+swagger: "2.0"
