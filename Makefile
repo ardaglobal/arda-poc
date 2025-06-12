@@ -1,4 +1,4 @@
-BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+			BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 COMMIT := $(shell git log -1 --format='%H')
 APPNAME := arda
 
@@ -127,6 +127,7 @@ setup-dev: setup-script proto-deps
 	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(golangci_version)
 	@go install golang.org/x/vuln/cmd/govulncheck@latest
 	@go install golang.org/x/tools/cmd/goimports@latest
+	@go install github.com/swaggo/swag/cmd/swag@latest
 .PHONY: setup-dev
 
 ###################
@@ -138,10 +139,15 @@ dev:
 	@ignite chain serve 
 .PHONY: dev
 
-dev-sidecar:
+dev-sidecar: sidecar-docs
 	@echo "--> Running dev-sidecar"
 	@go run ./cmd/tx-sidecar
 .PHONY: dev-sidecar
+
+sidecar-docs:
+	@echo "--> Generating sidecar OpenAPI docs"
+	@swag init --dir cmd/tx-sidecar --output cmd/tx-sidecar/docs
+.PHONY: sidecar-docs
 
 govet:
 	@echo Running go vet...

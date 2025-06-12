@@ -50,6 +50,13 @@ type UserDetailResponse struct {
 	PubKey  string `json:"pubkey"`
 }
 
+// loginHandler handles user login and registration
+// @Summary User login
+// @Accept json
+// @Produce json
+// @Param request body LoginRequest true "login info"
+// @Success 200 {object} LoginResponse
+// @Router /login [post]
 func (s *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -150,6 +157,11 @@ func (s *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// logoutHandler logs out the current user
+// @Summary User logout
+// @Produce json
+// @Success 200 {object} map[string]string
+// @Router /logout [post]
 func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -172,6 +184,13 @@ func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// kycUserHandler marks a user as KYC'd
+// @Summary KYC user
+// @Accept json
+// @Produce json
+// @Param request body KYCRequest true "KYC request"
+// @Success 200 {object} map[string]string
+// @Router /kyc-user [post]
 func (s *Server) kycUserHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -294,6 +313,11 @@ func (s *Server) saveLoginsToFile() error {
 	return os.WriteFile(s.loginsFile, data, 0644)
 }
 
+// listUsersHandler lists all users
+// @Summary List users
+// @Produce json
+// @Success 200 {array} UserDetailResponse
+// @Router /users [get]
 func (s *Server) listUsersHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)

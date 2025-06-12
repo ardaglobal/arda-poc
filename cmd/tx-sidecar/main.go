@@ -1,5 +1,12 @@
 package main
 
+// Transaction Sidecar API docs
+//
+// @title Transaction Sidecar API
+// @version 1.0
+// @description Simple HTTP service for submitting blockchain transactions.
+// @BasePath /
+
 import (
 	"encoding/json"
 	"fmt"
@@ -11,6 +18,7 @@ import (
 	fiberadaptor "github.com/gofiber/adaptor/v2"
 	fiber "github.com/gofiber/fiber/v2"
 	fibercors "github.com/gofiber/fiber/v2/middleware/cors"
+	fiberSwagger "github.com/gofiber/swagger"
 	"github.com/rs/zerolog"
 	zlog "github.com/rs/zerolog/log"
 
@@ -25,6 +33,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
+	_ "github.com/ardaglobal/arda-poc/cmd/tx-sidecar/docs"
 	sidecarclient "github.com/ardaglobal/arda-poc/pkg/client"
 )
 
@@ -249,6 +258,8 @@ func main() {
 	app := fiber.New()
 	app.Use(fibercors.New())
 
+	app.Get("/swagger/*", fiberSwagger.HandlerDefault)
+
 	app.Post("/register-property", fiberadaptor.HTTPHandlerFunc(server.registerPropertyHandler))
 	app.Post("/transfer-shares", fiberadaptor.HTTPHandlerFunc(server.transferSharesHandler))
 	app.Post("/edit-property", fiberadaptor.HTTPHandlerFunc(server.editPropertyMetadataHandler))
@@ -272,6 +283,13 @@ func main() {
 	}
 }
 
+// faucetHandler sends tokens from the faucet account
+// @Summary Faucet transfer
+// @Accept json
+// @Produce json
+// @Param request body FaucetRequest true "faucet request"
+// @Success 200 {object} map[string]string
+// @Router /faucet [post]
 func (s *Server) faucetHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)

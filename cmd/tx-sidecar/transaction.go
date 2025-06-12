@@ -173,14 +173,23 @@ func (s *Server) saveTransactionsToFile() {
 	}
 }
 
-// listTransactionsHandler returns the list of tracked transactions.
+// listTransactionsHandler returns the list of tracked transactions
+// @Summary List transactions
+// @Produce json
+// @Success 200 {array} TrackedTx
+// @Router /transactions [get]
 func (s *Server) listTransactionsHandler(w http.ResponseWriter, r *http.Request) {
 	zlog.Info().Str("handler", "listTransactionsHandler").Msg("received request")
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(s.transactions)
 }
 
-// getTransactionHandler returns a specific transaction by its hash.
+// getTransactionHandler returns a specific transaction by its hash
+// @Summary Get transaction
+// @Produce json
+// @Param hash path string true "Transaction hash"
+// @Success 200 {object} interface{}
+// @Router /transaction/{hash} [get]
 func (s *Server) getTransactionHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)

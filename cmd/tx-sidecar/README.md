@@ -25,6 +25,10 @@ make dev-sidecar
 ```
 The service will start and listen on port `8080`.
 
+### Generating API docs
+
+Run `make sidecar-docs` to regenerate the OpenAPI specification under `cmd/tx-sidecar/docs`.
+
 ## API Endpoints
 
 ### `POST /register-property`
