@@ -80,14 +80,21 @@ func (s *Server) buildSignAndBroadcastInternal(ctx context.Context, fromName, ga
 
 	txf = txf.WithAccountNumber(baseAcc.AccountNumber).WithSequence(baseAcc.Sequence)
 
-	var gas uint64 = 400000
-	if gasStr != "" && gasStr != "auto" {
+	var gas uint64
+	if gasStr == "auto" {
+		// Gas simulation will be triggered by the factory if gas is 0.
+		gas = 0
+	} else if gasStr != "" {
 		parsedGas, err := strconv.ParseUint(gasStr, 10, 64)
 		if err != nil {
 			return "", fmt.Errorf("invalid gas value provided: %s", gasStr)
 		}
 		gas = parsedGas
+	} else {
+		// Default gas if not provided and not auto.
+		gas = 800000 // Increased from 400000
 	}
+
 	txf = txf.WithGas(gas)
 
 	txb, err := txf.BuildUnsignedTx(msg)
