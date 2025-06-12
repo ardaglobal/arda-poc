@@ -83,7 +83,7 @@ type KYCErrorResponse struct {
 // @Param request body LoginRequest true "login info"
 // @Success 200 {object} LoginResponse
 // @Success 201 {object} LoginResponse
-// @Router /login [post]
+// @Router /user/login [post]
 func (s *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -189,7 +189,7 @@ func (s *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
 // @Description Logs out the currently authenticated user.
 // @Produce json
 // @Success 200 {object} map[string]string{status=string,message=string}
-// @Router /logout [post]
+// @Router /user/logout [post]
 func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -209,65 +209,6 @@ func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{
 		"status":  "success",
 		"message": fmt.Sprintf("User %s logged out", loggedOutUser),
-	})
-}
-
-// kycUserHandler marks a user as KYC'd
-// @Summary KYC user
-// @Description Updates a user's role from `user` to `investor`, marking them as KYC'd. If the user's role is not `user`, it is considered a no-op.
-// @Accept json
-// @Produce json
-// @Param request body KYCRequest true "KYC request"
-// @Success 200 {object} map[string]string{status=string,message=string}
-// @Router /kyc-user [post]
-func (s *Server) kycUserHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
-	}
-
-	var req KYCRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
-	}
-
-	zlog.Info().Str("handler", "kycUserHandler").Interface("request", req).Msg("received kyc request")
-
-	if req.Name == "" {
-		http.Error(w, "User name cannot be empty", http.StatusBadRequest)
-		return
-	}
-
-	userData, ok := s.users[req.Name]
-	if !ok {
-		http.Error(w, fmt.Sprintf("User '%s' not found", req.Name), http.StatusNotFound)
-		return
-	}
-
-	if userData.Role != "user" && userData.Role != "" {
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]string{
-			"status":  "noop",
-			"message": fmt.Sprintf("User '%s' is already KYC'd", req.Name),
-		})
-		return
-	}
-
-	userData.Role = "investor"
-	s.users[req.Name] = userData
-
-	if err := s.saveUsersToFile(); err != nil {
-		http.Error(w, "Failed to save updated user data", http.StatusInternalServerError)
-		zlog.Error().Msgf("Error saving users to file: %v", err)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{
-		"status":  "success",
-		"message": fmt.Sprintf("User '%s' role updated to 'investor'", req.Name),
 	})
 }
 
@@ -347,7 +288,7 @@ func (s *Server) saveLoginsToFile() error {
 // @Description Lists all registered users and their key details.
 // @Produce json
 // @Success 200 {array} UserDetailResponse
-// @Router /users [get]
+// @Router /user/list [get]
 func (s *Server) listUsersHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -453,7 +394,7 @@ func (s *Server) initUsers() error {
 // @Success 201 {object} KYCRequestEntry
 // @Failure 400 {object} KYCErrorResponse
 // @Failure 401 {object} KYCErrorResponse
-// @Router /request-kyc [post]
+// @Router /user/kyc/request [post]
 func (s *Server) requestKYCHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -494,7 +435,7 @@ func (s *Server) requestKYCHandler(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {array} KYCRequestEntry
 // @Failure 401 {object} KYCErrorResponse
 // @Failure 403 {object} KYCErrorResponse
-// @Router /kyc-requests [get]
+// @Router /user/kyc/requests [get]
 func (s *Server) getKYCRequestsHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -530,7 +471,7 @@ func (s *Server) getKYCRequestsHandler(w http.ResponseWriter, r *http.Request) {
 // @Failure 401 {object} KYCErrorResponse
 // @Failure 403 {object} KYCErrorResponse
 // @Failure 404 {object} KYCErrorResponse
-// @Router /approve-kyc [post]
+// @Router /user/kyc/approve [post]
 func (s *Server) approveKYCHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)

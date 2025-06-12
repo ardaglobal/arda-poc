@@ -103,7 +103,7 @@ type ApproveOffPlanPropertyRequest struct {
 // @Produce json
 // @Param request body RegisterPropertyRequest true "property info"
 // @Success 200 {object} map[string]string{tx_hash=string}
-// @Router /register-property [post]
+// @Router /property/register [post]
 func (s *Server) registerPropertyHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -140,7 +140,7 @@ func (s *Server) registerPropertyHandler(w http.ResponseWriter, r *http.Request)
 // @Produce json
 // @Param request body TransferSharesRequest true "transfer details"
 // @Success 200 {object} map[string]string{tx_hash=string}
-// @Router /transfer-shares [post]
+// @Router /property/transfer-shares [post]
 func (s *Server) transferSharesHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -180,7 +180,7 @@ func (s *Server) transferSharesHandler(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Param request body EditPropertyMetadataRequest true "metadata"
 // @Success 200 {object} map[string]string{tx_hash=string}
-// @Router /edit-property [post]
+// @Router /property/edit [post]
 func (s *Server) editPropertyMetadataHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -223,7 +223,7 @@ func (s *Server) editPropertyMetadataHandler(w http.ResponseWriter, r *http.Requ
 // @Param request body ListPropertyForSaleRequest true "listing info"
 // @Success 201 {object} ForSaleProperty
 // @Failure 400 {object} KYCErrorResponse
-// @Router /list-property-for-sale [post]
+// @Router /property/list-for-sale [post]
 func (s *Server) listPropertyForSaleHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -258,7 +258,7 @@ func (s *Server) listPropertyForSaleHandler(w http.ResponseWriter, r *http.Reque
 // @Description Returns all properties currently listed for sale.
 // @Produce json
 // @Success 200 {array} ForSaleProperty
-// @Router /properties-for-sale [get]
+// @Router /property/for-sale [get]
 func (s *Server) getPropertiesForSaleHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -294,7 +294,7 @@ func (s *Server) updateForSalePropertiesOnTransfer(propertyID string, fromOwners
 // @Produce json
 // @Param property_id query string true "Off plan property ID"
 // @Success 200 {array} OffPlanPurchaseRequest
-// @Router /offplan-purchase-requests [get]
+// @Router /property/offplan/purchase-requests [get]
 func (s *Server) getOffPlanPurchaseRequestsHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -340,7 +340,7 @@ func (s *Server) saveOffPlanPurchaseRequestsToFile() error {
 // @Param request body OffPlanPropertyRequest true "off plan property info"
 // @Success 201 {object} OffPlanProperty
 // @Failure 400 {object} KYCErrorResponse
-// @Router /offplan-property [post]
+// @Router /property/offplan [post]
 func (s *Server) postOffPlanPropertyHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -388,7 +388,7 @@ func (s *Server) postOffPlanPropertyHandler(w http.ResponseWriter, r *http.Reque
 // @Param request body OffPlanPurchaseRequestPayload true "purchase request info"
 // @Success 201 {object} OffPlanPurchaseRequest
 // @Failure 400 {object} KYCErrorResponse
-// @Router /offplan-purchase-request [post]
+// @Router /property/offplan/purchase-request [post]
 func (s *Server) postOffPlanPurchaseRequestHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -461,7 +461,7 @@ func (s *Server) postOffPlanPurchaseRequestHandler(w http.ResponseWriter, r *htt
 // @Success 200 {object} OffPlanProperty
 // @Failure 400 {object} KYCErrorResponse
 // @Failure 401 {object} KYCErrorResponse
-// @Router /approve-offplan-property [post]
+// @Router /property/offplan/approve [post]
 func (s *Server) approveOffPlanPropertyHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)

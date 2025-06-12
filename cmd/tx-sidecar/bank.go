@@ -74,7 +74,7 @@ type RepayMortgageRequest struct {
 // @Produce json
 // @Param request body MortgageRequestPayload true "mortgage details (with property purchase details)"
 // @Success 200 {object} map[string]string{tx_hash=string}
-// @Router /create-mortgage [post]
+// @Router /bank/mortgage/create [post]
 func (s *Server) createMortgageHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -149,7 +149,7 @@ func (s *Server) createMortgageHandler(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Param request body RepayMortgageRequest true "repayment details"
 // @Success 200 {object} map[string]string{tx_hash=string}
-// @Router /repay-mortgage [post]
+// @Router /bank/mortgage/repay [post]
 func (s *Server) repayMortgageHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -196,7 +196,7 @@ type RequestFundsRequest struct {
 // @Produce json
 // @Param request body RequestFundsRequest true "request details"
 // @Success 200 {object} map[string]string{tx_hash=string}
-// @Router /request-funds [post]
+// @Router /bank/request-funds [post]
 func (s *Server) requestFundsHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -240,7 +240,7 @@ func (s *Server) requestFundsHandler(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Param request body MortgageRequestPayload true "mortgage request (with property purchase details)"
 // @Success 201 {object} MortgageRequest
-// @Router /request-mortgage [post]
+// @Router /bank/mortgage/request [post]
 func (s *Server) requestMortgageHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -306,7 +306,7 @@ func (s *Server) requestMortgageHandler(w http.ResponseWriter, r *http.Request) 
 // @Description Allows a logged-in user to retrieve a list of all their pending mortgage requests, both those they have made (as the lendee) and those made to them (as the lender).
 // @Produce json
 // @Success 200 {array} MortgageRequest
-// @Router /mortgage-requests [get]
+// @Router /bank/mortgage/requests [get]
 func (s *Server) getMortgageRequestsHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -341,7 +341,7 @@ func (s *Server) getMortgageRequestsHandler(w http.ResponseWriter, r *http.Reque
 // @Success 201 {object} MortgageRequest
 // @Failure 400 {object} KYCErrorResponse
 // @Failure 401 {object} KYCErrorResponse
-// @Router /request-equity-mortgage [post]
+// @Router /bank/mortgage/request-equity [post]
 func (s *Server) requestEquityMortgageHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)

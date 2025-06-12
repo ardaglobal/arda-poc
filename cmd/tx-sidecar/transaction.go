@@ -185,7 +185,7 @@ func (s *Server) saveTransactionsToFile() {
 // @Description Lists all transaction hashes that have been successfully processed and stored by the sidecar.
 // @Produce json
 // @Success 200 {array} TrackedTx
-// @Router /transactions [get]
+// @Router /tx/list [get]
 func (s *Server) listTransactionsHandler(w http.ResponseWriter, r *http.Request) {
 	zlog.Info().Str("handler", "listTransactionsHandler").Msg("received request")
 	w.Header().Set("Content-Type", "application/json")
@@ -198,14 +198,14 @@ func (s *Server) listTransactionsHandler(w http.ResponseWriter, r *http.Request)
 // @Produce json
 // @Param hash path string true "Transaction hash"
 // @Success 200 {object} interface{}
-// @Router /transaction/{hash} [get]
+// @Router /tx/{hash} [get]
 func (s *Server) getTransactionHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
 
-	txHash := strings.TrimPrefix(r.URL.Path, "/transaction/")
+	txHash := strings.TrimPrefix(r.URL.Path, "/tx/")
 	zlog.Info().Str("handler", "getTransactionHandler").Str("tx_hash", txHash).Msg("received request")
 	if txHash == "" {
 		http.Error(w, "Transaction hash must be provided in the path", http.StatusBadRequest)

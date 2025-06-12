@@ -370,40 +370,44 @@ func main() {
 
 	app.Get("/swagger/*", fiberSwagger.HandlerDefault)
 
-	app.Post("/register-property", fiberadaptor.HTTPHandlerFunc(server.registerPropertyHandler))
-	app.Post("/transfer-shares", fiberadaptor.HTTPHandlerFunc(server.transferSharesHandler))
-	app.Post("/edit-property", fiberadaptor.HTTPHandlerFunc(server.editPropertyMetadataHandler))
-	app.Post("/list-property-for-sale", fiberadaptor.HTTPHandlerFunc(server.listPropertyForSaleHandler))
-	app.Get("/properties-for-sale", fiberadaptor.HTTPHandlerFunc(server.getPropertiesForSaleHandler))
-	app.Get("/users", fiberadaptor.HTTPHandlerFunc(server.listUsersHandler))
-	app.Post("/login", fiberadaptor.HTTPHandlerFunc(server.loginHandler))
-	app.Post("/logout", fiberadaptor.HTTPHandlerFunc(server.logoutHandler))
-	app.Get("/transactions", fiberadaptor.HTTPHandlerFunc(server.listTransactionsHandler))
-	app.Get("/transaction/*", fiberadaptor.HTTPHandlerFunc(server.getTransactionHandler))
-	app.Post("/kyc-user", fiberadaptor.HTTPHandlerFunc(server.kycUserHandler))
+	// User routes
+	app.Get("/user/list", fiberadaptor.HTTPHandlerFunc(server.listUsersHandler))
+	app.Post("/user/login", fiberadaptor.HTTPHandlerFunc(server.loginHandler))
+	app.Post("/user/logout", fiberadaptor.HTTPHandlerFunc(server.logoutHandler))
+	app.Post("/user/kyc", fiberadaptor.HTTPHandlerFunc(server.kycUserHandler))
 
-	// Mortgage and Bank endpoints
-	app.Post("/request-mortgage", fiberadaptor.HTTPHandlerFunc(server.requestMortgageHandler))
-	app.Get("/mortgage-requests", fiberadaptor.HTTPHandlerFunc(server.getMortgageRequestsHandler))
-	app.Post("/create-mortgage", fiberadaptor.HTTPHandlerFunc(server.createMortgageHandler))
-	app.Post("/repay-mortgage", fiberadaptor.HTTPHandlerFunc(server.repayMortgageHandler))
-	app.Post("/request-funds", fiberadaptor.HTTPHandlerFunc(server.requestFundsHandler))
+	// Property routes
+	app.Post("/property/register", fiberadaptor.HTTPHandlerFunc(server.registerPropertyHandler))
+	app.Post("/property/transfer-shares", fiberadaptor.HTTPHandlerFunc(server.transferSharesHandler))
+	app.Post("/property/edit", fiberadaptor.HTTPHandlerFunc(server.editPropertyMetadataHandler))
+	app.Post("/property/list-for-sale", fiberadaptor.HTTPHandlerFunc(server.listPropertyForSaleHandler))
+	app.Get("/property/for-sale", fiberadaptor.HTTPHandlerFunc(server.getPropertiesForSaleHandler))
 
-	// KYC workflow endpoints
-	app.Post("/request-kyc", fiberadaptor.HTTPHandlerFunc(server.requestKYCHandler))
-	app.Get("/kyc-requests", fiberadaptor.HTTPHandlerFunc(server.getKYCRequestsHandler))
-	app.Post("/approve-kyc", fiberadaptor.HTTPHandlerFunc(server.approveKYCHandler))
+	// Off plan property routes
+	app.Post("/property/offplan", fiberadaptor.HTTPHandlerFunc(server.postOffPlanPropertyHandler))
+	app.Post("/property/offplan/purchase-request", fiberadaptor.HTTPHandlerFunc(server.postOffPlanPurchaseRequestHandler))
+	app.Get("/property/offplan/purchase-requests", fiberadaptor.HTTPHandlerFunc(server.getOffPlanPurchaseRequestsHandler))
+	app.Post("/property/offplan/approve", fiberadaptor.HTTPHandlerFunc(server.approveOffPlanPropertyHandler))
 
-	app.Post("/admin-login", server.adminLoginHandler)
+	// Bank/mortgage routes
+	app.Post("/bank/mortgage/request", fiberadaptor.HTTPHandlerFunc(server.requestMortgageHandler))
+	app.Get("/bank/mortgage/requests", fiberadaptor.HTTPHandlerFunc(server.getMortgageRequestsHandler))
+	app.Post("/bank/mortgage/create", fiberadaptor.HTTPHandlerFunc(server.createMortgageHandler))
+	app.Post("/bank/mortgage/repay", fiberadaptor.HTTPHandlerFunc(server.repayMortgageHandler))
+	app.Post("/bank/request-funds", fiberadaptor.HTTPHandlerFunc(server.requestFundsHandler))
+	app.Post("/bank/mortgage/request-equity", fiberadaptor.HTTPHandlerFunc(server.requestEquityMortgageHandler))
 
-	app.Post("/request-equity-mortgage", fiberadaptor.HTTPHandlerFunc(server.requestEquityMortgageHandler))
+	// KYC workflow
+	app.Post("/user/kyc/request", fiberadaptor.HTTPHandlerFunc(server.requestKYCHandler))
+	app.Get("/user/kyc/requests", fiberadaptor.HTTPHandlerFunc(server.getKYCRequestsHandler))
+	app.Post("/user/kyc/approve", fiberadaptor.HTTPHandlerFunc(server.approveKYCHandler))
 
-	app.Get("/offplan-purchase-requests", fiberadaptor.HTTPHandlerFunc(server.getOffPlanPurchaseRequestsHandler))
+	// Transaction routes
+	app.Get("/tx/list", fiberadaptor.HTTPHandlerFunc(server.listTransactionsHandler))
+	app.Get("/tx/:hash", fiberadaptor.HTTPHandlerFunc(server.getTransactionHandler))
 
-	app.Post("/offplan-property", fiberadaptor.HTTPHandlerFunc(server.postOffPlanPropertyHandler))
-	app.Post("/offplan-purchase-request", fiberadaptor.HTTPHandlerFunc(server.postOffPlanPurchaseRequestHandler))
-
-	app.Post("/approve-offplan-property", fiberadaptor.HTTPHandlerFunc(server.approveOffPlanPropertyHandler))
+	// Admin
+	app.Post("/admin/login", server.adminLoginHandler)
 
 	zlog.Info().Msg("Starting transaction sidecar server on :8080...")
 	if err := app.Listen(":8080"); err != nil {
