@@ -249,10 +249,10 @@ func (s *Server) createUser(name, role string) (*UserData, error) {
 			"developer": true,
 			"regulator": true,
 			"admin":     true,
-			"faucet":    true,
+			"bank":      true,
 		}
 		if _, ok := allowedRoles[role]; !ok {
-			return nil, fmt.Errorf("invalid role provided: '%s'. aRole must be one of user, investor, developer, regulator, admin, or faucet", role)
+			return nil, fmt.Errorf("invalid role provided: '%s'. aRole must be one of user, investor, developer, regulator, admin, or bank", role)
 		}
 		finalRole = role
 	}
@@ -360,7 +360,15 @@ func (s *Server) initUsers() error {
 			zlog.Info().Msgf("Successfully created initial user '%s'", name)
 		} else {
 			// User exists, check if the role is correct.
-			if userData.Role != role {
+			if userData.Role == "faucet" {
+				// Migrate old "faucet" role to "bank"
+				zlog.Info().Msgf("Migrating user '%s' from deprecated 'faucet' role to 'bank'.", name)
+				userData.Role = "bank"
+				s.users[name] = userData
+				if err := s.saveUsersToFile(); err != nil {
+					return fmt.Errorf("failed to save users file after migrating %s's role: %w", name, err)
+				}
+			} else if userData.Role != role {
 				zlog.Info().Msgf("User '%s' has incorrect role '%s', updating to '%s'.", name, userData.Role, role)
 				userData.Role = role
 				s.users[name] = userData

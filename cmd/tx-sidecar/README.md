@@ -225,7 +225,7 @@ Updates the metadata for an existing property.
 
 A successful broadcast will return the transaction hash just like other endpoints.
 * `name` (string, optional): Required when registering a new user or linking an email to an existing user for the first time.
-* `role` (string, optional): The user's role. Defaults to `user`. Allowed values: `user`, `investor`, `developer`, `regulator`, `admin`, `faucet`.
+* `role` (string, optional): The user's role. Defaults to `user`. Allowed values: `user`, `investor`, `developer`, `regulator`, `admin`, `bank`.
 
 **Example `curl` Request (Login or Register/Link):**
 
@@ -374,7 +374,7 @@ Returns a JSON array of transaction details.
     },
     {
         "timestamp": "2023-10-27T10:10:00Z",
-        "type": "faucet",
+        "type": "request_funds",
         "tx_hash": "C3D4E5F6A1B2..."
     }
 ]
@@ -432,9 +432,9 @@ This response includes the decoded message that was part of the transaction.
 }
 ```
 
-### `POST /faucet`
+### `POST /request-funds`
 
-Requests funds from the built-in faucet. This is only available for development and testing purposes. The faucet account must be funded for this to work. On the first run, the sidecar will generate a `faucet` account and print its mnemonic phrase to the console. This mnemonic must be used to send funds to the faucet address before it can dispense tokens.
+Requests funds from the built-in bank/faucet. This is only available for development and testing purposes. The bank account must be funded for this to work. On the first run, the sidecar will generate a `bank` account and print its mnemonic phrase to the console. This mnemonic must be used to send funds to the bank address before it can dispense tokens.
 
 **Request Body:**
 
@@ -458,7 +458,7 @@ curl -X POST -H "Content-Type: application/json" -d '{
   "address": "arda1nwtujr8y49zeajrqskav5pvgn7dgad7up92pqm",
   "amount": 1000000,
   "denom": "uarda"
-}' http://localhost:8080/faucet
+}' http://localhost:8080/request-funds
 ```
 
 **Success Response:**

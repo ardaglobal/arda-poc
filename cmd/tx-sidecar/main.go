@@ -169,14 +169,14 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 	}
 	zlog.Info().Msgf("Using '%s' as the faucet account.", s.faucetName)
 
-	// Ensure faucet user has the 'faucet' role.
+	// Ensure faucet user has the 'bank' role.
 	if faucetUserData, ok := s.users[s.faucetName]; ok {
-		if faucetUserData.Role != "faucet" {
-			zlog.Info().Msgf("Updating role of faucet user '%s' to 'faucet'.", s.faucetName)
-			faucetUserData.Role = "faucet"
+		if faucetUserData.Role != "bank" {
+			zlog.Info().Msgf("Updating role of bank user '%s' to 'bank'.", s.faucetName)
+			faucetUserData.Role = "bank"
 			s.users[s.faucetName] = faucetUserData
 			if err := s.saveUsersToFile(); err != nil {
-				zlog.Warn().Msgf("failed to save users file after updating faucet role: %v", err)
+				zlog.Warn().Msgf("failed to save users file after updating bank role: %v", err)
 			}
 		}
 	}
@@ -240,14 +240,14 @@ func main() {
 	app.Get("/users", fiberadaptor.HTTPHandlerFunc(server.listUsersHandler))
 	app.Post("/login", fiberadaptor.HTTPHandlerFunc(server.loginHandler))
 	app.Post("/logout", fiberadaptor.HTTPHandlerFunc(server.logoutHandler))
-	app.Post("/faucet", fiberadaptor.HTTPHandlerFunc(server.faucetHandler))
 	app.Get("/transactions", fiberadaptor.HTTPHandlerFunc(server.listTransactionsHandler))
 	app.Get("/transaction/*", fiberadaptor.HTTPHandlerFunc(server.getTransactionHandler))
 	app.Post("/kyc-user", fiberadaptor.HTTPHandlerFunc(server.kycUserHandler))
 
-	// Mortgage endpoints
+	// Mortgage and Bank endpoints
 	app.Post("/create-mortgage", fiberadaptor.HTTPHandlerFunc(server.createMortgageHandler))
 	app.Post("/repay-mortgage", fiberadaptor.HTTPHandlerFunc(server.repayMortgageHandler))
+	app.Post("/request-funds", fiberadaptor.HTTPHandlerFunc(server.requestFundsHandler))
 
 	zlog.Info().Msg("Starting transaction sidecar server on :8080...")
 	if err := app.Listen(":8080"); err != nil {
