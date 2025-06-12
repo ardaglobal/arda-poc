@@ -19,6 +19,8 @@ service Msg {
   // parameters. The authority defaults to the x/gov module account.
   rpc UpdateParams   (MsgUpdateParams  ) returns (MsgUpdateParamsResponse  );
   rpc CreateMortgage (MsgCreateMortgage) returns (MsgCreateMortgageResponse);
+  rpc UpdateMortgage (MsgUpdateMortgage) returns (MsgUpdateMortgageResponse);
+  rpc DeleteMortgage (MsgDeleteMortgage) returns (MsgDeleteMortgageResponse);
   rpc RepayMortgage  (MsgRepayMortgage ) returns (MsgRepayMortgageResponse );
 }
 // MsgUpdateParams is the Msg/UpdateParams request type.
@@ -53,11 +55,33 @@ message MsgCreateMortgage {
 
 message MsgCreateMortgageResponse {}
 
+message MsgUpdateMortgage {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string index = 2;
+  string lender = 3;
+  string lendee = 4;
+  string collateral = 5;
+  uint64 amount = 6;
+  string interestRate = 7;
+  string term = 8;
+}
+
+message MsgUpdateMortgageResponse {}
+
+message MsgDeleteMortgage {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string index = 2;
+}
+
+message MsgDeleteMortgageResponse {}
+
 message MsgRepayMortgage {
   option (cosmos.msg.v1.signer) = "creator";
-  string creator    = 1;
-  string mortgage_id = 2;
-  uint64 amount     = 3;
+  string creator = 1;
+  string mortgageId = 2;
+  uint64 amount = 3;
 }
 
 message MsgRepayMortgageResponse {}

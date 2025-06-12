@@ -3,31 +3,34 @@ package mortgage
 
 import (
 	fmt "fmt"
-	io "io"
-	reflect "reflect"
-	sync "sync"
-
 	runtime "github.com/cosmos/cosmos-proto/runtime"
+	_ "github.com/cosmos/gogoproto/gogoproto"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoiface "google.golang.org/protobuf/runtime/protoiface"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	io "io"
+	reflect "reflect"
+	sync "sync"
 )
 
 var (
-	md_Mortgage              protoreflect.MessageDescriptor
-	fd_Mortgage_index        protoreflect.FieldDescriptor
-	fd_Mortgage_lender       protoreflect.FieldDescriptor
-	fd_Mortgage_lendee       protoreflect.FieldDescriptor
-	fd_Mortgage_collateral   protoreflect.FieldDescriptor
-	fd_Mortgage_amount       protoreflect.FieldDescriptor
-	fd_Mortgage_interestRate protoreflect.FieldDescriptor
-	fd_Mortgage_term         protoreflect.FieldDescriptor
-	fd_Mortgage_creator      protoreflect.FieldDescriptor
+	md_Mortgage                    protoreflect.MessageDescriptor
+	fd_Mortgage_creator            protoreflect.FieldDescriptor
+	fd_Mortgage_index              protoreflect.FieldDescriptor
+	fd_Mortgage_lender             protoreflect.FieldDescriptor
+	fd_Mortgage_lendee             protoreflect.FieldDescriptor
+	fd_Mortgage_collateral         protoreflect.FieldDescriptor
+	fd_Mortgage_amount             protoreflect.FieldDescriptor
+	fd_Mortgage_interestRate       protoreflect.FieldDescriptor
+	fd_Mortgage_term               protoreflect.FieldDescriptor
+	fd_Mortgage_status             protoreflect.FieldDescriptor
+	fd_Mortgage_outstanding_amount protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_ardapoc_mortgage_mortgage_proto_init()
 	md_Mortgage = File_ardapoc_mortgage_mortgage_proto.Messages().ByName("Mortgage")
+	fd_Mortgage_creator = md_Mortgage.Fields().ByName("creator")
 	fd_Mortgage_index = md_Mortgage.Fields().ByName("index")
 	fd_Mortgage_lender = md_Mortgage.Fields().ByName("lender")
 	fd_Mortgage_lendee = md_Mortgage.Fields().ByName("lendee")
@@ -35,7 +38,8 @@ func init() {
 	fd_Mortgage_amount = md_Mortgage.Fields().ByName("amount")
 	fd_Mortgage_interestRate = md_Mortgage.Fields().ByName("interestRate")
 	fd_Mortgage_term = md_Mortgage.Fields().ByName("term")
-	fd_Mortgage_creator = md_Mortgage.Fields().ByName("creator")
+	fd_Mortgage_status = md_Mortgage.Fields().ByName("status")
+	fd_Mortgage_outstanding_amount = md_Mortgage.Fields().ByName("outstanding_amount")
 }
 
 var _ protoreflect.Message = (*fastReflection_Mortgage)(nil)
@@ -103,6 +107,12 @@ func (x *fastReflection_Mortgage) Interface() protoreflect.ProtoMessage {
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
 func (x *fastReflection_Mortgage) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if x.Creator != "" {
+		value := protoreflect.ValueOfString(x.Creator)
+		if !f(fd_Mortgage_creator, value) {
+			return
+		}
+	}
 	if x.Index != "" {
 		value := protoreflect.ValueOfString(x.Index)
 		if !f(fd_Mortgage_index, value) {
@@ -145,9 +155,15 @@ func (x *fastReflection_Mortgage) Range(f func(protoreflect.FieldDescriptor, pro
 			return
 		}
 	}
-	if x.Creator != "" {
-		value := protoreflect.ValueOfString(x.Creator)
-		if !f(fd_Mortgage_creator, value) {
+	if x.Status != 0 {
+		value := protoreflect.ValueOfEnum((protoreflect.EnumNumber)(x.Status))
+		if !f(fd_Mortgage_status, value) {
+			return
+		}
+	}
+	if x.OutstandingAmount != uint64(0) {
+		value := protoreflect.ValueOfUint64(x.OutstandingAmount)
+		if !f(fd_Mortgage_outstanding_amount, value) {
 			return
 		}
 	}
@@ -166,6 +182,8 @@ func (x *fastReflection_Mortgage) Range(f func(protoreflect.FieldDescriptor, pro
 // a repeated field is populated if it is non-empty.
 func (x *fastReflection_Mortgage) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
+	case "ardapoc.mortgage.Mortgage.creator":
+		return x.Creator != ""
 	case "ardapoc.mortgage.Mortgage.index":
 		return x.Index != ""
 	case "ardapoc.mortgage.Mortgage.lender":
@@ -180,8 +198,10 @@ func (x *fastReflection_Mortgage) Has(fd protoreflect.FieldDescriptor) bool {
 		return x.InterestRate != ""
 	case "ardapoc.mortgage.Mortgage.term":
 		return x.Term != ""
-	case "ardapoc.mortgage.Mortgage.creator":
-		return x.Creator != ""
+	case "ardapoc.mortgage.Mortgage.status":
+		return x.Status != 0
+	case "ardapoc.mortgage.Mortgage.outstanding_amount":
+		return x.OutstandingAmount != uint64(0)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.mortgage.Mortgage"))
@@ -198,6 +218,8 @@ func (x *fastReflection_Mortgage) Has(fd protoreflect.FieldDescriptor) bool {
 // Clear is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_Mortgage) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
+	case "ardapoc.mortgage.Mortgage.creator":
+		x.Creator = ""
 	case "ardapoc.mortgage.Mortgage.index":
 		x.Index = ""
 	case "ardapoc.mortgage.Mortgage.lender":
@@ -212,8 +234,10 @@ func (x *fastReflection_Mortgage) Clear(fd protoreflect.FieldDescriptor) {
 		x.InterestRate = ""
 	case "ardapoc.mortgage.Mortgage.term":
 		x.Term = ""
-	case "ardapoc.mortgage.Mortgage.creator":
-		x.Creator = ""
+	case "ardapoc.mortgage.Mortgage.status":
+		x.Status = 0
+	case "ardapoc.mortgage.Mortgage.outstanding_amount":
+		x.OutstandingAmount = uint64(0)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.mortgage.Mortgage"))
@@ -230,6 +254,9 @@ func (x *fastReflection_Mortgage) Clear(fd protoreflect.FieldDescriptor) {
 // of the value; to obtain a mutable reference, use Mutable.
 func (x *fastReflection_Mortgage) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
+	case "ardapoc.mortgage.Mortgage.creator":
+		value := x.Creator
+		return protoreflect.ValueOfString(value)
 	case "ardapoc.mortgage.Mortgage.index":
 		value := x.Index
 		return protoreflect.ValueOfString(value)
@@ -251,9 +278,12 @@ func (x *fastReflection_Mortgage) Get(descriptor protoreflect.FieldDescriptor) p
 	case "ardapoc.mortgage.Mortgage.term":
 		value := x.Term
 		return protoreflect.ValueOfString(value)
-	case "ardapoc.mortgage.Mortgage.creator":
-		value := x.Creator
-		return protoreflect.ValueOfString(value)
+	case "ardapoc.mortgage.Mortgage.status":
+		value := x.Status
+		return protoreflect.ValueOfEnum((protoreflect.EnumNumber)(value))
+	case "ardapoc.mortgage.Mortgage.outstanding_amount":
+		value := x.OutstandingAmount
+		return protoreflect.ValueOfUint64(value)
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.mortgage.Mortgage"))
@@ -274,6 +304,8 @@ func (x *fastReflection_Mortgage) Get(descriptor protoreflect.FieldDescriptor) p
 // Set is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_Mortgage) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
+	case "ardapoc.mortgage.Mortgage.creator":
+		x.Creator = value.Interface().(string)
 	case "ardapoc.mortgage.Mortgage.index":
 		x.Index = value.Interface().(string)
 	case "ardapoc.mortgage.Mortgage.lender":
@@ -288,8 +320,10 @@ func (x *fastReflection_Mortgage) Set(fd protoreflect.FieldDescriptor, value pro
 		x.InterestRate = value.Interface().(string)
 	case "ardapoc.mortgage.Mortgage.term":
 		x.Term = value.Interface().(string)
-	case "ardapoc.mortgage.Mortgage.creator":
-		x.Creator = value.Interface().(string)
+	case "ardapoc.mortgage.Mortgage.status":
+		x.Status = (MortgageStatus)(value.Enum())
+	case "ardapoc.mortgage.Mortgage.outstanding_amount":
+		x.OutstandingAmount = value.Uint()
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.mortgage.Mortgage"))
@@ -310,6 +344,8 @@ func (x *fastReflection_Mortgage) Set(fd protoreflect.FieldDescriptor, value pro
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_Mortgage) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
+	case "ardapoc.mortgage.Mortgage.creator":
+		panic(fmt.Errorf("field creator of message ardapoc.mortgage.Mortgage is not mutable"))
 	case "ardapoc.mortgage.Mortgage.index":
 		panic(fmt.Errorf("field index of message ardapoc.mortgage.Mortgage is not mutable"))
 	case "ardapoc.mortgage.Mortgage.lender":
@@ -324,8 +360,10 @@ func (x *fastReflection_Mortgage) Mutable(fd protoreflect.FieldDescriptor) proto
 		panic(fmt.Errorf("field interestRate of message ardapoc.mortgage.Mortgage is not mutable"))
 	case "ardapoc.mortgage.Mortgage.term":
 		panic(fmt.Errorf("field term of message ardapoc.mortgage.Mortgage is not mutable"))
-	case "ardapoc.mortgage.Mortgage.creator":
-		panic(fmt.Errorf("field creator of message ardapoc.mortgage.Mortgage is not mutable"))
+	case "ardapoc.mortgage.Mortgage.status":
+		panic(fmt.Errorf("field status of message ardapoc.mortgage.Mortgage is not mutable"))
+	case "ardapoc.mortgage.Mortgage.outstanding_amount":
+		panic(fmt.Errorf("field outstanding_amount of message ardapoc.mortgage.Mortgage is not mutable"))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.mortgage.Mortgage"))
@@ -339,6 +377,8 @@ func (x *fastReflection_Mortgage) Mutable(fd protoreflect.FieldDescriptor) proto
 // For lists, maps, and messages, this returns a new, empty, mutable value.
 func (x *fastReflection_Mortgage) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
+	case "ardapoc.mortgage.Mortgage.creator":
+		return protoreflect.ValueOfString("")
 	case "ardapoc.mortgage.Mortgage.index":
 		return protoreflect.ValueOfString("")
 	case "ardapoc.mortgage.Mortgage.lender":
@@ -353,8 +393,10 @@ func (x *fastReflection_Mortgage) NewField(fd protoreflect.FieldDescriptor) prot
 		return protoreflect.ValueOfString("")
 	case "ardapoc.mortgage.Mortgage.term":
 		return protoreflect.ValueOfString("")
-	case "ardapoc.mortgage.Mortgage.creator":
-		return protoreflect.ValueOfString("")
+	case "ardapoc.mortgage.Mortgage.status":
+		return protoreflect.ValueOfEnum(0)
+	case "ardapoc.mortgage.Mortgage.outstanding_amount":
+		return protoreflect.ValueOfUint64(uint64(0))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: ardapoc.mortgage.Mortgage"))
@@ -424,6 +466,10 @@ func (x *fastReflection_Mortgage) ProtoMethods() *protoiface.Methods {
 		var n int
 		var l int
 		_ = l
+		l = len(x.Creator)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
 		l = len(x.Index)
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
@@ -451,9 +497,11 @@ func (x *fastReflection_Mortgage) ProtoMethods() *protoiface.Methods {
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		l = len(x.Creator)
-		if l > 0 {
-			n += 1 + l + runtime.Sov(uint64(l))
+		if x.Status != 0 {
+			n += 1 + runtime.Sov(uint64(x.Status))
+		}
+		if x.OutstandingAmount != 0 {
+			n += 1 + runtime.Sov(uint64(x.OutstandingAmount))
 		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
@@ -484,57 +532,67 @@ func (x *fastReflection_Mortgage) ProtoMethods() *protoiface.Methods {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
-		if len(x.Creator) > 0 {
-			i -= len(x.Creator)
-			copy(dAtA[i:], x.Creator)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Creator)))
+		if x.OutstandingAmount != 0 {
+			i = runtime.EncodeVarint(dAtA, i, uint64(x.OutstandingAmount))
 			i--
-			dAtA[i] = 0x42
+			dAtA[i] = 0x50
+		}
+		if x.Status != 0 {
+			i = runtime.EncodeVarint(dAtA, i, uint64(x.Status))
+			i--
+			dAtA[i] = 0x48
 		}
 		if len(x.Term) > 0 {
 			i -= len(x.Term)
 			copy(dAtA[i:], x.Term)
 			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Term)))
 			i--
-			dAtA[i] = 0x3a
+			dAtA[i] = 0x42
 		}
 		if len(x.InterestRate) > 0 {
 			i -= len(x.InterestRate)
 			copy(dAtA[i:], x.InterestRate)
 			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.InterestRate)))
 			i--
-			dAtA[i] = 0x32
+			dAtA[i] = 0x3a
 		}
 		if x.Amount != 0 {
 			i = runtime.EncodeVarint(dAtA, i, uint64(x.Amount))
 			i--
-			dAtA[i] = 0x28
+			dAtA[i] = 0x30
 		}
 		if len(x.Collateral) > 0 {
 			i -= len(x.Collateral)
 			copy(dAtA[i:], x.Collateral)
 			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Collateral)))
 			i--
-			dAtA[i] = 0x22
+			dAtA[i] = 0x2a
 		}
 		if len(x.Lendee) > 0 {
 			i -= len(x.Lendee)
 			copy(dAtA[i:], x.Lendee)
 			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Lendee)))
 			i--
-			dAtA[i] = 0x1a
+			dAtA[i] = 0x22
 		}
 		if len(x.Lender) > 0 {
 			i -= len(x.Lender)
 			copy(dAtA[i:], x.Lender)
 			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Lender)))
 			i--
-			dAtA[i] = 0x12
+			dAtA[i] = 0x1a
 		}
 		if len(x.Index) > 0 {
 			i -= len(x.Index)
 			copy(dAtA[i:], x.Index)
 			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Index)))
+			i--
+			dAtA[i] = 0x12
+		}
+		if len(x.Creator) > 0 {
+			i -= len(x.Creator)
+			copy(dAtA[i:], x.Creator)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Creator)))
 			i--
 			dAtA[i] = 0xa
 		}
@@ -589,6 +647,38 @@ func (x *fastReflection_Mortgage) ProtoMethods() *protoiface.Methods {
 			switch fieldNum {
 			case 1:
 				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Creator = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 2:
+				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Index", wireType)
 				}
 				var stringLen uint64
@@ -619,7 +709,7 @@ func (x *fastReflection_Mortgage) ProtoMethods() *protoiface.Methods {
 				}
 				x.Index = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
-			case 2:
+			case 3:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Lender", wireType)
 				}
@@ -651,7 +741,7 @@ func (x *fastReflection_Mortgage) ProtoMethods() *protoiface.Methods {
 				}
 				x.Lender = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
-			case 3:
+			case 4:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Lendee", wireType)
 				}
@@ -683,7 +773,7 @@ func (x *fastReflection_Mortgage) ProtoMethods() *protoiface.Methods {
 				}
 				x.Lendee = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
-			case 4:
+			case 5:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Collateral", wireType)
 				}
@@ -715,7 +805,7 @@ func (x *fastReflection_Mortgage) ProtoMethods() *protoiface.Methods {
 				}
 				x.Collateral = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
-			case 5:
+			case 6:
 				if wireType != 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
 				}
@@ -734,7 +824,7 @@ func (x *fastReflection_Mortgage) ProtoMethods() *protoiface.Methods {
 						break
 					}
 				}
-			case 6:
+			case 7:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field InterestRate", wireType)
 				}
@@ -766,7 +856,7 @@ func (x *fastReflection_Mortgage) ProtoMethods() *protoiface.Methods {
 				}
 				x.InterestRate = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
-			case 7:
+			case 8:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Term", wireType)
 				}
@@ -798,11 +888,11 @@ func (x *fastReflection_Mortgage) ProtoMethods() *protoiface.Methods {
 				}
 				x.Term = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
-			case 8:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			case 9:
+				if wireType != 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
 				}
-				var stringLen uint64
+				x.Status = 0
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
@@ -812,24 +902,30 @@ func (x *fastReflection_Mortgage) ProtoMethods() *protoiface.Methods {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					stringLen |= uint64(b&0x7F) << shift
+					x.Status |= MortgageStatus(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
 				}
-				intStringLen := int(stringLen)
-				if intStringLen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+			case 10:
+				if wireType != 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field OutstandingAmount", wireType)
 				}
-				postIndex := iNdEx + intStringLen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				x.OutstandingAmount = 0
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					x.OutstandingAmount |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
 				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				x.Creator = string(dAtA[iNdEx:postIndex])
-				iNdEx = postIndex
 			default:
 				iNdEx = preIndex
 				skippy, err := runtime.Skip(dAtA[iNdEx:])
@@ -878,19 +974,76 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type MortgageStatus int32
+
+const (
+	MortgageStatus_REQUESTED MortgageStatus = 0
+	MortgageStatus_APPROVED  MortgageStatus = 1
+	MortgageStatus_REJECTED  MortgageStatus = 2
+	MortgageStatus_PAID      MortgageStatus = 3
+	MortgageStatus_CANCELLED MortgageStatus = 4
+)
+
+// Enum value maps for MortgageStatus.
+var (
+	MortgageStatus_name = map[int32]string{
+		0: "REQUESTED",
+		1: "APPROVED",
+		2: "REJECTED",
+		3: "PAID",
+		4: "CANCELLED",
+	}
+	MortgageStatus_value = map[string]int32{
+		"REQUESTED": 0,
+		"APPROVED":  1,
+		"REJECTED":  2,
+		"PAID":      3,
+		"CANCELLED": 4,
+	}
+)
+
+func (x MortgageStatus) Enum() *MortgageStatus {
+	p := new(MortgageStatus)
+	*p = x
+	return p
+}
+
+func (x MortgageStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (MortgageStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_ardapoc_mortgage_mortgage_proto_enumTypes[0].Descriptor()
+}
+
+func (MortgageStatus) Type() protoreflect.EnumType {
+	return &file_ardapoc_mortgage_mortgage_proto_enumTypes[0]
+}
+
+func (x MortgageStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use MortgageStatus.Descriptor instead.
+func (MortgageStatus) EnumDescriptor() ([]byte, []int) {
+	return file_ardapoc_mortgage_mortgage_proto_rawDescGZIP(), []int{0}
+}
+
 type Mortgage struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Index        string `protobuf:"bytes,1,opt,name=index,proto3" json:"index,omitempty"`
-	Lender       string `protobuf:"bytes,2,opt,name=lender,proto3" json:"lender,omitempty"`
-	Lendee       string `protobuf:"bytes,3,opt,name=lendee,proto3" json:"lendee,omitempty"`
-	Collateral   string `protobuf:"bytes,4,opt,name=collateral,proto3" json:"collateral,omitempty"`
-	Amount       uint64 `protobuf:"varint,5,opt,name=amount,proto3" json:"amount,omitempty"`
-	InterestRate string `protobuf:"bytes,6,opt,name=interestRate,proto3" json:"interestRate,omitempty"`
-	Term         string `protobuf:"bytes,7,opt,name=term,proto3" json:"term,omitempty"`
-	Creator      string `protobuf:"bytes,8,opt,name=creator,proto3" json:"creator,omitempty"`
+	Creator           string         `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	Index             string         `protobuf:"bytes,2,opt,name=index,proto3" json:"index,omitempty"`
+	Lender            string         `protobuf:"bytes,3,opt,name=lender,proto3" json:"lender,omitempty"`
+	Lendee            string         `protobuf:"bytes,4,opt,name=lendee,proto3" json:"lendee,omitempty"`
+	Collateral        string         `protobuf:"bytes,5,opt,name=collateral,proto3" json:"collateral,omitempty"`
+	Amount            uint64         `protobuf:"varint,6,opt,name=amount,proto3" json:"amount,omitempty"`
+	InterestRate      string         `protobuf:"bytes,7,opt,name=interestRate,proto3" json:"interestRate,omitempty"`
+	Term              string         `protobuf:"bytes,8,opt,name=term,proto3" json:"term,omitempty"`
+	Status            MortgageStatus `protobuf:"varint,9,opt,name=status,proto3,enum=ardapoc.mortgage.MortgageStatus" json:"status,omitempty"`
+	OutstandingAmount uint64         `protobuf:"varint,10,opt,name=outstanding_amount,json=outstandingAmount,proto3" json:"outstanding_amount,omitempty"`
 }
 
 func (x *Mortgage) Reset() {
@@ -911,6 +1064,13 @@ func (*Mortgage) ProtoMessage() {}
 // Deprecated: Use Mortgage.ProtoReflect.Descriptor instead.
 func (*Mortgage) Descriptor() ([]byte, []int) {
 	return file_ardapoc_mortgage_mortgage_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *Mortgage) GetCreator() string {
+	if x != nil {
+		return x.Creator
+	}
+	return ""
 }
 
 func (x *Mortgage) GetIndex() string {
@@ -962,11 +1122,18 @@ func (x *Mortgage) GetTerm() string {
 	return ""
 }
 
-func (x *Mortgage) GetCreator() string {
+func (x *Mortgage) GetStatus() MortgageStatus {
 	if x != nil {
-		return x.Creator
+		return x.Status
 	}
-	return ""
+	return MortgageStatus_REQUESTED
+}
+
+func (x *Mortgage) GetOutstandingAmount() uint64 {
+	if x != nil {
+		return x.OutstandingAmount
+	}
+	return 0
 }
 
 var File_ardapoc_mortgage_mortgage_proto protoreflect.FileDescriptor
@@ -975,31 +1142,45 @@ var file_ardapoc_mortgage_mortgage_proto_rawDesc = []byte{
 	0x0a, 0x1f, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2f, 0x6d, 0x6f, 0x72, 0x74, 0x67, 0x61,
 	0x67, 0x65, 0x2f, 0x6d, 0x6f, 0x72, 0x74, 0x67, 0x61, 0x67, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74,
 	0x6f, 0x12, 0x10, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x6d, 0x6f, 0x72, 0x74, 0x67,
-	0x61, 0x67, 0x65, 0x22, 0xda, 0x01, 0x0a, 0x08, 0x4d, 0x6f, 0x72, 0x74, 0x67, 0x61, 0x67, 0x65,
-	0x12, 0x14, 0x0a, 0x05, 0x69, 0x6e, 0x64, 0x65, 0x78, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x61, 0x67, 0x65, 0x1a, 0x14, 0x67, 0x6f, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x67,
+	0x6f, 0x67, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xc3, 0x02, 0x0a, 0x08, 0x4d, 0x6f,
+	0x72, 0x74, 0x67, 0x61, 0x67, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f,
+	0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72,
+	0x12, 0x14, 0x0a, 0x05, 0x69, 0x6e, 0x64, 0x65, 0x78, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
 	0x05, 0x69, 0x6e, 0x64, 0x65, 0x78, 0x12, 0x16, 0x0a, 0x06, 0x6c, 0x65, 0x6e, 0x64, 0x65, 0x72,
-	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x6c, 0x65, 0x6e, 0x64, 0x65, 0x72, 0x12, 0x16,
-	0x0a, 0x06, 0x6c, 0x65, 0x6e, 0x64, 0x65, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x6c, 0x65, 0x6e, 0x64, 0x65, 0x72, 0x12, 0x16,
+	0x0a, 0x06, 0x6c, 0x65, 0x6e, 0x64, 0x65, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06,
 	0x6c, 0x65, 0x6e, 0x64, 0x65, 0x65, 0x12, 0x1e, 0x0a, 0x0a, 0x63, 0x6f, 0x6c, 0x6c, 0x61, 0x74,
-	0x65, 0x72, 0x61, 0x6c, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x63, 0x6f, 0x6c, 0x6c,
+	0x65, 0x72, 0x61, 0x6c, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x63, 0x6f, 0x6c, 0x6c,
 	0x61, 0x74, 0x65, 0x72, 0x61, 0x6c, 0x12, 0x16, 0x0a, 0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74,
-	0x18, 0x05, 0x20, 0x01, 0x28, 0x04, 0x52, 0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x12, 0x22,
-	0x0a, 0x0c, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x65, 0x73, 0x74, 0x52, 0x61, 0x74, 0x65, 0x18, 0x06,
+	0x18, 0x06, 0x20, 0x01, 0x28, 0x04, 0x52, 0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x12, 0x22,
+	0x0a, 0x0c, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x65, 0x73, 0x74, 0x52, 0x61, 0x74, 0x65, 0x18, 0x07,
 	0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x65, 0x73, 0x74, 0x52, 0x61,
-	0x74, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x65, 0x72, 0x6d, 0x18, 0x07, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x04, 0x74, 0x65, 0x72, 0x6d, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f,
-	0x72, 0x18, 0x08, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72,
-	0x42, 0xa4, 0x01, 0x0a, 0x14, 0x63, 0x6f, 0x6d, 0x2e, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63,
-	0x2e, 0x6d, 0x6f, 0x72, 0x74, 0x67, 0x61, 0x67, 0x65, 0x42, 0x0d, 0x4d, 0x6f, 0x72, 0x74, 0x67,
-	0x61, 0x67, 0x65, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x1c, 0x61, 0x72, 0x64, 0x61,
-	0x70, 0x6f, 0x63, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2f,
-	0x6d, 0x6f, 0x72, 0x74, 0x67, 0x61, 0x67, 0x65, 0xa2, 0x02, 0x03, 0x41, 0x4d, 0x58, 0xaa, 0x02,
-	0x10, 0x41, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x4d, 0x6f, 0x72, 0x74, 0x67, 0x61, 0x67,
-	0x65, 0xca, 0x02, 0x10, 0x41, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x5c, 0x4d, 0x6f, 0x72, 0x74,
-	0x67, 0x61, 0x67, 0x65, 0xe2, 0x02, 0x1c, 0x41, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x5c, 0x4d,
-	0x6f, 0x72, 0x74, 0x67, 0x61, 0x67, 0x65, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64,
-	0x61, 0x74, 0x61, 0xea, 0x02, 0x11, 0x41, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x3a, 0x3a, 0x4d,
-	0x6f, 0x72, 0x74, 0x67, 0x61, 0x67, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x74, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x65, 0x72, 0x6d, 0x18, 0x08, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x04, 0x74, 0x65, 0x72, 0x6d, 0x12, 0x38, 0x0a, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73,
+	0x18, 0x09, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x20, 0x2e, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63,
+	0x2e, 0x6d, 0x6f, 0x72, 0x74, 0x67, 0x61, 0x67, 0x65, 0x2e, 0x4d, 0x6f, 0x72, 0x74, 0x67, 0x61,
+	0x67, 0x65, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73,
+	0x12, 0x2d, 0x0a, 0x12, 0x6f, 0x75, 0x74, 0x73, 0x74, 0x61, 0x6e, 0x64, 0x69, 0x6e, 0x67, 0x5f,
+	0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x04, 0x52, 0x11, 0x6f, 0x75,
+	0x74, 0x73, 0x74, 0x61, 0x6e, 0x64, 0x69, 0x6e, 0x67, 0x41, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x2a,
+	0x5a, 0x0a, 0x0e, 0x4d, 0x6f, 0x72, 0x74, 0x67, 0x61, 0x67, 0x65, 0x53, 0x74, 0x61, 0x74, 0x75,
+	0x73, 0x12, 0x0d, 0x0a, 0x09, 0x52, 0x45, 0x51, 0x55, 0x45, 0x53, 0x54, 0x45, 0x44, 0x10, 0x00,
+	0x12, 0x0c, 0x0a, 0x08, 0x41, 0x50, 0x50, 0x52, 0x4f, 0x56, 0x45, 0x44, 0x10, 0x01, 0x12, 0x0c,
+	0x0a, 0x08, 0x52, 0x45, 0x4a, 0x45, 0x43, 0x54, 0x45, 0x44, 0x10, 0x02, 0x12, 0x08, 0x0a, 0x04,
+	0x50, 0x41, 0x49, 0x44, 0x10, 0x03, 0x12, 0x0d, 0x0a, 0x09, 0x43, 0x41, 0x4e, 0x43, 0x45, 0x4c,
+	0x4c, 0x45, 0x44, 0x10, 0x04, 0x1a, 0x04, 0x88, 0xa3, 0x1e, 0x00, 0x42, 0xa4, 0x01, 0x0a, 0x14,
+	0x63, 0x6f, 0x6d, 0x2e, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2e, 0x6d, 0x6f, 0x72, 0x74,
+	0x67, 0x61, 0x67, 0x65, 0x42, 0x0d, 0x4d, 0x6f, 0x72, 0x74, 0x67, 0x61, 0x67, 0x65, 0x50, 0x72,
+	0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x1c, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2f, 0x61,
+	0x70, 0x69, 0x2f, 0x61, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x2f, 0x6d, 0x6f, 0x72, 0x74, 0x67,
+	0x61, 0x67, 0x65, 0xa2, 0x02, 0x03, 0x41, 0x4d, 0x58, 0xaa, 0x02, 0x10, 0x41, 0x72, 0x64, 0x61,
+	0x70, 0x6f, 0x63, 0x2e, 0x4d, 0x6f, 0x72, 0x74, 0x67, 0x61, 0x67, 0x65, 0xca, 0x02, 0x10, 0x41,
+	0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x5c, 0x4d, 0x6f, 0x72, 0x74, 0x67, 0x61, 0x67, 0x65, 0xe2,
+	0x02, 0x1c, 0x41, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x5c, 0x4d, 0x6f, 0x72, 0x74, 0x67, 0x61,
+	0x67, 0x65, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02,
+	0x11, 0x41, 0x72, 0x64, 0x61, 0x70, 0x6f, 0x63, 0x3a, 0x3a, 0x4d, 0x6f, 0x72, 0x74, 0x67, 0x61,
+	0x67, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1014,16 +1195,19 @@ func file_ardapoc_mortgage_mortgage_proto_rawDescGZIP() []byte {
 	return file_ardapoc_mortgage_mortgage_proto_rawDescData
 }
 
+var file_ardapoc_mortgage_mortgage_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_ardapoc_mortgage_mortgage_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_ardapoc_mortgage_mortgage_proto_goTypes = []interface{}{
-	(*Mortgage)(nil), // 0: ardapoc.mortgage.Mortgage
+	(MortgageStatus)(0), // 0: ardapoc.mortgage.MortgageStatus
+	(*Mortgage)(nil),    // 1: ardapoc.mortgage.Mortgage
 }
 var file_ardapoc_mortgage_mortgage_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0, // 0: ardapoc.mortgage.Mortgage.status:type_name -> ardapoc.mortgage.MortgageStatus
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_ardapoc_mortgage_mortgage_proto_init() }
@@ -1050,13 +1234,14 @@ func file_ardapoc_mortgage_mortgage_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_ardapoc_mortgage_mortgage_proto_rawDesc,
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_ardapoc_mortgage_mortgage_proto_goTypes,
 		DependencyIndexes: file_ardapoc_mortgage_mortgage_proto_depIdxs,
+		EnumInfos:         file_ardapoc_mortgage_mortgage_proto_enumTypes,
 		MessageInfos:      file_ardapoc_mortgage_mortgage_proto_msgTypes,
 	}.Build()
 	File_ardapoc_mortgage_mortgage_proto = out.File

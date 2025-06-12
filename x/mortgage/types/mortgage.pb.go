@@ -5,11 +5,11 @@ package types
 
 import (
 	fmt "fmt"
+	_ "github.com/cosmos/gogoproto/gogoproto"
+	proto "github.com/cosmos/gogoproto/proto"
 	io "io"
 	math "math"
 	math_bits "math/bits"
-
-	proto "github.com/cosmos/gogoproto/proto"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -23,15 +23,51 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+type MortgageStatus int32
+
+const (
+	REQUESTED MortgageStatus = 0
+	APPROVED  MortgageStatus = 1
+	REJECTED  MortgageStatus = 2
+	PAID      MortgageStatus = 3
+	CANCELLED MortgageStatus = 4
+)
+
+var MortgageStatus_name = map[int32]string{
+	0: "REQUESTED",
+	1: "APPROVED",
+	2: "REJECTED",
+	3: "PAID",
+	4: "CANCELLED",
+}
+
+var MortgageStatus_value = map[string]int32{
+	"REQUESTED": 0,
+	"APPROVED":  1,
+	"REJECTED":  2,
+	"PAID":      3,
+	"CANCELLED": 4,
+}
+
+func (x MortgageStatus) String() string {
+	return proto.EnumName(MortgageStatus_name, int32(x))
+}
+
+func (MortgageStatus) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_247875c39e7208c6, []int{0}
+}
+
 type Mortgage struct {
-	Index        string `protobuf:"bytes,1,opt,name=index,proto3" json:"index,omitempty"`
-	Lender       string `protobuf:"bytes,2,opt,name=lender,proto3" json:"lender,omitempty"`
-	Lendee       string `protobuf:"bytes,3,opt,name=lendee,proto3" json:"lendee,omitempty"`
-	Collateral   string `protobuf:"bytes,4,opt,name=collateral,proto3" json:"collateral,omitempty"`
-	Amount       uint64 `protobuf:"varint,5,opt,name=amount,proto3" json:"amount,omitempty"`
-	InterestRate string `protobuf:"bytes,6,opt,name=interestRate,proto3" json:"interestRate,omitempty"`
-	Term         string `protobuf:"bytes,7,opt,name=term,proto3" json:"term,omitempty"`
-	Creator      string `protobuf:"bytes,8,opt,name=creator,proto3" json:"creator,omitempty"`
+	Creator           string         `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	Index             string         `protobuf:"bytes,2,opt,name=index,proto3" json:"index,omitempty"`
+	Lender            string         `protobuf:"bytes,3,opt,name=lender,proto3" json:"lender,omitempty"`
+	Lendee            string         `protobuf:"bytes,4,opt,name=lendee,proto3" json:"lendee,omitempty"`
+	Collateral        string         `protobuf:"bytes,5,opt,name=collateral,proto3" json:"collateral,omitempty"`
+	Amount            uint64         `protobuf:"varint,6,opt,name=amount,proto3" json:"amount,omitempty"`
+	InterestRate      string         `protobuf:"bytes,7,opt,name=interestRate,proto3" json:"interestRate,omitempty"`
+	Term              string         `protobuf:"bytes,8,opt,name=term,proto3" json:"term,omitempty"`
+	Status            MortgageStatus `protobuf:"varint,9,opt,name=status,proto3,enum=ardapoc.mortgage.MortgageStatus" json:"status,omitempty"`
+	OutstandingAmount uint64         `protobuf:"varint,10,opt,name=outstanding_amount,json=outstandingAmount,proto3" json:"outstanding_amount,omitempty"`
 }
 
 func (m *Mortgage) Reset()         { *m = Mortgage{} }
@@ -66,6 +102,13 @@ func (m *Mortgage) XXX_DiscardUnknown() {
 }
 
 var xxx_messageInfo_Mortgage proto.InternalMessageInfo
+
+func (m *Mortgage) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
 
 func (m *Mortgage) GetIndex() string {
 	if m != nil {
@@ -116,37 +159,54 @@ func (m *Mortgage) GetTerm() string {
 	return ""
 }
 
-func (m *Mortgage) GetCreator() string {
+func (m *Mortgage) GetStatus() MortgageStatus {
 	if m != nil {
-		return m.Creator
+		return m.Status
 	}
-	return ""
+	return REQUESTED
+}
+
+func (m *Mortgage) GetOutstandingAmount() uint64 {
+	if m != nil {
+		return m.OutstandingAmount
+	}
+	return 0
 }
 
 func init() {
+	proto.RegisterEnum("ardapoc.mortgage.MortgageStatus", MortgageStatus_name, MortgageStatus_value)
 	proto.RegisterType((*Mortgage)(nil), "ardapoc.mortgage.Mortgage")
 }
 
 func init() { proto.RegisterFile("ardapoc/mortgage/mortgage.proto", fileDescriptor_247875c39e7208c6) }
 
 var fileDescriptor_247875c39e7208c6 = []byte{
-	// 252 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x54, 0x90, 0xb1, 0x4e, 0xc3, 0x30,
-	0x10, 0x86, 0x63, 0x48, 0xd3, 0x62, 0x31, 0x20, 0x0b, 0x21, 0x4f, 0xa6, 0xea, 0xd4, 0x85, 0x64,
-	0xe0, 0x0d, 0xd8, 0x18, 0x58, 0x32, 0xb2, 0x39, 0xc9, 0x29, 0x44, 0x72, 0x72, 0xd1, 0xf5, 0x2a,
-	0x95, 0xb7, 0xe0, 0xb1, 0x18, 0x3b, 0x22, 0x26, 0x94, 0xbc, 0x08, 0x8a, 0x71, 0x4b, 0xbb, 0xfd,
-	0xdf, 0x77, 0xf7, 0x2f, 0xbf, 0xbc, 0xb7, 0x54, 0xd9, 0x1e, 0xcb, 0xac, 0x45, 0xe2, 0xda, 0xd6,
-	0x70, 0x0c, 0x69, 0x4f, 0xc8, 0xa8, 0x6e, 0xc2, 0x43, 0x7a, 0xf0, 0xab, 0x6f, 0x21, 0x17, 0x2f,
-	0x01, 0xd4, 0xad, 0x9c, 0x35, 0x5d, 0x05, 0x3b, 0x2d, 0x96, 0x62, 0x7d, 0x95, 0xff, 0x81, 0xba,
-	0x93, 0x89, 0x83, 0xae, 0x02, 0xd2, 0x17, 0x5e, 0x07, 0x3a, 0x7a, 0xd0, 0x97, 0x27, 0x1e, 0x94,
-	0x91, 0xb2, 0x44, 0xe7, 0x2c, 0x03, 0x59, 0xa7, 0x63, 0x7f, 0x3b, 0x31, 0x53, 0xcf, 0xb6, 0xb8,
-	0xed, 0x58, 0xcf, 0x96, 0x62, 0x1d, 0xe7, 0x81, 0xd4, 0x4a, 0x5e, 0x37, 0x1d, 0x03, 0xc1, 0x86,
-	0x73, 0xcb, 0xa0, 0x13, 0xdf, 0x3c, 0x73, 0x4a, 0xc9, 0x98, 0x81, 0x5a, 0x3d, 0xf7, 0x37, 0x9f,
-	0x95, 0x96, 0xf3, 0x92, 0xc0, 0x32, 0x92, 0x5e, 0x78, 0x7d, 0xc0, 0xa7, 0xe7, 0xcf, 0xc1, 0x88,
-	0xfd, 0x60, 0xc4, 0xcf, 0x60, 0xc4, 0xc7, 0x68, 0xa2, 0xfd, 0x68, 0xa2, 0xaf, 0xd1, 0x44, 0xaf,
-	0x59, 0xdd, 0xf0, 0xdb, 0xb6, 0x48, 0x4b, 0x6c, 0xb3, 0x69, 0x93, 0xda, 0x61, 0x61, 0x9d, 0x8f,
-	0x0f, 0xd3, 0x80, 0xbb, 0xff, 0x09, 0xf9, 0xbd, 0x87, 0x4d, 0x91, 0xf8, 0x01, 0x1f, 0x7f, 0x03,
-	0x00, 0x00, 0xff, 0xff, 0xc8, 0x62, 0x89, 0xf6, 0x63, 0x01, 0x00, 0x00,
+	// 392 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x5c, 0x92, 0xb1, 0x8e, 0xd3, 0x30,
+	0x1c, 0xc6, 0xe3, 0x5e, 0x2e, 0x97, 0xfe, 0x75, 0x9c, 0x82, 0x75, 0x42, 0xd6, 0x0d, 0x26, 0xba,
+	0xa9, 0x42, 0xba, 0x44, 0x82, 0x85, 0x35, 0x34, 0x1e, 0x8a, 0x0a, 0x94, 0x14, 0x18, 0xba, 0x20,
+	0x37, 0xb1, 0x42, 0xa4, 0x24, 0xae, 0x1c, 0x47, 0x2a, 0x6f, 0xc0, 0xc8, 0x3b, 0xf0, 0x28, 0x2c,
+	0x8c, 0x1d, 0x19, 0x51, 0xfb, 0x22, 0x28, 0x6e, 0x5a, 0x5a, 0xb6, 0xef, 0xfb, 0x7d, 0xdf, 0x3f,
+	0xb2, 0xe3, 0x3f, 0x3c, 0xe5, 0x2a, 0xe3, 0x2b, 0x99, 0x86, 0x95, 0x54, 0x3a, 0xe7, 0xb9, 0x38,
+	0x8a, 0x60, 0xa5, 0xa4, 0x96, 0xd8, 0xeb, 0x0b, 0xc1, 0x81, 0xdf, 0xdd, 0xe6, 0x32, 0x97, 0x26,
+	0x0c, 0x3b, 0xb5, 0xef, 0xdd, 0xff, 0x1c, 0x80, 0xfb, 0xa6, 0xaf, 0x60, 0x02, 0x57, 0xa9, 0x12,
+	0x5c, 0x4b, 0x45, 0x90, 0x8f, 0x46, 0xc3, 0xe4, 0x60, 0xf1, 0x2d, 0x5c, 0x16, 0x75, 0x26, 0xd6,
+	0x64, 0x60, 0xf8, 0xde, 0xe0, 0x27, 0xe0, 0x94, 0xa2, 0xce, 0x84, 0x22, 0x17, 0x06, 0xf7, 0xee,
+	0xc8, 0x05, 0xb1, 0x4f, 0xb8, 0xc0, 0x14, 0x20, 0x95, 0x65, 0xc9, 0xb5, 0x50, 0xbc, 0x24, 0x97,
+	0x26, 0x3b, 0x21, 0xdd, 0x1c, 0xaf, 0x64, 0x5b, 0x6b, 0xe2, 0xf8, 0x68, 0x64, 0x27, 0xbd, 0xc3,
+	0xf7, 0x70, 0x5d, 0xd4, 0x5a, 0x28, 0xd1, 0xe8, 0x84, 0x6b, 0x41, 0xae, 0xcc, 0xe4, 0x19, 0xc3,
+	0x18, 0x6c, 0x2d, 0x54, 0x45, 0x5c, 0x93, 0x19, 0x8d, 0x5f, 0x82, 0xd3, 0x68, 0xae, 0xdb, 0x86,
+	0x0c, 0x7d, 0x34, 0xba, 0x79, 0xee, 0x07, 0xff, 0xff, 0x95, 0xe0, 0x70, 0xf7, 0xb9, 0xe9, 0x25,
+	0x7d, 0x1f, 0x3f, 0x00, 0x96, 0xad, 0x6e, 0x34, 0xaf, 0xb3, 0xa2, 0xce, 0x3f, 0xf7, 0xa7, 0x02,
+	0x73, 0xaa, 0xc7, 0x27, 0x49, 0x64, 0x82, 0x67, 0x0b, 0xb8, 0x39, 0xff, 0x10, 0x7e, 0x04, 0xc3,
+	0x84, 0xbd, 0xff, 0xc8, 0xe6, 0x1f, 0x58, 0xec, 0x59, 0xf8, 0x1a, 0xdc, 0x68, 0x36, 0x4b, 0xde,
+	0x7d, 0x62, 0xb1, 0x87, 0x3a, 0x97, 0xb0, 0xd7, 0x6c, 0xdc, 0x65, 0x03, 0xec, 0x82, 0x3d, 0x8b,
+	0x26, 0xb1, 0x77, 0xd1, 0x0d, 0x8d, 0xa3, 0xb7, 0x63, 0x36, 0x9d, 0xb2, 0xd8, 0xb3, 0xef, 0xec,
+	0x6f, 0x3f, 0xa8, 0xf5, 0x6a, 0xf2, 0x6b, 0x4b, 0xd1, 0x66, 0x4b, 0xd1, 0x9f, 0x2d, 0x45, 0xdf,
+	0x77, 0xd4, 0xda, 0xec, 0xa8, 0xf5, 0x7b, 0x47, 0xad, 0x45, 0x98, 0x17, 0xfa, 0x4b, 0xbb, 0x0c,
+	0x52, 0x59, 0x85, 0xdd, 0xc5, 0xf2, 0x52, 0x2e, 0x79, 0x69, 0xe4, 0x43, 0xb7, 0x1b, 0xeb, 0x7f,
+	0xdb, 0xa1, 0xbf, 0xae, 0x44, 0xb3, 0x74, 0xcc, 0x9b, 0xbf, 0xf8, 0x1b, 0x00, 0x00, 0xff, 0xff,
+	0x26, 0x94, 0x00, 0xb6, 0x3e, 0x02, 0x00, 0x00,
 }
 
 func (m *Mortgage) Marshal() (dAtA []byte, err error) {
@@ -169,57 +229,67 @@ func (m *Mortgage) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.Creator) > 0 {
-		i -= len(m.Creator)
-		copy(dAtA[i:], m.Creator)
-		i = encodeVarintMortgage(dAtA, i, uint64(len(m.Creator)))
+	if m.OutstandingAmount != 0 {
+		i = encodeVarintMortgage(dAtA, i, uint64(m.OutstandingAmount))
 		i--
-		dAtA[i] = 0x42
+		dAtA[i] = 0x50
+	}
+	if m.Status != 0 {
+		i = encodeVarintMortgage(dAtA, i, uint64(m.Status))
+		i--
+		dAtA[i] = 0x48
 	}
 	if len(m.Term) > 0 {
 		i -= len(m.Term)
 		copy(dAtA[i:], m.Term)
 		i = encodeVarintMortgage(dAtA, i, uint64(len(m.Term)))
 		i--
-		dAtA[i] = 0x3a
+		dAtA[i] = 0x42
 	}
 	if len(m.InterestRate) > 0 {
 		i -= len(m.InterestRate)
 		copy(dAtA[i:], m.InterestRate)
 		i = encodeVarintMortgage(dAtA, i, uint64(len(m.InterestRate)))
 		i--
-		dAtA[i] = 0x32
+		dAtA[i] = 0x3a
 	}
 	if m.Amount != 0 {
 		i = encodeVarintMortgage(dAtA, i, uint64(m.Amount))
 		i--
-		dAtA[i] = 0x28
+		dAtA[i] = 0x30
 	}
 	if len(m.Collateral) > 0 {
 		i -= len(m.Collateral)
 		copy(dAtA[i:], m.Collateral)
 		i = encodeVarintMortgage(dAtA, i, uint64(len(m.Collateral)))
 		i--
-		dAtA[i] = 0x22
+		dAtA[i] = 0x2a
 	}
 	if len(m.Lendee) > 0 {
 		i -= len(m.Lendee)
 		copy(dAtA[i:], m.Lendee)
 		i = encodeVarintMortgage(dAtA, i, uint64(len(m.Lendee)))
 		i--
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x22
 	}
 	if len(m.Lender) > 0 {
 		i -= len(m.Lender)
 		copy(dAtA[i:], m.Lender)
 		i = encodeVarintMortgage(dAtA, i, uint64(len(m.Lender)))
 		i--
-		dAtA[i] = 0x12
+		dAtA[i] = 0x1a
 	}
 	if len(m.Index) > 0 {
 		i -= len(m.Index)
 		copy(dAtA[i:], m.Index)
 		i = encodeVarintMortgage(dAtA, i, uint64(len(m.Index)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintMortgage(dAtA, i, uint64(len(m.Creator)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -243,6 +313,10 @@ func (m *Mortgage) Size() (n int) {
 	}
 	var l int
 	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovMortgage(uint64(l))
+	}
 	l = len(m.Index)
 	if l > 0 {
 		n += 1 + l + sovMortgage(uint64(l))
@@ -270,9 +344,11 @@ func (m *Mortgage) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovMortgage(uint64(l))
 	}
-	l = len(m.Creator)
-	if l > 0 {
-		n += 1 + l + sovMortgage(uint64(l))
+	if m.Status != 0 {
+		n += 1 + sovMortgage(uint64(m.Status))
+	}
+	if m.OutstandingAmount != 0 {
+		n += 1 + sovMortgage(uint64(m.OutstandingAmount))
 	}
 	return n
 }
@@ -314,6 +390,38 @@ func (m *Mortgage) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMortgage
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthMortgage
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthMortgage
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Index", wireType)
 			}
 			var stringLen uint64
@@ -344,7 +452,7 @@ func (m *Mortgage) Unmarshal(dAtA []byte) error {
 			}
 			m.Index = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 2:
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Lender", wireType)
 			}
@@ -376,7 +484,7 @@ func (m *Mortgage) Unmarshal(dAtA []byte) error {
 			}
 			m.Lender = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 3:
+		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Lendee", wireType)
 			}
@@ -408,7 +516,7 @@ func (m *Mortgage) Unmarshal(dAtA []byte) error {
 			}
 			m.Lendee = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 4:
+		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Collateral", wireType)
 			}
@@ -440,7 +548,7 @@ func (m *Mortgage) Unmarshal(dAtA []byte) error {
 			}
 			m.Collateral = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 5:
+		case 6:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
 			}
@@ -459,7 +567,7 @@ func (m *Mortgage) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 6:
+		case 7:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field InterestRate", wireType)
 			}
@@ -491,7 +599,7 @@ func (m *Mortgage) Unmarshal(dAtA []byte) error {
 			}
 			m.InterestRate = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 7:
+		case 8:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Term", wireType)
 			}
@@ -523,11 +631,11 @@ func (m *Mortgage) Unmarshal(dAtA []byte) error {
 			}
 			m.Term = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 8:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+		case 9:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
 			}
-			var stringLen uint64
+			m.Status = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowMortgage
@@ -537,24 +645,30 @@ func (m *Mortgage) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				m.Status |= MortgageStatus(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthMortgage
+		case 10:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OutstandingAmount", wireType)
 			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthMortgage
+			m.OutstandingAmount = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMortgage
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.OutstandingAmount |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
 			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Creator = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipMortgage(dAtA[iNdEx:])
