@@ -57,6 +57,36 @@
                 }
             }
         },
+        "/ardaglobal/arda-poc/mortgage/mortgage": {
+            "get": {
+                "description": "Proxies GET /ardaglobal/arda-poc/mortgage/mortgage to the blockchain REST API",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "passthrough"
+                ],
+                "summary": "Proxy: Get all mortgages from blockchain",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/bank/mortgage/create": {
             "post": {
                 "description": "Submits a transaction to create a new mortgage, effectively approving a pending request. This must be called by the **lender**, who must be logged in. The sidecar will use the logged-in user's account to sign the transaction, funding the mortgage from their account. The details in the request body should match the details from a pending mortgage request.",
@@ -283,6 +313,75 @@
                                         }
                                     }
                                 ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/cosmonaut/arda/property/properties": {
+            "get": {
+                "description": "Proxies GET /cosmonaut/arda/property/properties to the blockchain REST API",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "passthrough"
+                ],
+                "summary": "Proxy: Get all properties from blockchain",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/cosmos/bank/v1beta1/balances/{address}": {
+            "get": {
+                "description": "Proxies GET /cosmos/bank/v1beta1/balances/{address} to the blockchain REST API",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "passthrough"
+                ],
+                "summary": "Proxy: Get wallet balances",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Wallet address",
+                        "name": "address",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
                             }
                         }
                     }

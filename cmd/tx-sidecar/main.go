@@ -10,6 +10,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 	"net/url"
 	"os"
 	"strings"
@@ -330,6 +332,67 @@ func (s *Server) adminLoginHandler(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusUnauthorized).JSON(AdminLoginErrorResponse{Success: false, Error: "invalid key"})
 }
 
+// passthroughGET proxies a GET request to the blockchain REST API and returns the response as-is.
+func passthroughGET(path string, c *fiber.Ctx) error {
+	baseURL := "http://localhost:1317"
+	// Compose the full URL
+	url := baseURL + path
+	resp, err := http.Get(url)
+	if err != nil {
+		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": err.Error()})
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	c.Status(resp.StatusCode)
+	for k, v := range resp.Header {
+		for _, vv := range v {
+			c.Set(k, vv)
+		}
+	}
+	return c.Send(body)
+}
+
+// getPropertiesPassthrough godoc
+// @Summary      Proxy: Get all properties from blockchain
+// @Description  Proxies GET /cosmonaut/arda/property/properties to the blockchain REST API
+// @Tags         passthrough
+// @Produce      json
+// @Success      200 {object} map[string]interface{}
+// @Failure      502 {object} map[string]string
+// @Router       /cosmonaut/arda/property/properties [get]
+func getPropertiesPassthrough(c *fiber.Ctx) error {
+	return passthroughGET("/cosmonaut/arda/property/properties", c)
+}
+
+// getWalletBalancePassthrough godoc
+// @Summary      Proxy: Get wallet balances
+// @Description  Proxies GET /cosmos/bank/v1beta1/balances/{address} to the blockchain REST API
+// @Tags         passthrough
+// @Produce      json
+// @Param        address path string true "Wallet address"
+// @Success      200 {object} map[string]interface{}
+// @Failure      502 {object} map[string]string
+// @Router       /cosmos/bank/v1beta1/balances/{address} [get]
+func getWalletBalancePassthrough(c *fiber.Ctx) error {
+	address := c.Params("address")
+	return passthroughGET("/cosmos/bank/v1beta1/balances/"+address, c)
+}
+
+// getMortgagesPassthrough godoc
+// @Summary      Proxy: Get all mortgages from blockchain
+// @Description  Proxies GET /ardaglobal/arda-poc/mortgage/mortgage to the blockchain REST API
+// @Tags         passthrough
+// @Produce      json
+// @Success      200 {object} map[string]interface{}
+// @Failure      502 {object} map[string]string
+// @Router       /ardaglobal/arda-poc/mortgage/mortgage [get]
+func getMortgagesPassthrough(c *fiber.Ctx) error {
+	return passthroughGET("/ardaglobal/arda-poc/mortgage/mortgage", c)
+}
+
 func main() {
 	// Load .env file if present
 	_ = godotenv.Load()
@@ -407,6 +470,11 @@ func main() {
 
 	// Admin
 	app.Post("/admin/login", server.adminLoginHandler)
+
+	// Passthrough routes for blockchain REST API (with Swagger docs)
+	app.Get("/cosmonaut/arda/property/properties", getPropertiesPassthrough)
+	app.Get("/cosmos/bank/v1beta1/balances/:address", getWalletBalancePassthrough)
+	app.Get("/ardaglobal/arda-poc/mortgage/mortgage", getMortgagesPassthrough)
 
 	zlog.Info().Msg("Starting transaction sidecar server on :8080...")
 	if err := app.Listen(":8080"); err != nil {

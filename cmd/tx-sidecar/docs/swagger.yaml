@@ -393,6 +393,27 @@ paths:
           schema:
             $ref: '#/definitions/main.AdminLoginErrorResponse'
       summary: Admin login
+  /ardaglobal/arda-poc/mortgage/mortgage:
+    get:
+      description: Proxies GET /ardaglobal/arda-poc/mortgage/mortgage to the blockchain
+        REST API
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "502":
+          description: Bad Gateway
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 'Proxy: Get all mortgages from blockchain'
+      tags:
+      - passthrough
   /bank/mortgage/create:
     post:
       consumes:
@@ -550,6 +571,54 @@ paths:
                 type: object
             type: object
       summary: Request funds from faucet
+  /cosmonaut/arda/property/properties:
+    get:
+      description: Proxies GET /cosmonaut/arda/property/properties to the blockchain
+        REST API
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "502":
+          description: Bad Gateway
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 'Proxy: Get all properties from blockchain'
+      tags:
+      - passthrough
+  /cosmos/bank/v1beta1/balances/{address}:
+    get:
+      description: Proxies GET /cosmos/bank/v1beta1/balances/{address} to the blockchain
+        REST API
+      parameters:
+      - description: Wallet address
+        in: path
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "502":
+          description: Bad Gateway
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 'Proxy: Get wallet balances'
+      tags:
+      - passthrough
   /property/edit:
     post:
       consumes:
