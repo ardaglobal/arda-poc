@@ -47,6 +47,16 @@ type AppConfig struct {
 	Faucet FaucetConfig `yaml:"faucet"`
 }
 
+// ForSaleProperty represents a property or shares listed for sale.
+type ForSaleProperty struct {
+	ID         string   `json:"id"` // unique listing ID
+	PropertyID string   `json:"property_id"`
+	Owner      string   `json:"owner"`
+	Shares     []uint64 `json:"shares"`
+	Price      uint64   `json:"price"`
+	Status     string   `json:"status"` // "listed", "sold"
+}
+
 // Server holds the dependencies for the sidecar http server.
 type Server struct {
 	clientCtx            client.Context
@@ -65,6 +75,9 @@ type Server struct {
 
 	kycRequests     []KYCRequestEntry
 	kycRequestsFile string
+
+	forSaleProperties     []ForSaleProperty
+	forSalePropertiesFile string
 }
 
 // NewServer creates a new instance of the Server with all its dependencies.
@@ -183,21 +196,34 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		return nil, fmt.Errorf("failed to read kyc requests file: %w", err)
 	}
 
+	forSalePropertiesFile := "for_sale_properties.json"
+	forSaleProperties := make([]ForSaleProperty, 0)
+	fspData, err := os.ReadFile(forSalePropertiesFile)
+	if err == nil {
+		if err := json.Unmarshal(fspData, &forSaleProperties); err != nil {
+			zlog.Warn().Msgf("failed to unmarshal for sale properties file, starting with empty list: %v", err)
+		}
+	} else if !os.IsNotExist(err) {
+		return nil, fmt.Errorf("failed to read for sale properties file: %w", err)
+	}
+
 	s := &Server{
-		clientCtx:            clientCtx,
-		authClient:           authtypes.NewQueryClient(grpcConn),
-		txClient:             txtypes.NewServiceClient(grpcConn),
-		users:                users,
-		usersFile:            usersFile,
-		logins:               logins,
-		loginsFile:           loginsFile,
-		faucetName:           appConfig.Faucet.Name,
-		transactions:         transactions,
-		transactionsFile:     transactionsFile,
-		mortgageRequests:     mortgageRequests,
-		mortgageRequestsFile: mortgageRequestsFile,
-		kycRequests:          kycRequests,
-		kycRequestsFile:      kycRequestsFile,
+		clientCtx:             clientCtx,
+		authClient:            authtypes.NewQueryClient(grpcConn),
+		txClient:              txtypes.NewServiceClient(grpcConn),
+		users:                 users,
+		usersFile:             usersFile,
+		logins:                logins,
+		loginsFile:            loginsFile,
+		faucetName:            appConfig.Faucet.Name,
+		transactions:          transactions,
+		transactionsFile:      transactionsFile,
+		mortgageRequests:      mortgageRequests,
+		mortgageRequestsFile:  mortgageRequestsFile,
+		kycRequests:           kycRequests,
+		kycRequestsFile:       kycRequestsFile,
+		forSaleProperties:     forSaleProperties,
+		forSalePropertiesFile: forSalePropertiesFile,
 	}
 
 	// Ensure that the faucet account from config exists in the keyring.
@@ -316,6 +342,8 @@ func main() {
 	app.Post("/register-property", fiberadaptor.HTTPHandlerFunc(server.registerPropertyHandler))
 	app.Post("/transfer-shares", fiberadaptor.HTTPHandlerFunc(server.transferSharesHandler))
 	app.Post("/edit-property", fiberadaptor.HTTPHandlerFunc(server.editPropertyMetadataHandler))
+	app.Post("/list-property-for-sale", fiberadaptor.HTTPHandlerFunc(server.listPropertyForSaleHandler))
+	app.Get("/properties-for-sale", fiberadaptor.HTTPHandlerFunc(server.getPropertiesForSaleHandler))
 	app.Get("/users", fiberadaptor.HTTPHandlerFunc(server.listUsersHandler))
 	app.Post("/login", fiberadaptor.HTTPHandlerFunc(server.loginHandler))
 	app.Post("/logout", fiberadaptor.HTTPHandlerFunc(server.logoutHandler))

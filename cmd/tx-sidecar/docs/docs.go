@@ -292,6 +292,43 @@ const docTemplate = `{
                 }
             }
         },
+        "/list-property-for-sale": {
+            "post": {
+                "description": "Allows an owner to list their property (or shares) for sale.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "List property for sale",
+                "parameters": [
+                    {
+                        "description": "listing info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.ListPropertyForSaleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/main.ForSaleProperty"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.KYCErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/login": {
             "post": {
                 "description": "Handles user login, registration, and linking. If a user with the given email exists, they are logged in. If the email does not exist and a name is provided, a new user account and key are created. If the email does not exist but a user with the given name does exist, the email is linked to the existing user account.",
@@ -378,6 +415,26 @@ const docTemplate = `{
                             "type": "array",
                             "items": {
                                 "$ref": "#/definitions/main.MortgageRequest"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/properties-for-sale": {
+            "get": {
+                "description": "Returns all properties currently listed for sale.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get properties for sale",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/main.ForSaleProperty"
                             }
                         }
                     }
@@ -796,6 +853,34 @@ const docTemplate = `{
                 }
             }
         },
+        "main.ForSaleProperty": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "description": "unique listing ID",
+                    "type": "string"
+                },
+                "owner": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "property_id": {
+                    "type": "string"
+                },
+                "shares": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "status": {
+                    "description": "\"listed\", \"sold\"",
+                    "type": "string"
+                }
+            }
+        },
         "main.KYCErrorResponse": {
             "type": "object",
             "properties": {
@@ -836,6 +921,26 @@ const docTemplate = `{
             "properties": {
                 "status": {
                     "type": "string"
+                }
+            }
+        },
+        "main.ListPropertyForSaleRequest": {
+            "type": "object",
+            "properties": {
+                "owner": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "integer"
+                },
+                "property_id": {
+                    "type": "string"
+                },
+                "shares": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },

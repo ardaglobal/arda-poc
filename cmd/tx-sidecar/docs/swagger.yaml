@@ -64,6 +64,25 @@ definitions:
       zoning_classification:
         type: string
     type: object
+  main.ForSaleProperty:
+    properties:
+      id:
+        description: unique listing ID
+        type: string
+      owner:
+        type: string
+      price:
+        type: integer
+      property_id:
+        type: string
+      shares:
+        items:
+          type: integer
+        type: array
+      status:
+        description: '"listed", "sold"'
+        type: string
+    type: object
   main.KYCErrorResponse:
     properties:
       error:
@@ -91,6 +110,19 @@ definitions:
     properties:
       status:
         type: string
+    type: object
+  main.ListPropertyForSaleRequest:
+    properties:
+      owner:
+        type: string
+      price:
+        type: integer
+      property_id:
+        type: string
+      shares:
+        items:
+          type: integer
+        type: array
     type: object
   main.LoginRequest:
     properties:
@@ -425,6 +457,30 @@ paths:
                 type: object
             type: object
       summary: KYC user
+  /list-property-for-sale:
+    post:
+      consumes:
+      - application/json
+      description: Allows an owner to list their property (or shares) for sale.
+      parameters:
+      - description: listing info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.ListPropertyForSaleRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.ForSaleProperty'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.KYCErrorResponse'
+      summary: List property for sale
   /login:
     post:
       consumes:
@@ -488,6 +544,19 @@ paths:
               $ref: '#/definitions/main.MortgageRequest'
             type: array
       summary: Get pending mortgage requests
+  /properties-for-sale:
+    get:
+      description: Returns all properties currently listed for sale.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.ForSaleProperty'
+            type: array
+      summary: Get properties for sale
   /register-property:
     post:
       consumes:

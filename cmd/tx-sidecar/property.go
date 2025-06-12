@@ -3,9 +3,11 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"os"
 
 	propertytypes "github.com/ardaglobal/arda-poc/x/property/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/google/uuid"
 	zlog "github.com/rs/zerolog/log"
 )
 
@@ -42,6 +44,14 @@ type EditPropertyMetadataRequest struct {
 	TenantID                string `json:"tenant_id"`
 	UnitNumber              string `json:"unit_number"`
 	Gas                     string `json:"gas,omitempty"`
+}
+
+// ListPropertyForSaleRequest defines the request body for listing a property for sale.
+type ListPropertyForSaleRequest struct {
+	PropertyID string   `json:"property_id"`
+	Owner      string   `json:"owner"`
+	Shares     []uint64 `json:"shares"`
+	Price      uint64   `json:"price"`
 }
 
 // registerPropertyHandler handles property registration
@@ -116,6 +126,9 @@ func (s *Server) transferSharesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.buildSignAndBroadcast(w, r, fromName, req.Gas, "transfer_shares", msgBuilder)
+
+	// After transfer, update for-sale listings
+	s.updateForSalePropertiesOnTransfer(req.PropertyID, req.FromOwners, req.FromShares)
 }
 
 // editPropertyMetadataHandler edits property metadata
@@ -158,4 +171,77 @@ func (s *Server) editPropertyMetadataHandler(w http.ResponseWriter, r *http.Requ
 	}
 
 	s.buildSignAndBroadcast(w, r, fromName, req.Gas, "edit_property_metadata", msgBuilder)
+}
+
+// listPropertyForSaleHandler allows an owner to list a property for sale.
+// @Summary List property for sale
+// @Description Allows an owner to list their property (or shares) for sale.
+// @Accept json
+// @Produce json
+// @Param request body ListPropertyForSaleRequest true "listing info"
+// @Success 201 {object} ForSaleProperty
+// @Failure 400 {object} KYCErrorResponse
+// @Router /list-property-for-sale [post]
+func (s *Server) listPropertyForSaleHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+	var req ListPropertyForSaleRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+	if req.PropertyID == "" || req.Owner == "" || len(req.Shares) == 0 || req.Price == 0 {
+		http.Error(w, "property_id, owner, shares, and price are required", http.StatusBadRequest)
+		return
+	}
+	listing := ForSaleProperty{
+		ID:         uuid.New().String(),
+		PropertyID: req.PropertyID,
+		Owner:      req.Owner,
+		Shares:     req.Shares,
+		Price:      req.Price,
+		Status:     "listed",
+	}
+	s.forSaleProperties = append(s.forSaleProperties, listing)
+	s.saveForSalePropertiesToFile()
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(listing)
+}
+
+// getPropertiesForSaleHandler returns all properties currently for sale.
+// @Summary Get properties for sale
+// @Description Returns all properties currently listed for sale.
+// @Produce json
+// @Success 200 {array} ForSaleProperty
+// @Router /properties-for-sale [get]
+func (s *Server) getPropertiesForSaleHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+	listings := make([]ForSaleProperty, 0)
+	for _, l := range s.forSaleProperties {
+		if l.Status == "listed" {
+			listings = append(listings, l)
+		}
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(listings)
+}
+
+// saveForSalePropertiesToFile persists the forSaleProperties slice.
+func (s *Server) saveForSalePropertiesToFile() error {
+	data, err := json.MarshalIndent(s.forSaleProperties, "", "  ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(s.forSalePropertiesFile, data, 0644)
+}
+
+// updateForSalePropertiesOnTransfer updates/removes for-sale listings after a transfer.
+func (s *Server) updateForSalePropertiesOnTransfer(propertyID string, fromOwners []string, fromShares []uint64) {
+	// TODO: Implement logic to match and update for-sale listings when shares are transferred.
 }
