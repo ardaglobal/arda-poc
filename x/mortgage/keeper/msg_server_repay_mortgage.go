@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 
 	errorsmod "cosmossdk.io/errors"
 	"github.com/ardaglobal/arda-poc/x/mortgage/types"
@@ -51,7 +50,7 @@ func (k msgServer) RepayMortgage(goCtx context.Context, msg *types.MsgRepayMortg
 	if mortgage.OutstandingAmount == 0 {
 		mortgage.Status = types.PAID
 
-		markerDenom := fmt.Sprintf("mortgage/%s/%s", mortgage.Collateral, mortgage.Index)
+		markerDenom := types.MortgageMarkerDenom(mortgage.Collateral, mortgage.Index)
 		markerCoin := sdk.NewCoins(sdk.NewInt64Coin(markerDenom, 1))
 		if err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, lendee, types.ModuleName, markerCoin); err != nil {
 			return nil, errorsmod.Wrap(err, "failed to send marker token from lendee to module")

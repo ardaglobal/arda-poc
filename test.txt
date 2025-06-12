@@ -157,17 +157,16 @@ ardad query bank balances Bank
 The **Lender (`Bank`)** creates the mortgage, which sends the funds to the **Lendee (`matt`)**.
 
 ```bash
-ardad tx mortgage create-mortgage \
+arda-pocd tx mortgage create-mortgage \
   "mortgage-02" \
-  $(ardad keys show Bank -a) \
-  $(ardad keys show matt -a) \
-  "property-456" \
-  100000 \
+  arda1gm5qvzlcdwt7telxhfwtdynjflf9tqja8ht8zd \
+  arda1de32vtfxzg6eret83uggrsl4hkzttqkuwpyjnq \
+  "2518 main st" \
+  500000 \
   "5" \
   "240 months" \
   --from Bank \
-  --chain-id arda-poc-1 \
-  --gas auto --gas-adjustment 1.5 -y
+  --gas auto --gas-adjustment 2 -y
 ```
 
 **What this command does:**
@@ -201,12 +200,11 @@ ardad tx mortgage create-mortgage \
 The **Lendee (`matt`)** now repays part of the loan.
 
 ```bash
-ardad tx mortgage repay-mortgage \
+arda-pocd tx mortgage repay-mortgage \
   "mortgage-02" \
   25000 \
   --from matt \
-  --chain-id arda-poc-1 \
-  --gas auto --gas-adjustment 1.5 -y
+  --gas auto --gas-adjustment 2.0 -y
 ```
 
 **What this command does:**
@@ -234,12 +232,11 @@ ardad tx mortgage repay-mortgage \
 Let's make the final payment for the remaining balance.
 
 ```bash
-ardad tx mortgage repay-mortgage \
+arda-pocd tx mortgage repay-mortgage \
   "mortgage-02" \
-  75000 \
+  475000 \
   --from matt \
-  --chain-id arda-poc-1 \
-  --gas auto --gas-adjustment 1.5 -y
+  --gas auto --gas-adjustment 2.0 -y
 ```
 
 ### Step 7: Verify Mortgage Closure
@@ -265,33 +262,6 @@ Here is the complete plan to rebuild the `mortgage` module from scratch.
 ---
 
 ### **Phase 1: Full Cleanup**
-
-First, we must completely eradicate the old module to ensure a clean slate.
-
-1.  **Stop your chain** if it's currently running.
-
-2.  **Delete the module's Go code directory** from your project's `x` folder.
-    ```bash
-    rm -rf x/mortgage
-    ```
-
-3.  **Delete the module's API/proto directory** from your project's `proto` folder.
-    ```bash
-    rm -rf proto/ardapoc/mortgage
-    ```
-
-4.  **Manually remove the old module from `app/app.go`**. This is the most critical cleanup step. Open `app/app.go` and delete every line that references the old `mortgage` module. Look for `"mortgage"` in these places:
-    *   The `import` block at the top of the file.
-    *   The `ModuleBasics` manager variable.
-    *   The `keeper` declarations struct inside `type App struct`.
-    *   The `app.MortgageKeeper` instantiation inside the `New()` function.
-    *   The list of modules passed to `app.mm.SetOrder...`.
-    *   The `configurator` setup for `BeginBlock` and `EndBlock`.
-
-    Be thorough here. A single leftover reference will cause a compiler error later.
-
----
-
 ### **Phase 2: Scaffold the New Module with Ignite**
 
 Now we'll use the Ignite CLI to build the new module foundation.
