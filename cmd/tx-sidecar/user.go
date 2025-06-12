@@ -51,11 +51,13 @@ type UserDetailResponse struct {
 }
 
 // loginHandler handles user login and registration
-// @Summary User login
+// @Summary User login, registration, and linking
+// @Description Handles user login, registration, and linking. If a user with the given email exists, they are logged in. If the email does not exist and a name is provided, a new user account and key are created. If the email does not exist but a user with the given name does exist, the email is linked to the existing user account.
 // @Accept json
 // @Produce json
 // @Param request body LoginRequest true "login info"
 // @Success 200 {object} LoginResponse
+// @Success 201 {object} LoginResponse
 // @Router /login [post]
 func (s *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -68,6 +70,8 @@ func (s *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
+
+	zlog.Info().Str("handler", "loginHandler").Str("email", req.Email).Str("name", req.Name).Str("role", req.Role).Msg("received login request")
 
 	if req.Email == "" {
 		http.Error(w, "Email cannot be empty", http.StatusBadRequest)
@@ -157,14 +161,17 @@ func (s *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
 
 // logoutHandler logs out the current user
 // @Summary User logout
+// @Description Logs out the currently authenticated user.
 // @Produce json
-// @Success 200 {object} map[string]string
+// @Success 200 {object} map[string]string{status=string,message=string}
 // @Router /logout [post]
 func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
+
+	zlog.Info().Str("handler", "logoutHandler").Str("loggedInUser", s.loggedInUser).Msg("received logout request")
 
 	if s.loggedInUser == "" {
 		http.Error(w, "No user is currently logged in", http.StatusBadRequest)
@@ -182,10 +189,11 @@ func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 
 // kycUserHandler marks a user as KYC'd
 // @Summary KYC user
+// @Description Updates a user's role from `user` to `investor`, marking them as KYC'd. If the user's role is not `user`, it is considered a no-op.
 // @Accept json
 // @Produce json
 // @Param request body KYCRequest true "KYC request"
-// @Success 200 {object} map[string]string
+// @Success 200 {object} map[string]string{status=string,message=string}
 // @Router /kyc-user [post]
 func (s *Server) kycUserHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -198,6 +206,8 @@ func (s *Server) kycUserHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
+
+	zlog.Info().Str("handler", "kycUserHandler").Interface("request", req).Msg("received kyc request")
 
 	if req.Name == "" {
 		http.Error(w, "User name cannot be empty", http.StatusBadRequest)
@@ -268,10 +278,10 @@ func (s *Server) createUser(name, role string) (*UserData, error) {
 			"developer": true,
 			"regulator": true,
 			"admin":     true,
-			"faucet":    true,
+			"bank":      true,
 		}
 		if _, ok := allowedRoles[role]; !ok {
-			return nil, fmt.Errorf("invalid role provided: '%s'. aRole must be one of user, investor, developer, regulator, admin, or faucet", role)
+			return nil, fmt.Errorf("invalid role provided: '%s'. aRole must be one of user, investor, developer, regulator, admin, or bank", role)
 		}
 		finalRole = role
 	}
@@ -309,6 +319,7 @@ func (s *Server) saveLoginsToFile() error {
 
 // listUsersHandler lists all users
 // @Summary List users
+// @Description Lists all registered users and their key details.
 // @Produce json
 // @Success 200 {array} UserDetailResponse
 // @Router /users [get]
@@ -317,6 +328,8 @@ func (s *Server) listUsersHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
+
+	zlog.Info().Str("handler", "listUsersHandler").Msg("received request")
 
 	userInfos := make([]UserDetailResponse, 0, len(s.users))
 	for name, userData := range s.users {
@@ -384,7 +397,15 @@ func (s *Server) initUsers() error {
 			zlog.Info().Msgf("Successfully created initial user '%s'", name)
 		} else {
 			// User exists, check if the role is correct.
-			if userData.Role != role {
+			if userData.Role == "faucet" {
+				// Migrate old "faucet" role to "bank"
+				zlog.Info().Msgf("Migrating user '%s' from deprecated 'faucet' role to 'bank'.", name)
+				userData.Role = "bank"
+				s.users[name] = userData
+				if err := s.saveUsersToFile(); err != nil {
+					return fmt.Errorf("failed to save users file after migrating %s's role: %w", name, err)
+				}
+			} else if userData.Role != role {
 				zlog.Info().Msgf("User '%s' has incorrect role '%s', updating to '%s'.", name, userData.Role, role)
 				userData.Role = role
 				s.users[name] = userData

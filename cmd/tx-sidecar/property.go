@@ -6,6 +6,7 @@ import (
 
 	propertytypes "github.com/ardaglobal/arda-poc/x/property/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	zlog "github.com/rs/zerolog/log"
 )
 
 // RegisterPropertyRequest defines the request body for registering a property.
@@ -45,10 +46,11 @@ type EditPropertyMetadataRequest struct {
 
 // registerPropertyHandler handles property registration
 // @Summary Register a property
+// @Description Submits a transaction to register a new property on the blockchain.
 // @Accept json
 // @Produce json
 // @Param request body RegisterPropertyRequest true "property info"
-// @Success 200 {object} map[string]string
+// @Success 200 {object} map[string]string{tx_hash=string}
 // @Router /register-property [post]
 func (s *Server) registerPropertyHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -61,6 +63,8 @@ func (s *Server) registerPropertyHandler(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
+
+	zlog.Info().Str("handler", "registerPropertyHandler").Interface("request", req).Msg("received request")
 
 	fromName := "ERES" // In a real app, this might come from the request or config
 	msgBuilder := func(fromAddr string) sdk.Msg {
@@ -79,10 +83,11 @@ func (s *Server) registerPropertyHandler(w http.ResponseWriter, r *http.Request)
 
 // transferSharesHandler handles share transfer
 // @Summary Transfer property shares
+// @Description Submits a transaction to transfer property shares between one or more owners.
 // @Accept json
 // @Produce json
 // @Param request body TransferSharesRequest true "transfer details"
-// @Success 200 {object} map[string]string
+// @Success 200 {object} map[string]string{tx_hash=string}
 // @Router /transfer-shares [post]
 func (s *Server) transferSharesHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -95,6 +100,8 @@ func (s *Server) transferSharesHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
+
+	zlog.Info().Str("handler", "transferSharesHandler").Interface("request", req).Msg("received request")
 
 	fromName := "ERES" // In a real app, this might come from the request or config
 	msgBuilder := func(fromAddr string) sdk.Msg {
@@ -113,10 +120,11 @@ func (s *Server) transferSharesHandler(w http.ResponseWriter, r *http.Request) {
 
 // editPropertyMetadataHandler edits property metadata
 // @Summary Edit property metadata
+// @Description Updates the metadata for an existing property.
 // @Accept json
 // @Produce json
 // @Param request body EditPropertyMetadataRequest true "metadata"
-// @Success 200 {object} map[string]string
+// @Success 200 {object} map[string]string{tx_hash=string}
 // @Router /edit-property [post]
 func (s *Server) editPropertyMetadataHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -129,6 +137,8 @@ func (s *Server) editPropertyMetadataHandler(w http.ResponseWriter, r *http.Requ
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
+
+	zlog.Info().Str("handler", "editPropertyMetadataHandler").Interface("request", req).Msg("received request")
 
 	fromName := "ERES"
 	msgBuilder := func(fromAddr string) sdk.Msg {

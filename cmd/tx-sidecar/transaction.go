@@ -80,14 +80,21 @@ func (s *Server) buildSignAndBroadcastInternal(ctx context.Context, fromName, ga
 
 	txf = txf.WithAccountNumber(baseAcc.AccountNumber).WithSequence(baseAcc.Sequence)
 
-	var gas uint64 = 400000
-	if gasStr != "" && gasStr != "auto" {
+	var gas uint64
+	if gasStr == "auto" {
+		// Gas simulation will be triggered by the factory if gas is 0.
+		gas = 0
+	} else if gasStr != "" {
 		parsedGas, err := strconv.ParseUint(gasStr, 10, 64)
 		if err != nil {
 			return "", fmt.Errorf("invalid gas value provided: %s", gasStr)
 		}
 		gas = parsedGas
+	} else {
+		// Default gas if not provided and not auto.
+		gas = 800000 // Increased from 400000
 	}
+
 	txf = txf.WithGas(gas)
 
 	txb, err := txf.BuildUnsignedTx(msg)
@@ -175,16 +182,19 @@ func (s *Server) saveTransactionsToFile() {
 
 // listTransactionsHandler returns the list of tracked transactions
 // @Summary List transactions
+// @Description Lists all transaction hashes that have been successfully processed and stored by the sidecar.
 // @Produce json
 // @Success 200 {array} TrackedTx
 // @Router /transactions [get]
 func (s *Server) listTransactionsHandler(w http.ResponseWriter, r *http.Request) {
+	zlog.Info().Str("handler", "listTransactionsHandler").Msg("received request")
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(s.transactions)
 }
 
 // getTransactionHandler returns a specific transaction by its hash
 // @Summary Get transaction
+// @Description Queries the blockchain for a specific transaction by its hash and returns details. For certain transaction types like 'register_property', it returns a richer, decoded response.
 // @Produce json
 // @Param hash path string true "Transaction hash"
 // @Success 200 {object} interface{}
@@ -196,6 +206,7 @@ func (s *Server) getTransactionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	txHash := strings.TrimPrefix(r.URL.Path, "/transaction/")
+	zlog.Info().Str("handler", "getTransactionHandler").Str("tx_hash", txHash).Msg("received request")
 	if txHash == "" {
 		http.Error(w, "Transaction hash must be provided in the path", http.StatusBadRequest)
 		return
@@ -231,7 +242,7 @@ func (s *Server) getTransactionHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Process the response based on the transaction type from tx.json
 	switch trackedTx.Type {
-	case "register_property", "transfer_shares", "edit_property_metadata":
+	case "register_property", "transfer_shares", "edit_property_metadata", "create_mortgage", "repay_mortgage", "request_funds":
 		// Build a richer response object, modeled after the provided txout.json example.
 		response := make(map[string]interface{})
 

@@ -76,13 +76,15 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 
 	ardamodulekeeper "github.com/ardaglobal/arda-poc/x/arda/keeper"
+	mortgagemodulekeeper "github.com/ardaglobal/arda-poc/x/mortgage/keeper"
 	propertymodulekeeper "github.com/ardaglobal/arda-poc/x/property/keeper"
-
 	usdardamodulekeeper "github.com/ardaglobal/arda-poc/x/usdarda/keeper"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	"github.com/ardaglobal/arda-poc/docs"
 	"github.com/ardaglobal/arda-poc/pkg/consts"
+	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 )
 
 const (
@@ -152,6 +154,7 @@ type App struct {
 	ArdaKeeper     ardamodulekeeper.Keeper
 	PropertyKeeper propertymodulekeeper.Keeper
 	UsdardaKeeper  usdardamodulekeeper.Keeper
+	MortgageKeeper mortgagemodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// simulation manager
@@ -261,6 +264,7 @@ func New(
 		&app.ArdaKeeper,
 		&app.PropertyKeeper,
 		&app.UsdardaKeeper,
+		&app.MortgageKeeper,
 		// this line is used by starport scaffolding # stargate/app/keeperDefinition
 	); err != nil {
 		panic(err)
@@ -307,6 +311,14 @@ func New(
 
 	if err := app.Load(loadLatest); err != nil {
 		return nil, err
+	}
+
+	ctx := app.BaseApp.NewContext(true)
+	feePool, err := app.DistrKeeper.FeePool.Get(ctx)
+	if err != nil && feePool.CommunityPool == nil {
+		if err := app.DistrKeeper.FeePool.Set(ctx, distrtypes.InitialFeePool()); err != nil {
+			return nil, err
+		}
 	}
 
 	return app, nil

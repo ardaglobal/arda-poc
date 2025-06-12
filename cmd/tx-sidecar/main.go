@@ -10,7 +10,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"net/url"
 	"os"
 	"strings"
@@ -22,16 +21,13 @@ import (
 	"github.com/rs/zerolog"
 	zlog "github.com/rs/zerolog/log"
 
-	"cosmossdk.io/math"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"gopkg.in/yaml.v3"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
 	_ "github.com/ardaglobal/arda-poc/cmd/tx-sidecar/docs"
 	sidecarclient "github.com/ardaglobal/arda-poc/pkg/client"
@@ -63,6 +59,8 @@ type Server struct {
 	loggedInUser     string
 	transactions     []TrackedTx
 	transactionsFile string
+	mortgageRequests []MortgageRequest
+	mortgageRequestsFile string
 }
 
 // NewServer creates a new instance of the Server with all its dependencies.
@@ -143,6 +141,17 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		return nil, fmt.Errorf("failed to read transactions file: %w", err)
 	}
 
+	mortgageRequestsFile := "mortgage_requests.json"
+	mortgageRequests := make([]MortgageRequest, 0)
+	mrData, err := os.ReadFile(mortgageRequestsFile)
+	if err == nil {
+		if err := json.Unmarshal(mrData, &mortgageRequests); err != nil {
+			zlog.Warn().Msgf("failed to unmarshal mortgage requests file, starting with empty list: %v", err)
+		}
+	} else if !os.IsNotExist(err) {
+		return nil, fmt.Errorf("failed to read mortgage requests file: %w", err)
+	}
+
 	// Read faucet configuration
 	configPath := "config.yml"
 	configData, err := os.ReadFile(configPath)
@@ -170,6 +179,8 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		faucetName:       appConfig.Faucet.Name,
 		transactions:     transactions,
 		transactionsFile: transactionsFile,
+		mortgageRequests:     mortgageRequests,
+		mortgageRequestsFile: mortgageRequestsFile,
 	}
 
 	// Ensure that the faucet account from config exists in the keyring.
@@ -178,14 +189,14 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 	}
 	zlog.Info().Msgf("Using '%s' as the faucet account.", s.faucetName)
 
-	// Ensure faucet user has the 'faucet' role.
+	// Ensure faucet user has the 'bank' role.
 	if faucetUserData, ok := s.users[s.faucetName]; ok {
-		if faucetUserData.Role != "faucet" {
-			zlog.Info().Msgf("Updating role of faucet user '%s' to 'faucet'.", s.faucetName)
-			faucetUserData.Role = "faucet"
+		if faucetUserData.Role != "bank" {
+			zlog.Info().Msgf("Updating role of bank user '%s' to 'bank'.", s.faucetName)
+			faucetUserData.Role = "bank"
 			s.users[s.faucetName] = faucetUserData
 			if err := s.saveUsersToFile(); err != nil {
-				zlog.Warn().Msgf("failed to save users file after updating faucet role: %v", err)
+				zlog.Warn().Msgf("failed to save users file after updating bank role: %v", err)
 			}
 		}
 	}
@@ -199,14 +210,6 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 
 // Close is a no-op for this server version but can be used for cleanup.
 func (s *Server) Close() {}
-
-// FaucetRequest defines the request body for requesting funds from the faucet.
-type FaucetRequest struct {
-	Address string `json:"address"`
-	Amount  uint64 `json:"amount"`
-	Denom   string `json:"denom"`
-	Gas     string `json:"gas,omitempty"`
-}
 
 func main() {
 	// This context is for the main application, not for individual requests.
@@ -251,54 +254,19 @@ func main() {
 	app.Get("/users", fiberadaptor.HTTPHandlerFunc(server.listUsersHandler))
 	app.Post("/login", fiberadaptor.HTTPHandlerFunc(server.loginHandler))
 	app.Post("/logout", fiberadaptor.HTTPHandlerFunc(server.logoutHandler))
-	app.Post("/faucet", fiberadaptor.HTTPHandlerFunc(server.faucetHandler))
 	app.Get("/transactions", fiberadaptor.HTTPHandlerFunc(server.listTransactionsHandler))
 	app.Get("/transaction/*", fiberadaptor.HTTPHandlerFunc(server.getTransactionHandler))
 	app.Post("/kyc-user", fiberadaptor.HTTPHandlerFunc(server.kycUserHandler))
+
+	// Mortgage and Bank endpoints
+	app.Post("/request-mortgage", fiberadaptor.HTTPHandlerFunc(server.requestMortgageHandler))
+	app.Get("/mortgage-requests", fiberadaptor.HTTPHandlerFunc(server.getMortgageRequestsHandler))
+	app.Post("/create-mortgage", fiberadaptor.HTTPHandlerFunc(server.createMortgageHandler))
+	app.Post("/repay-mortgage", fiberadaptor.HTTPHandlerFunc(server.repayMortgageHandler))
+	app.Post("/request-funds", fiberadaptor.HTTPHandlerFunc(server.requestFundsHandler))
 
 	zlog.Info().Msg("Starting transaction sidecar server on :8080...")
 	if err := app.Listen(":8080"); err != nil {
 		zlog.Fatal().Msgf("Failed to start server: %v", err)
 	}
-}
-
-// faucetHandler sends tokens from the faucet account
-// @Summary Faucet transfer
-// @Accept json
-// @Produce json
-// @Param request body FaucetRequest true "faucet request"
-// @Success 200 {object} map[string]string
-// @Router /faucet [post]
-func (s *Server) faucetHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
-	}
-
-	var req FaucetRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
-	}
-
-	if req.Amount == 0 || req.Denom == "" || req.Address == "" {
-		http.Error(w, "address, amount, and denom must be provided, and amount must be positive", http.StatusBadRequest)
-		return
-	}
-
-	if _, err := sdk.AccAddressFromBech32(req.Address); err != nil {
-		http.Error(w, fmt.Sprintf("Invalid recipient address: %v", err), http.StatusBadRequest)
-		return
-	}
-
-	fromName := s.faucetName
-	msgBuilder := func(fromAddr string) sdk.Msg {
-		return &banktypes.MsgSend{
-			FromAddress: fromAddr,
-			ToAddress:   req.Address,
-			Amount:      sdk.NewCoins(sdk.NewCoin(req.Denom, math.NewInt(int64(req.Amount)))),
-		}
-	}
-
-	s.buildSignAndBroadcast(w, r, fromName, req.Gas, "faucet", msgBuilder)
 }
