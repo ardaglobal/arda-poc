@@ -533,6 +533,49 @@ const docTemplate = `{
                 }
             }
         },
+        "/request-equity-mortgage": {
+            "post": {
+                "description": "Allows a user to request a home equity mortgage against a property they own. The request is routed to the specified lender for approval. The index is set to 'equity'.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Request a home equity mortgage (pending lender approval)",
+                "parameters": [
+                    {
+                        "description": "equity mortgage request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.MortgageRequestPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/main.MortgageRequest"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.KYCErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/main.KYCErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/request-funds": {
             "post": {
                 "description": "Requests funds from the built-in bank/faucet. This is only available for development and testing purposes. The bank account must be funded for this to work. On the first run, the sidecar will generate a ` + "`" + `bank` + "`" + ` account and print its mnemonic phrase to the console. This mnemonic must be used to send funds to the bank address before it can dispense tokens.",

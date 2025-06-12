@@ -332,6 +332,78 @@ func (s *Server) getMortgageRequestsHandler(w http.ResponseWriter, r *http.Reque
 	json.NewEncoder(w).Encode(userRequests)
 }
 
+// requestEquityMortgageHandler allows a user to request a home equity mortgage against a property they own, routed to a lender for approval.
+// @Summary Request a home equity mortgage (pending lender approval)
+// @Description Allows a user to request a home equity mortgage against a property they own. The request is routed to the specified lender for approval. The index is set to 'equity'.
+// @Accept json
+// @Produce json
+// @Param request body MortgageRequestPayload true "equity mortgage request"
+// @Success 201 {object} MortgageRequest
+// @Failure 400 {object} KYCErrorResponse
+// @Failure 401 {object} KYCErrorResponse
+// @Router /request-equity-mortgage [post]
+func (s *Server) requestEquityMortgageHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+	if s.loggedInUser == "" {
+		http.Error(w, "No user is logged in. Please log in to request a home equity mortgage.", http.StatusUnauthorized)
+		return
+	}
+	var req MortgageRequestPayload
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+	// Validate that the lender exists
+	if _, ok := s.users[req.Lender]; !ok {
+		http.Error(w, "Lender not found.", http.StatusBadRequest)
+		return
+	}
+	// Validate that the requester owns the property (simple check: must be in ToOwners)
+	ownsProperty := false
+	for _, owner := range req.ToOwners {
+		if owner == s.loggedInUser {
+			ownsProperty = true
+			break
+		}
+	}
+	if !ownsProperty {
+		http.Error(w, "You must be an owner of the property to request a home equity mortgage.", http.StatusBadRequest)
+		return
+	}
+	requesterData := s.users[s.loggedInUser]
+	newReq := MortgageRequest{
+		ID:           uuid.New().String(),
+		Requester:    s.loggedInUser,
+		Lender:       req.Lender,
+		LendeeAddr:   requesterData.Address,
+		Index:        "equity",
+		Collateral:   req.Collateral,
+		Amount:       req.Amount,
+		InterestRate: req.InterestRate,
+		Term:         req.Term,
+		Status:       "pending",
+		Timestamp:    time.Now(),
+		PropertyID:   req.PropertyID,
+		FromOwners:   req.FromOwners,
+		FromShares:   req.FromShares,
+		ToOwners:     req.ToOwners,
+		ToShares:     req.ToShares,
+		Price:        req.Price,
+	}
+	s.mortgageRequests = append(s.mortgageRequests, newReq)
+	if err := s.saveMortgageRequestsToFile(); err != nil {
+		http.Error(w, "Failed to save mortgage request", http.StatusInternalServerError)
+		zlog.Error().Err(err).Msg("failed to save mortgage requests file")
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(newReq)
+}
+
 func (s *Server) saveMortgageRequestsToFile() error {
 	data, err := json.MarshalIndent(s.mortgageRequests, "", "  ")
 	if err != nil {

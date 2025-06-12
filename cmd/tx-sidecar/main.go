@@ -365,6 +365,8 @@ func main() {
 
 	app.Post("/admin-login", server.adminLoginHandler)
 
+	app.Post("/request-equity-mortgage", fiberadaptor.HTTPHandlerFunc(server.requestEquityMortgageHandler))
+
 	zlog.Info().Msg("Starting transaction sidecar server on :8080...")
 	if err := app.Listen(":8080"); err != nil {
 		zlog.Fatal().Msgf("Failed to start server: %v", err)
