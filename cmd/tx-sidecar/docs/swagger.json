@@ -57,7 +57,624 @@
                 }
             }
         },
-        "/approve-kyc": {
+        "/bank/mortgage/create": {
+            "post": {
+                "description": "Submits a transaction to create a new mortgage, effectively approving a pending request. This must be called by the **lender**, who must be logged in. The sidecar will use the logged-in user's account to sign the transaction, funding the mortgage from their account. The details in the request body should match the details from a pending mortgage request.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create a mortgage (lender)",
+                "parameters": [
+                    {
+                        "description": "mortgage details (with property purchase details)",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.MortgageRequestPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "allOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "tx_hash": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/bank/mortgage/repay": {
+            "post": {
+                "description": "Submits a transaction to repay a portion of an outstanding mortgage. This must be called by the **lendee**, who must be logged in.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Repay a mortgage (lendee)",
+                "parameters": [
+                    {
+                        "description": "repayment details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.RepayMortgageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "allOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "tx_hash": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/bank/mortgage/request": {
+            "post": {
+                "description": "Allows a logged-in user (the lendee) to request a mortgage from a specified lender. This request is stored by the sidecar and does not submit a transaction. It creates a pending request that the lender can later approve.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Request a mortgage (lendee)",
+                "parameters": [
+                    {
+                        "description": "mortgage request (with property purchase details)",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.MortgageRequestPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/main.MortgageRequest"
+                        }
+                    }
+                }
+            }
+        },
+        "/bank/mortgage/request-equity": {
+            "post": {
+                "description": "Allows a user to request a home equity mortgage against a property they own. The request is routed to the specified lender for approval. The index is set to 'equity'.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Request a home equity mortgage (pending lender approval)",
+                "parameters": [
+                    {
+                        "description": "equity mortgage request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.MortgageRequestPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/main.MortgageRequest"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.KYCErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/main.KYCErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/bank/mortgage/requests": {
+            "get": {
+                "description": "Allows a logged-in user to retrieve a list of all their pending mortgage requests, both those they have made (as the lendee) and those made to them (as the lender).",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get pending mortgage requests",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/main.MortgageRequest"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/bank/request-funds": {
+            "post": {
+                "description": "Requests funds from the built-in bank/faucet. This is only available for development and testing purposes. The bank account must be funded for this to work. On the first run, the sidecar will generate a `bank` account and print its mnemonic phrase to the console. This mnemonic must be used to send funds to the bank address before it can dispense tokens.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Request funds from faucet",
+                "parameters": [
+                    {
+                        "description": "request details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.RequestFundsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "allOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "tx_hash": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/property/edit": {
+            "post": {
+                "description": "Updates the metadata for an existing property.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Edit property metadata",
+                "parameters": [
+                    {
+                        "description": "metadata",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.EditPropertyMetadataRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "allOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "tx_hash": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/property/for-sale": {
+            "get": {
+                "description": "Returns all properties currently listed for sale.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get properties for sale",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/main.ForSaleProperty"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/property/list-for-sale": {
+            "post": {
+                "description": "Allows an owner to list their property (or shares) for sale.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "List property for sale",
+                "parameters": [
+                    {
+                        "description": "listing info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.ListPropertyForSaleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/main.ForSaleProperty"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.KYCErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/property/offplan": {
+            "post": {
+                "description": "Developer submits a new off plan property to be funded. Status is set to 'for_sale'.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Submit off plan property",
+                "parameters": [
+                    {
+                        "description": "off plan property info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.OffPlanPropertyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/main.OffPlanProperty"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.KYCErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/property/offplan/approve": {
+            "post": {
+                "description": "Regulator approves a fully funded off plan property, registering it on-chain with the owners from the purchase requests. Status is updated to 'registered'.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Approve off plan property (regulator)",
+                "parameters": [
+                    {
+                        "description": "Off plan property ID",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.ApproveOffPlanPropertyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.OffPlanProperty"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.KYCErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/main.KYCErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/property/offplan/purchase-request": {
+            "post": {
+                "description": "User submits a request to purchase shares in an off plan property. Auto-accepted if not fully funded. Rejected if \u003e100% funded. If 100% funded, property status is set to 'pending_regulator_approval'.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Submit off plan property purchase request",
+                "parameters": [
+                    {
+                        "description": "purchase request info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.OffPlanPurchaseRequestPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/main.OffPlanPurchaseRequest"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.KYCErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/property/offplan/purchase-requests": {
+            "get": {
+                "description": "Returns all purchase requests for a given off plan property.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get off plan property purchase requests",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Off plan property ID",
+                        "name": "property_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/main.OffPlanPurchaseRequest"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/property/register": {
+            "post": {
+                "description": "Submits a transaction to register a new property on the blockchain.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Register a property",
+                "parameters": [
+                    {
+                        "description": "property info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.RegisterPropertyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "allOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "tx_hash": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/property/transfer-shares": {
+            "post": {
+                "description": "Submits a transaction to transfer property shares between one or more owners.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Transfer property shares",
+                "parameters": [
+                    {
+                        "description": "transfer details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.TransferSharesRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "allOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "tx_hash": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/tx/list": {
+            "get": {
+                "description": "Lists all transaction hashes that have been successfully processed and stored by the sidecar.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "List transactions",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/main.TrackedTx"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/tx/{hash}": {
+            "get": {
+                "description": "Queries the blockchain for a specific transaction by its hash and returns details. For certain transaction types like 'register_property', it returns a richer, decoded response.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get transaction",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Transaction hash",
+                        "name": "hash",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {}
+                    }
+                }
+            }
+        },
+        "/user/kyc/approve": {
             "post": {
                 "description": "Allows a logged-in regulator to approve a pending KYC request. The user's role will be updated to 'investor'.",
                 "consumes": [
@@ -112,32 +729,21 @@
                 }
             }
         },
-        "/approve-offplan-property": {
+        "/user/kyc/request": {
             "post": {
-                "description": "Regulator approves a fully funded off plan property, registering it on-chain with the owners from the purchase requests. Status is updated to 'registered'.",
+                "description": "Allows a logged-in user to request KYC. This creates a pending KYC request that a regulator can later approve.",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Approve off plan property (regulator)",
-                "parameters": [
-                    {
-                        "description": "Off plan property ID",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/main.ApproveOffPlanPropertyRequest"
-                        }
-                    }
-                ],
+                "summary": "Request KYC (user)",
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "201": {
+                        "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/main.OffPlanProperty"
+                            "$ref": "#/definitions/main.KYCRequestEntry"
                         }
                     },
                     "400": {
@@ -155,99 +761,7 @@
                 }
             }
         },
-        "/create-mortgage": {
-            "post": {
-                "description": "Submits a transaction to create a new mortgage, effectively approving a pending request. This must be called by the **lender**, who must be logged in. The sidecar will use the logged-in user's account to sign the transaction, funding the mortgage from their account. The details in the request body should match the details from a pending mortgage request.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Create a mortgage (lender)",
-                "parameters": [
-                    {
-                        "description": "mortgage details (with property purchase details)",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/main.MortgageRequestPayload"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "allOf": [
-                                    {
-                                        "type": "string"
-                                    },
-                                    {
-                                        "type": "object",
-                                        "properties": {
-                                            "tx_hash": {
-                                                "type": "string"
-                                            }
-                                        }
-                                    }
-                                ]
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/edit-property": {
-            "post": {
-                "description": "Updates the metadata for an existing property.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Edit property metadata",
-                "parameters": [
-                    {
-                        "description": "metadata",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/main.EditPropertyMetadataRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "allOf": [
-                                    {
-                                        "type": "string"
-                                    },
-                                    {
-                                        "type": "object",
-                                        "properties": {
-                                            "tx_hash": {
-                                                "type": "string"
-                                            }
-                                        }
-                                    }
-                                ]
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/kyc-requests": {
+        "/user/kyc/requests": {
             "get": {
                 "description": "Allows a logged-in regulator to view all pending KYC requests.",
                 "produces": [
@@ -279,93 +793,27 @@
                 }
             }
         },
-        "/kyc-user": {
-            "post": {
-                "description": "Updates a user's role from `user` to `investor`, marking them as KYC'd. If the user's role is not `user`, it is considered a no-op.",
-                "consumes": [
-                    "application/json"
-                ],
+        "/user/list": {
+            "get": {
+                "description": "Lists all registered users and their key details.",
                 "produces": [
                     "application/json"
                 ],
-                "summary": "KYC user",
-                "parameters": [
-                    {
-                        "description": "KYC request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/main.KYCRequest"
-                        }
-                    }
-                ],
+                "summary": "List users",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "allOf": [
-                                    {
-                                        "type": "string"
-                                    },
-                                    {
-                                        "type": "object",
-                                        "properties": {
-                                            "message": {
-                                                "type": "string"
-                                            },
-                                            "status": {
-                                                "type": "string"
-                                            }
-                                        }
-                                    }
-                                ]
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/main.UserDetailResponse"
                             }
                         }
                     }
                 }
             }
         },
-        "/list-property-for-sale": {
-            "post": {
-                "description": "Allows an owner to list their property (or shares) for sale.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "List property for sale",
-                "parameters": [
-                    {
-                        "description": "listing info",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/main.ListPropertyForSaleRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/main.ForSaleProperty"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/main.KYCErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/login": {
+        "/user/login": {
             "post": {
                 "description": "Handles user login, registration, and linking. If a user with the given email exists, they are logged in. If the email does not exist and a name is provided, a new user account and key are created. If the email does not exist but a user with the given name does exist, the email is linked to the existing user account.",
                 "consumes": [
@@ -402,7 +850,7 @@
                 }
             }
         },
-        "/logout": {
+        "/user/logout": {
             "post": {
                 "description": "Logs out the currently authenticated user.",
                 "produces": [
@@ -431,503 +879,6 @@
                                         }
                                     }
                                 ]
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/mortgage-requests": {
-            "get": {
-                "description": "Allows a logged-in user to retrieve a list of all their pending mortgage requests, both those they have made (as the lendee) and those made to them (as the lender).",
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Get pending mortgage requests",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/main.MortgageRequest"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/offplan-property": {
-            "post": {
-                "description": "Developer submits a new off plan property to be funded. Status is set to 'for_sale'.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Submit off plan property",
-                "parameters": [
-                    {
-                        "description": "off plan property info",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/main.OffPlanPropertyRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/main.OffPlanProperty"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/main.KYCErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/offplan-purchase-request": {
-            "post": {
-                "description": "User submits a request to purchase shares in an off plan property. Auto-accepted if not fully funded. Rejected if \u003e100% funded. If 100% funded, property status is set to 'pending_regulator_approval'.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Submit off plan property purchase request",
-                "parameters": [
-                    {
-                        "description": "purchase request info",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/main.OffPlanPurchaseRequestPayload"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/main.OffPlanPurchaseRequest"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/main.KYCErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/offplan-purchase-requests": {
-            "get": {
-                "description": "Returns all purchase requests for a given off plan property.",
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Get off plan property purchase requests",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Off plan property ID",
-                        "name": "property_id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/main.OffPlanPurchaseRequest"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/properties-for-sale": {
-            "get": {
-                "description": "Returns all properties currently listed for sale.",
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Get properties for sale",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/main.ForSaleProperty"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/register-property": {
-            "post": {
-                "description": "Submits a transaction to register a new property on the blockchain.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Register a property",
-                "parameters": [
-                    {
-                        "description": "property info",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/main.RegisterPropertyRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "allOf": [
-                                    {
-                                        "type": "string"
-                                    },
-                                    {
-                                        "type": "object",
-                                        "properties": {
-                                            "tx_hash": {
-                                                "type": "string"
-                                            }
-                                        }
-                                    }
-                                ]
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/repay-mortgage": {
-            "post": {
-                "description": "Submits a transaction to repay a portion of an outstanding mortgage. This must be called by the **lendee**, who must be logged in.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Repay a mortgage (lendee)",
-                "parameters": [
-                    {
-                        "description": "repayment details",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/main.RepayMortgageRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "allOf": [
-                                    {
-                                        "type": "string"
-                                    },
-                                    {
-                                        "type": "object",
-                                        "properties": {
-                                            "tx_hash": {
-                                                "type": "string"
-                                            }
-                                        }
-                                    }
-                                ]
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/request-equity-mortgage": {
-            "post": {
-                "description": "Allows a user to request a home equity mortgage against a property they own. The request is routed to the specified lender for approval. The index is set to 'equity'.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Request a home equity mortgage (pending lender approval)",
-                "parameters": [
-                    {
-                        "description": "equity mortgage request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/main.MortgageRequestPayload"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/main.MortgageRequest"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/main.KYCErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/main.KYCErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/request-funds": {
-            "post": {
-                "description": "Requests funds from the built-in bank/faucet. This is only available for development and testing purposes. The bank account must be funded for this to work. On the first run, the sidecar will generate a `bank` account and print its mnemonic phrase to the console. This mnemonic must be used to send funds to the bank address before it can dispense tokens.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Request funds from faucet",
-                "parameters": [
-                    {
-                        "description": "request details",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/main.RequestFundsRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "allOf": [
-                                    {
-                                        "type": "string"
-                                    },
-                                    {
-                                        "type": "object",
-                                        "properties": {
-                                            "tx_hash": {
-                                                "type": "string"
-                                            }
-                                        }
-                                    }
-                                ]
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/request-kyc": {
-            "post": {
-                "description": "Allows a logged-in user to request KYC. This creates a pending KYC request that a regulator can later approve.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Request KYC (user)",
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/main.KYCRequestEntry"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/main.KYCErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/main.KYCErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/request-mortgage": {
-            "post": {
-                "description": "Allows a logged-in user (the lendee) to request a mortgage from a specified lender. This request is stored by the sidecar and does not submit a transaction. It creates a pending request that the lender can later approve.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Request a mortgage (lendee)",
-                "parameters": [
-                    {
-                        "description": "mortgage request (with property purchase details)",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/main.MortgageRequestPayload"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/main.MortgageRequest"
-                        }
-                    }
-                }
-            }
-        },
-        "/transaction/{hash}": {
-            "get": {
-                "description": "Queries the blockchain for a specific transaction by its hash and returns details. For certain transaction types like 'register_property', it returns a richer, decoded response.",
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Get transaction",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Transaction hash",
-                        "name": "hash",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {}
-                    }
-                }
-            }
-        },
-        "/transactions": {
-            "get": {
-                "description": "Lists all transaction hashes that have been successfully processed and stored by the sidecar.",
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "List transactions",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/main.TrackedTx"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/transfer-shares": {
-            "post": {
-                "description": "Submits a transaction to transfer property shares between one or more owners.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Transfer property shares",
-                "parameters": [
-                    {
-                        "description": "transfer details",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/main.TransferSharesRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "allOf": [
-                                    {
-                                        "type": "string"
-                                    },
-                                    {
-                                        "type": "object",
-                                        "properties": {
-                                            "tx_hash": {
-                                                "type": "string"
-                                            }
-                                        }
-                                    }
-                                ]
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/users": {
-            "get": {
-                "description": "Lists all registered users and their key details.",
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "List users",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/main.UserDetailResponse"
                             }
                         }
                     }
@@ -1049,14 +1000,6 @@
             "type": "object",
             "properties": {
                 "error": {
-                    "type": "string"
-                }
-            }
-        },
-        "main.KYCRequest": {
-            "type": "object",
-            "properties": {
-                "name": {
                     "type": "string"
                 }
             }
