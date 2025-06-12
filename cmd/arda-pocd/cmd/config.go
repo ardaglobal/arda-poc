@@ -3,6 +3,8 @@ package cmd
 import (
 	cmtcfg "github.com/cometbft/cometbft/config"
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
+
+	"github.com/ardaglobal/arda-poc/pkg/consts"
 )
 
 // initCometBFTConfig helps to override default CometBFT Config values.
@@ -41,6 +43,7 @@ func initAppConfig() (string, interface{}) {
 	//
 	// In tests, we set the min gas prices to 0.
 	// srvCfg.MinGasPrices = "0stake"
+	srvCfg.MinGasPrices = "0" + consts.BondDenom
 	// srvCfg.BaseConfig.IAVLDisableFastNode = true // disable fastnode by default
 
 	customAppConfig := CustomAppConfig{
