@@ -12,6 +12,7 @@ users.json
 logins.json
 tx.json 
 mortgage_requests.json 
+test.*
 
 .arda_data/
 
