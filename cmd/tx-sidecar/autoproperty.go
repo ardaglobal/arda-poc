@@ -50,7 +50,7 @@ func intToUint64Slice(v []int) []uint64 {
 // registerProperty creates a new property with random data and sends the CLI command.
 func (s *Server) registerProperty(ctx context.Context, users []string) (Property, error) {
 	address := fmt.Sprintf("%d Main St", rand.Intn(9000)+100)
-	value := rand.Intn(900000) + 100000
+	value := rand.Intn(900000) + 1000000
 
 	// choose random number of owners
 	n := rand.Intn(len(users)) + 1

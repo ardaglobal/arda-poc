@@ -3,9 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"math"
 	"net/http"
 
+	"cosmossdk.io/math"
 	mortgagetypes "github.com/ardaglobal/arda-poc/x/mortgage/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
