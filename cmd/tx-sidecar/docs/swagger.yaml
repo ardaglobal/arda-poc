@@ -28,6 +28,14 @@ definitions:
         type: integer
       collateral:
         type: string
+      from_owners:
+        items:
+          type: string
+        type: array
+      from_shares:
+        items:
+          type: integer
+        type: array
       gas:
         type: string
       index:
@@ -36,8 +44,21 @@ definitions:
         type: string
       lendee:
         type: string
+      price:
+        type: integer
+      property_id:
+        description: Property purchase details
+        type: string
       term:
         type: string
+      to_owners:
+        items:
+          type: string
+        type: array
+      to_shares:
+        items:
+          type: integer
+        type: array
     type: object
   main.EditPropertyMetadataRequest:
     properties:
@@ -150,6 +171,14 @@ definitions:
         type: integer
       collateral:
         type: string
+      from_owners:
+        items:
+          type: string
+        type: array
+      from_shares:
+        items:
+          type: integer
+        type: array
       id:
         type: string
       index:
@@ -162,6 +191,11 @@ definitions:
       lender:
         description: Name of the user (lender) the request is for.
         type: string
+      price:
+        type: integer
+      property_id:
+        description: Property purchase details
+        type: string
       requester:
         description: Name of the user (lendee) who made the request.
         type: string
@@ -172,6 +206,14 @@ definitions:
         type: string
       timestamp:
         type: string
+      to_owners:
+        items:
+          type: string
+        type: array
+      to_shares:
+        items:
+          type: integer
+        type: array
     type: object
   main.NewMortgageRequest:
     properties:
@@ -179,14 +221,35 @@ definitions:
         type: integer
       collateral:
         type: string
+      from_owners:
+        items:
+          type: string
+        type: array
+      from_shares:
+        items:
+          type: integer
+        type: array
       index:
         type: string
       interest_rate:
         type: string
       lender:
         type: string
+      price:
+        type: integer
+      property_id:
+        description: Property purchase details
+        type: string
       term:
         type: string
+      to_owners:
+        items:
+          type: string
+        type: array
+      to_shares:
+        items:
+          type: integer
+        type: array
     type: object
   main.RegisterPropertyRequest:
     properties:
@@ -358,7 +421,7 @@ paths:
         funding the mortgage from their account. The details in the request body should
         match the details from a pending mortgage request.
       parameters:
-      - description: mortgage details
+      - description: mortgage details (with property purchase details)
         in: body
         name: request
         required: true
@@ -673,7 +736,7 @@ paths:
         a specified lender. This request is stored by the sidecar and does not submit
         a transaction. It creates a pending request that the lender can later approve.
       parameters:
-      - description: mortgage request
+      - description: mortgage request (with property purchase details)
         in: body
         name: request
         required: true

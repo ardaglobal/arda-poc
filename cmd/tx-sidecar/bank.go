@@ -3,8 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"cosmossdk.io/math"
@@ -18,9 +20,9 @@ import (
 // MortgageRequest stores information about a user's request for a mortgage.
 type MortgageRequest struct {
 	ID           string    `json:"id"`
-	Requester    string    `json:"requester"`     // Name of the user (lendee) who made the request.
-	Lender       string    `json:"lender"`        // Name of the user (lender) the request is for.
-	LendeeAddr   string    `json:"lendee_addr"`   // Bech32 address of the lendee.
+	Requester    string    `json:"requester"`   // Name of the user (lendee) who made the request.
+	Lender       string    `json:"lender"`      // Name of the user (lender) the request is for.
+	LendeeAddr   string    `json:"lendee_addr"` // Bech32 address of the lendee.
 	Index        string    `json:"index"`
 	Collateral   string    `json:"collateral"`
 	Amount       uint64    `json:"amount"`
@@ -28,6 +30,14 @@ type MortgageRequest struct {
 	Term         string    `json:"term"`
 	Status       string    `json:"status"` // e.g., "pending", "completed"
 	Timestamp    time.Time `json:"timestamp"`
+
+	// Property purchase details
+	PropertyID string   `json:"property_id,omitempty"`
+	FromOwners []string `json:"from_owners,omitempty"`
+	FromShares []uint64 `json:"from_shares,omitempty"`
+	ToOwners   []string `json:"to_owners,omitempty"`
+	ToShares   []uint64 `json:"to_shares,omitempty"`
+	Price      uint64   `json:"price,omitempty"`
 }
 
 // NewMortgageRequest defines the request body for requesting a mortgage.
@@ -38,6 +48,14 @@ type NewMortgageRequest struct {
 	Amount       uint64 `json:"amount"`
 	InterestRate string `json:"interest_rate"`
 	Term         string `json:"term"`
+
+	// Property purchase details
+	PropertyID string   `json:"property_id"`
+	FromOwners []string `json:"from_owners"`
+	FromShares []uint64 `json:"from_shares"`
+	ToOwners   []string `json:"to_owners"`
+	ToShares   []uint64 `json:"to_shares"`
+	Price      uint64   `json:"price"`
 }
 
 // CreateMortgageRequest defines the request body for creating a mortgage.
@@ -49,6 +67,14 @@ type CreateMortgageRequest struct {
 	InterestRate string `json:"interest_rate"`
 	Term         string `json:"term"`
 	Gas          string `json:"gas,omitempty"`
+
+	// Property purchase details
+	PropertyID string   `json:"property_id"`
+	FromOwners []string `json:"from_owners"`
+	FromShares []uint64 `json:"from_shares"`
+	ToOwners   []string `json:"to_owners"`
+	ToShares   []uint64 `json:"to_shares"`
+	Price      uint64   `json:"price"`
 }
 
 // RepayMortgageRequest defines the request body for repaying a mortgage.
@@ -63,7 +89,7 @@ type RepayMortgageRequest struct {
 // @Description Submits a transaction to create a new mortgage, effectively approving a pending request. This must be called by the **lender**, who must be logged in. The sidecar will use the logged-in user's account to sign the transaction, funding the mortgage from their account. The details in the request body should match the details from a pending mortgage request.
 // @Accept json
 // @Produce json
-// @Param request body CreateMortgageRequest true "mortgage details"
+// @Param request body CreateMortgageRequest true "mortgage details (with property purchase details)"
 // @Success 200 {object} map[string]string{tx_hash=string}
 // @Router /create-mortgage [post]
 func (s *Server) createMortgageHandler(w http.ResponseWriter, r *http.Request) {
@@ -109,8 +135,22 @@ func (s *Server) createMortgageHandler(w http.ResponseWriter, r *http.Request) {
 	for i, mr := range s.mortgageRequests {
 		if mr.Index == req.Index && mr.Lender == fromName && mr.Status == "pending" {
 			s.mortgageRequests[i].Status = "completed"
+			// After mortgage approval, immediately send transfer shares request if property purchase details are present
+			if req.PropertyID != "" && len(req.FromOwners) > 0 && len(req.FromShares) > 0 && len(req.ToOwners) > 0 && len(req.ToShares) > 0 {
+				transferReq := TransferSharesRequest{
+					PropertyID: req.PropertyID,
+					FromOwners: req.FromOwners,
+					FromShares: req.FromShares,
+					ToOwners:   req.ToOwners,
+					ToShares:   req.ToShares,
+				}
+				// Call the transferSharesHandler logic directly (simulate HTTP call)
+				// Note: This is a simplified call; in production, you may want to handle errors and context more robustly.
+				transferReqBody, _ := json.Marshal(transferReq)
+				r2 := &http.Request{Body: io.NopCloser(strings.NewReader(string(transferReqBody))), Method: http.MethodPost}
+				s.transferSharesHandler(w, r2)
+			}
 			if err := s.saveMortgageRequestsToFile(); err != nil {
-				// Log the error, but don't fail the whole request since the tx is already broadcast.
 				zlog.Error().Err(err).Msgf("failed to update status for mortgage request index %s", req.Index)
 			}
 			break // Assume index is unique per lender
@@ -217,7 +257,7 @@ func (s *Server) requestFundsHandler(w http.ResponseWriter, r *http.Request) {
 // @Description Allows a logged-in user (the lendee) to request a mortgage from a specified lender. This request is stored by the sidecar and does not submit a transaction. It creates a pending request that the lender can later approve.
 // @Accept json
 // @Produce json
-// @Param request body NewMortgageRequest true "mortgage request"
+// @Param request body NewMortgageRequest true "mortgage request (with property purchase details)"
 // @Success 201 {object} MortgageRequest
 // @Router /request-mortgage [post]
 func (s *Server) requestMortgageHandler(w http.ResponseWriter, r *http.Request) {
@@ -260,6 +300,12 @@ func (s *Server) requestMortgageHandler(w http.ResponseWriter, r *http.Request) 
 		Term:         req.Term,
 		Status:       "pending",
 		Timestamp:    time.Now(),
+		PropertyID:   req.PropertyID,
+		FromOwners:   req.FromOwners,
+		FromShares:   req.FromShares,
+		ToOwners:     req.ToOwners,
+		ToShares:     req.ToShares,
+		Price:        req.Price,
 	}
 
 	s.mortgageRequests = append(s.mortgageRequests, newReq)
@@ -311,4 +357,4 @@ func (s *Server) saveMortgageRequestsToFile() error {
 		return fmt.Errorf("failed to marshal mortgage requests: %w", err)
 	}
 	return os.WriteFile(s.mortgageRequestsFile, data, 0644)
-} 
+}

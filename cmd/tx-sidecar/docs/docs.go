@@ -131,7 +131,7 @@ const docTemplate = `{
                 "summary": "Create a mortgage (lender)",
                 "parameters": [
                     {
-                        "description": "mortgage details",
+                        "description": "mortgage details (with property purchase details)",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -623,7 +623,7 @@ const docTemplate = `{
                 "summary": "Request a mortgage (lendee)",
                 "parameters": [
                     {
-                        "description": "mortgage request",
+                        "description": "mortgage request (with property purchase details)",
                         "name": "request",
                         "in": "body",
                         "required": true,
@@ -798,6 +798,18 @@ const docTemplate = `{
                 "collateral": {
                     "type": "string"
                 },
+                "from_owners": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "from_shares": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "gas": {
                     "type": "string"
                 },
@@ -810,8 +822,27 @@ const docTemplate = `{
                 "lendee": {
                     "type": "string"
                 },
+                "price": {
+                    "type": "integer"
+                },
+                "property_id": {
+                    "description": "Property purchase details",
+                    "type": "string"
+                },
                 "term": {
                     "type": "string"
+                },
+                "to_owners": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "to_shares": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },
@@ -984,6 +1015,18 @@ const docTemplate = `{
                 "collateral": {
                     "type": "string"
                 },
+                "from_owners": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "from_shares": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "id": {
                     "type": "string"
                 },
@@ -1001,6 +1044,13 @@ const docTemplate = `{
                     "description": "Name of the user (lender) the request is for.",
                     "type": "string"
                 },
+                "price": {
+                    "type": "integer"
+                },
+                "property_id": {
+                    "description": "Property purchase details",
+                    "type": "string"
+                },
                 "requester": {
                     "description": "Name of the user (lendee) who made the request.",
                     "type": "string"
@@ -1014,6 +1064,18 @@ const docTemplate = `{
                 },
                 "timestamp": {
                     "type": "string"
+                },
+                "to_owners": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "to_shares": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },
@@ -1026,6 +1088,18 @@ const docTemplate = `{
                 "collateral": {
                     "type": "string"
                 },
+                "from_owners": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "from_shares": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "index": {
                     "type": "string"
                 },
@@ -1035,8 +1109,27 @@ const docTemplate = `{
                 "lender": {
                     "type": "string"
                 },
+                "price": {
+                    "type": "integer"
+                },
+                "property_id": {
+                    "description": "Property purchase details",
+                    "type": "string"
+                },
                 "term": {
                     "type": "string"
+                },
+                "to_owners": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "to_shares": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 }
             }
         },
