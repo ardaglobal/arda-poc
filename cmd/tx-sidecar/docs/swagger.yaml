@@ -22,44 +22,6 @@ definitions:
       id:
         type: string
     type: object
-  main.CreateMortgageRequest:
-    properties:
-      amount:
-        type: integer
-      collateral:
-        type: string
-      from_owners:
-        items:
-          type: string
-        type: array
-      from_shares:
-        items:
-          type: integer
-        type: array
-      gas:
-        type: string
-      index:
-        type: string
-      interest_rate:
-        type: string
-      lendee:
-        type: string
-      price:
-        type: integer
-      property_id:
-        description: Property purchase details
-        type: string
-      term:
-        type: string
-      to_owners:
-        items:
-          type: string
-        type: array
-      to_shares:
-        items:
-          type: integer
-        type: array
-    type: object
   main.EditPropertyMetadataRequest:
     properties:
       construction_information:
@@ -215,7 +177,7 @@ definitions:
           type: integer
         type: array
     type: object
-  main.NewMortgageRequest:
+  main.MortgageRequestPayload:
     properties:
       amount:
         type: integer
@@ -229,9 +191,14 @@ definitions:
         items:
           type: integer
         type: array
+      gas:
+        type: string
       index:
         type: string
       interest_rate:
+        type: string
+      lendee:
+        description: Only used for create (lender approval)
         type: string
       lender:
         type: string
@@ -426,7 +393,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/main.CreateMortgageRequest'
+          $ref: '#/definitions/main.MortgageRequestPayload'
       produces:
       - application/json
       responses:
@@ -741,7 +708,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/main.NewMortgageRequest'
+          $ref: '#/definitions/main.MortgageRequestPayload'
       produces:
       - application/json
       responses:

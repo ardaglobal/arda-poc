@@ -136,7 +136,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.CreateMortgageRequest"
+                            "$ref": "#/definitions/main.MortgageRequestPayload"
                         }
                     }
                 ],
@@ -628,7 +628,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.NewMortgageRequest"
+                            "$ref": "#/definitions/main.MortgageRequestPayload"
                         }
                     }
                 ],
@@ -786,63 +786,6 @@ const docTemplate = `{
             "properties": {
                 "id": {
                     "type": "string"
-                }
-            }
-        },
-        "main.CreateMortgageRequest": {
-            "type": "object",
-            "properties": {
-                "amount": {
-                    "type": "integer"
-                },
-                "collateral": {
-                    "type": "string"
-                },
-                "from_owners": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "from_shares": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "gas": {
-                    "type": "string"
-                },
-                "index": {
-                    "type": "string"
-                },
-                "interest_rate": {
-                    "type": "string"
-                },
-                "lendee": {
-                    "type": "string"
-                },
-                "price": {
-                    "type": "integer"
-                },
-                "property_id": {
-                    "description": "Property purchase details",
-                    "type": "string"
-                },
-                "term": {
-                    "type": "string"
-                },
-                "to_owners": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "to_shares": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
                 }
             }
         },
@@ -1079,7 +1022,7 @@ const docTemplate = `{
                 }
             }
         },
-        "main.NewMortgageRequest": {
+        "main.MortgageRequestPayload": {
             "type": "object",
             "properties": {
                 "amount": {
@@ -1100,10 +1043,17 @@ const docTemplate = `{
                         "type": "integer"
                     }
                 },
+                "gas": {
+                    "type": "string"
+                },
                 "index": {
                     "type": "string"
                 },
                 "interest_rate": {
+                    "type": "string"
+                },
+                "lendee": {
+                    "description": "Only used for create (lender approval)",
                     "type": "string"
                 },
                 "lender": {

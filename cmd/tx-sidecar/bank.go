@@ -40,28 +40,10 @@ type MortgageRequest struct {
 	Price      uint64   `json:"price,omitempty"`
 }
 
-// NewMortgageRequest defines the request body for requesting a mortgage.
-type NewMortgageRequest struct {
+// MortgageRequestPayload is used for both requesting and creating a mortgage, including property purchase details.
+type MortgageRequestPayload struct {
 	Lender       string `json:"lender"`
 	Index        string `json:"index"`
-	Collateral   string `json:"collateral"`
-	Amount       uint64 `json:"amount"`
-	InterestRate string `json:"interest_rate"`
-	Term         string `json:"term"`
-
-	// Property purchase details
-	PropertyID string   `json:"property_id"`
-	FromOwners []string `json:"from_owners"`
-	FromShares []uint64 `json:"from_shares"`
-	ToOwners   []string `json:"to_owners"`
-	ToShares   []uint64 `json:"to_shares"`
-	Price      uint64   `json:"price"`
-}
-
-// CreateMortgageRequest defines the request body for creating a mortgage.
-type CreateMortgageRequest struct {
-	Index        string `json:"index"`
-	Lendee       string `json:"lendee"`
 	Collateral   string `json:"collateral"`
 	Amount       uint64 `json:"amount"`
 	InterestRate string `json:"interest_rate"`
@@ -75,6 +57,7 @@ type CreateMortgageRequest struct {
 	ToOwners   []string `json:"to_owners"`
 	ToShares   []uint64 `json:"to_shares"`
 	Price      uint64   `json:"price"`
+	Lendee     string   `json:"lendee,omitempty"` // Only used for create (lender approval)
 }
 
 // RepayMortgageRequest defines the request body for repaying a mortgage.
@@ -89,7 +72,7 @@ type RepayMortgageRequest struct {
 // @Description Submits a transaction to create a new mortgage, effectively approving a pending request. This must be called by the **lender**, who must be logged in. The sidecar will use the logged-in user's account to sign the transaction, funding the mortgage from their account. The details in the request body should match the details from a pending mortgage request.
 // @Accept json
 // @Produce json
-// @Param request body CreateMortgageRequest true "mortgage details (with property purchase details)"
+// @Param request body MortgageRequestPayload true "mortgage details (with property purchase details)"
 // @Success 200 {object} map[string]string{tx_hash=string}
 // @Router /create-mortgage [post]
 func (s *Server) createMortgageHandler(w http.ResponseWriter, r *http.Request) {
@@ -103,7 +86,7 @@ func (s *Server) createMortgageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req CreateMortgageRequest
+	var req MortgageRequestPayload
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
@@ -144,8 +127,6 @@ func (s *Server) createMortgageHandler(w http.ResponseWriter, r *http.Request) {
 					ToOwners:   req.ToOwners,
 					ToShares:   req.ToShares,
 				}
-				// Call the transferSharesHandler logic directly (simulate HTTP call)
-				// Note: This is a simplified call; in production, you may want to handle errors and context more robustly.
 				transferReqBody, _ := json.Marshal(transferReq)
 				r2 := &http.Request{Body: io.NopCloser(strings.NewReader(string(transferReqBody))), Method: http.MethodPost}
 				s.transferSharesHandler(w, r2)
@@ -257,7 +238,7 @@ func (s *Server) requestFundsHandler(w http.ResponseWriter, r *http.Request) {
 // @Description Allows a logged-in user (the lendee) to request a mortgage from a specified lender. This request is stored by the sidecar and does not submit a transaction. It creates a pending request that the lender can later approve.
 // @Accept json
 // @Produce json
-// @Param request body NewMortgageRequest true "mortgage request (with property purchase details)"
+// @Param request body MortgageRequestPayload true "mortgage request (with property purchase details)"
 // @Success 201 {object} MortgageRequest
 // @Router /request-mortgage [post]
 func (s *Server) requestMortgageHandler(w http.ResponseWriter, r *http.Request) {
@@ -271,7 +252,7 @@ func (s *Server) requestMortgageHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	var req NewMortgageRequest
+	var req MortgageRequestPayload
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
