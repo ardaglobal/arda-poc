@@ -31,6 +31,7 @@ import (
 
 	_ "github.com/ardaglobal/arda-poc/cmd/tx-sidecar/docs"
 	sidecarclient "github.com/ardaglobal/arda-poc/pkg/client"
+	"github.com/joho/godotenv"
 )
 
 func init() {
@@ -48,18 +49,18 @@ type AppConfig struct {
 
 // Server holds the dependencies for the sidecar http server.
 type Server struct {
-	clientCtx        client.Context
-	authClient       authtypes.QueryClient
-	txClient         txtypes.ServiceClient
-	users            map[string]UserData
-	usersFile        string
-	logins           map[string]string // email -> name
-	loginsFile       string
-	faucetName       string
-	loggedInUser     string
-	transactions     []TrackedTx
-	transactionsFile string
-	mortgageRequests []MortgageRequest
+	clientCtx            client.Context
+	authClient           authtypes.QueryClient
+	txClient             txtypes.ServiceClient
+	users                map[string]UserData
+	usersFile            string
+	logins               map[string]string // email -> name
+	loginsFile           string
+	faucetName           string
+	loggedInUser         string
+	transactions         []TrackedTx
+	transactionsFile     string
+	mortgageRequests     []MortgageRequest
 	mortgageRequestsFile string
 }
 
@@ -169,16 +170,16 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 	}
 
 	s := &Server{
-		clientCtx:        clientCtx,
-		authClient:       authtypes.NewQueryClient(grpcConn),
-		txClient:         txtypes.NewServiceClient(grpcConn),
-		users:            users,
-		usersFile:        usersFile,
-		logins:           logins,
-		loginsFile:       loginsFile,
-		faucetName:       appConfig.Faucet.Name,
-		transactions:     transactions,
-		transactionsFile: transactionsFile,
+		clientCtx:            clientCtx,
+		authClient:           authtypes.NewQueryClient(grpcConn),
+		txClient:             txtypes.NewServiceClient(grpcConn),
+		users:                users,
+		usersFile:            usersFile,
+		logins:               logins,
+		loginsFile:           loginsFile,
+		faucetName:           appConfig.Faucet.Name,
+		transactions:         transactions,
+		transactionsFile:     transactionsFile,
 		mortgageRequests:     mortgageRequests,
 		mortgageRequestsFile: mortgageRequestsFile,
 	}
@@ -211,7 +212,39 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 // Close is a no-op for this server version but can be used for cleanup.
 func (s *Server) Close() {}
 
+// adminLoginHandler handles admin login
+// @Summary Admin login
+// @Description Authenticates an admin using a key. Returns success if the provided key matches the ADMIN_KEY environment variable.
+// @Accept json
+// @Produce json
+// @Param request body struct{Key string `json:"key"`} true "Admin login key"
+// @Success 200 {object} map[string]bool{"success":true}
+// @Failure 400 {object} map[string]string{"error":"invalid request body"}
+// @Failure 401 {object} map[string]interface{"success":false,"error":"invalid key"}
+// @Failure 500 {object} map[string]string{"error":"admin key not set"}
+// @Router /admin-login [post]
+func (s *Server) adminLoginHandler(c *fiber.Ctx) error {
+	type reqBody struct {
+		Key string `json:"key"`
+	}
+	var body reqBody
+	if err := c.BodyParser(&body); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid request body"})
+	}
+	adminKey := os.Getenv("ADMIN_KEY")
+	if adminKey == "" {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "admin key not set"})
+	}
+	if body.Key == adminKey {
+		return c.JSON(fiber.Map{"success": true})
+	}
+	return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"success": false, "error": "invalid key"})
+}
+
 func main() {
+	// Load .env file if present
+	_ = godotenv.Load()
+
 	// This context is for the main application, not for individual requests.
 	clientCtx, err := sidecarclient.NewClientContext()
 	if err != nil {
@@ -264,6 +297,8 @@ func main() {
 	app.Post("/create-mortgage", fiberadaptor.HTTPHandlerFunc(server.createMortgageHandler))
 	app.Post("/repay-mortgage", fiberadaptor.HTTPHandlerFunc(server.repayMortgageHandler))
 	app.Post("/request-funds", fiberadaptor.HTTPHandlerFunc(server.requestFundsHandler))
+
+	app.Post("/admin-login", server.adminLoginHandler)
 
 	zlog.Info().Msg("Starting transaction sidecar server on :8080...")
 	if err := app.Listen(":8080"); err != nil {

@@ -10,10 +10,12 @@ release/
 
 users.json
 logins.json
-tx.json 
-mortgage_requests.json 
+tx.json
+mortgage_requests.json
 test.*
 
 .arda_data/
 
 **/.claude/settings.local.json
+
+.env*
