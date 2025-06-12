@@ -6,6 +6,7 @@ import (
 
 	propertytypes "github.com/ardaglobal/arda-poc/x/property/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	zlog "github.com/rs/zerolog/log"
 )
 
 // RegisterPropertyRequest defines the request body for registering a property.
@@ -55,6 +56,8 @@ func (s *Server) registerPropertyHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	zlog.Info().Str("handler", "registerPropertyHandler").Interface("request", req).Msg("received request")
+
 	fromName := "ERES" // In a real app, this might come from the request or config
 	msgBuilder := func(fromAddr string) sdk.Msg {
 		return propertytypes.NewMsgRegisterProperty(
@@ -82,6 +85,8 @@ func (s *Server) transferSharesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	zlog.Info().Str("handler", "transferSharesHandler").Interface("request", req).Msg("received request")
+
 	fromName := "ERES" // In a real app, this might come from the request or config
 	msgBuilder := func(fromAddr string) sdk.Msg {
 		return propertytypes.NewMsgTransferShares(
@@ -108,6 +113,8 @@ func (s *Server) editPropertyMetadataHandler(w http.ResponseWriter, r *http.Requ
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
+
+	zlog.Info().Str("handler", "editPropertyMetadataHandler").Interface("request", req).Msg("received request")
 
 	fromName := "ERES"
 	msgBuilder := func(fromAddr string) sdk.Msg {

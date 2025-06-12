@@ -175,6 +175,7 @@ func (s *Server) saveTransactionsToFile() {
 
 // listTransactionsHandler returns the list of tracked transactions.
 func (s *Server) listTransactionsHandler(w http.ResponseWriter, r *http.Request) {
+	zlog.Info().Str("handler", "listTransactionsHandler").Msg("received request")
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(s.transactions)
 }
@@ -187,6 +188,7 @@ func (s *Server) getTransactionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	txHash := strings.TrimPrefix(r.URL.Path, "/transaction/")
+	zlog.Info().Str("handler", "getTransactionHandler").Str("tx_hash", txHash).Msg("received request")
 	if txHash == "" {
 		http.Error(w, "Transaction hash must be provided in the path", http.StatusBadRequest)
 		return

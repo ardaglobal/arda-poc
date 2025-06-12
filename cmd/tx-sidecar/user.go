@@ -62,6 +62,8 @@ func (s *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	zlog.Info().Str("handler", "loginHandler").Str("email", req.Email).Str("name", req.Name).Str("role", req.Role).Msg("received login request")
+
 	if req.Email == "" {
 		http.Error(w, "Email cannot be empty", http.StatusBadRequest)
 		return
@@ -154,6 +156,8 @@ func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	zlog.Info().Str("handler", "logoutHandler").Str("loggedInUser", s.loggedInUser).Msg("received logout request")
+
 	if s.loggedInUser == "" {
 		http.Error(w, "No user is currently logged in", http.StatusBadRequest)
 		return
@@ -179,6 +183,8 @@ func (s *Server) kycUserHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
+
+	zlog.Info().Str("handler", "kycUserHandler").Interface("request", req).Msg("received kyc request")
 
 	if req.Name == "" {
 		http.Error(w, "User name cannot be empty", http.StatusBadRequest)
@@ -293,6 +299,8 @@ func (s *Server) listUsersHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
+
+	zlog.Info().Str("handler", "listUsersHandler").Msg("received request")
 
 	userInfos := make([]UserDetailResponse, 0, len(s.users))
 	for name, userData := range s.users {

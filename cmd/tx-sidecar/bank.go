@@ -75,6 +75,8 @@ func (s *Server) createMortgageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	zlog.Info().Str("handler", "createMortgageHandler").Interface("request", req).Msg("received request")
+
 	fromName := s.loggedInUser
 	msgBuilder := func(fromAddr string) sdk.Msg {
 		return mortgagetypes.NewMsgCreateMortgage(
@@ -128,6 +130,8 @@ func (s *Server) repayMortgageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	zlog.Info().Str("handler", "repayMortgageHandler").Interface("request", req).Msg("received request")
+
 	fromName := s.loggedInUser
 	msgBuilder := func(fromAddr string) sdk.Msg {
 		return mortgagetypes.NewMsgRepayMortgage(
@@ -159,6 +163,8 @@ func (s *Server) requestFundsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
+
+	zlog.Info().Str("handler", "requestFundsHandler").Interface("request", req).Msg("received request")
 
 	if req.Amount == 0 || req.Denom == "" || req.Address == "" {
 		http.Error(w, "address, amount, and denom must be provided, and amount must be positive", http.StatusBadRequest)
@@ -198,6 +204,8 @@ func (s *Server) requestMortgageHandler(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
+
+	zlog.Info().Str("handler", "requestMortgageHandler").Interface("request", req).Msg("received request")
 
 	// Validate that the lender exists
 	if _, ok := s.users[req.Lender]; !ok {
@@ -239,6 +247,8 @@ func (s *Server) getMortgageRequestsHandler(w http.ResponseWriter, r *http.Reque
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
+
+	zlog.Info().Str("handler", "getMortgageRequestsHandler").Str("loggedInUser", s.loggedInUser).Msg("received request")
 
 	if s.loggedInUser == "" {
 		http.Error(w, "No user is logged in. A lender must be logged in to view their requests.", http.StatusUnauthorized)
