@@ -62,6 +62,9 @@ type Server struct {
 	transactionsFile     string
 	mortgageRequests     []MortgageRequest
 	mortgageRequestsFile string
+
+	kycRequests     []KYCRequestEntry
+	kycRequestsFile string
 }
 
 // NewServer creates a new instance of the Server with all its dependencies.
@@ -169,6 +172,17 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		return nil, fmt.Errorf("faucet name is not defined in config.yml")
 	}
 
+	kycRequestsFile := "kyc_requests.json"
+	kycRequests := make([]KYCRequestEntry, 0)
+	krData, err := os.ReadFile(kycRequestsFile)
+	if err == nil {
+		if err := json.Unmarshal(krData, &kycRequests); err != nil {
+			zlog.Warn().Msgf("failed to unmarshal kyc requests file, starting with empty list: %v", err)
+		}
+	} else if !os.IsNotExist(err) {
+		return nil, fmt.Errorf("failed to read kyc requests file: %w", err)
+	}
+
 	s := &Server{
 		clientCtx:            clientCtx,
 		authClient:           authtypes.NewQueryClient(grpcConn),
@@ -182,6 +196,8 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		transactionsFile:     transactionsFile,
 		mortgageRequests:     mortgageRequests,
 		mortgageRequestsFile: mortgageRequestsFile,
+		kycRequests:          kycRequests,
+		kycRequestsFile:      kycRequestsFile,
 	}
 
 	// Ensure that the faucet account from config exists in the keyring.
@@ -205,6 +221,8 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 	if err := s.initUsers(); err != nil {
 		return nil, fmt.Errorf("failed to initialize users: %w", err)
 	}
+	// Load KYC requests from file (in case not loaded above)
+	_ = s.loadKYCRequestsFromFile()
 
 	return s, nil
 }
@@ -212,33 +230,47 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 // Close is a no-op for this server version but can be used for cleanup.
 func (s *Server) Close() {}
 
+// AdminLoginRequest defines the request body for admin login.
+type AdminLoginRequest struct {
+	Key string `json:"key"`
+}
+
+// AdminLoginResponse defines the response for a successful admin login.
+type AdminLoginResponse struct {
+	Success bool `json:"success"`
+}
+
+// AdminLoginErrorResponse defines the response for an error in admin login.
+type AdminLoginErrorResponse struct {
+	Success bool   `json:"success"`
+	Error   string `json:"error"`
+}
+
 // adminLoginHandler handles admin login
 // @Summary Admin login
 // @Description Authenticates an admin using a key. Returns success if the provided key matches the ADMIN_KEY environment variable.
 // @Accept json
 // @Produce json
-// @Param request body struct{Key string `json:"key"`} true "Admin login key"
-// @Success 200 {object} map[string]bool{"success":true}
-// @Failure 400 {object} map[string]string{"error":"invalid request body"}
-// @Failure 401 {object} map[string]interface{"success":false,"error":"invalid key"}
-// @Failure 500 {object} map[string]string{"error":"admin key not set"}
+// @Param request body AdminLoginRequest true "Admin login key"
+// @Success 200 {object} AdminLoginResponse
+// @Failure 400 {object} AdminLoginErrorResponse
+// @Failure 401 {object} AdminLoginErrorResponse
+// @Failure 500 {object} AdminLoginErrorResponse
 // @Router /admin-login [post]
 func (s *Server) adminLoginHandler(c *fiber.Ctx) error {
-	type reqBody struct {
-		Key string `json:"key"`
-	}
+	type reqBody AdminLoginRequest
 	var body reqBody
 	if err := c.BodyParser(&body); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid request body"})
+		return c.Status(fiber.StatusBadRequest).JSON(AdminLoginErrorResponse{Success: false, Error: "invalid request body"})
 	}
 	adminKey := os.Getenv("ADMIN_KEY")
 	if adminKey == "" {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "admin key not set"})
+		return c.Status(fiber.StatusInternalServerError).JSON(AdminLoginErrorResponse{Success: false, Error: "admin key not set"})
 	}
 	if body.Key == adminKey {
-		return c.JSON(fiber.Map{"success": true})
+		return c.JSON(AdminLoginResponse{Success: true})
 	}
-	return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"success": false, "error": "invalid key"})
+	return c.Status(fiber.StatusUnauthorized).JSON(AdminLoginErrorResponse{Success: false, Error: "invalid key"})
 }
 
 func main() {
@@ -297,6 +329,11 @@ func main() {
 	app.Post("/create-mortgage", fiberadaptor.HTTPHandlerFunc(server.createMortgageHandler))
 	app.Post("/repay-mortgage", fiberadaptor.HTTPHandlerFunc(server.repayMortgageHandler))
 	app.Post("/request-funds", fiberadaptor.HTTPHandlerFunc(server.requestFundsHandler))
+
+	// KYC workflow endpoints
+	app.Post("/request-kyc", fiberadaptor.HTTPHandlerFunc(server.requestKYCHandler))
+	app.Get("/kyc-requests", fiberadaptor.HTTPHandlerFunc(server.getKYCRequestsHandler))
+	app.Post("/approve-kyc", fiberadaptor.HTTPHandlerFunc(server.approveKYCHandler))
 
 	app.Post("/admin-login", server.adminLoginHandler)
 

@@ -8,6 +8,110 @@
     },
     "basePath": "/",
     "paths": {
+        "/admin-login": {
+            "post": {
+                "description": "Authenticates an admin using a key. Returns success if the provided key matches the ADMIN_KEY environment variable.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Admin login",
+                "parameters": [
+                    {
+                        "description": "Admin login key",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.AdminLoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.AdminLoginResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.AdminLoginErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/main.AdminLoginErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/main.AdminLoginErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/approve-kyc": {
+            "post": {
+                "description": "Allows a logged-in regulator to approve a pending KYC request. The user's role will be updated to 'investor'.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Approve KYC request (regulator)",
+                "parameters": [
+                    {
+                        "description": "KYC approval request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.ApproveKYCRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.KYCStatusResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.KYCErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/main.KYCErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/main.KYCErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/main.KYCErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/create-mortgage": {
             "post": {
                 "description": "Submits a transaction to create a new mortgage, effectively approving a pending request. This must be called by the **lender**, who must be logged in. The sidecar will use the logged-in user's account to sign the transaction, funding the mortgage from their account. The details in the request body should match the details from a pending mortgage request.",
@@ -95,6 +199,38 @@
                                     }
                                 ]
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "/kyc-requests": {
+            "get": {
+                "description": "Allows a logged-in regulator to view all pending KYC requests.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get pending KYC requests (regulator)",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/main.KYCRequestEntry"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/main.KYCErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/main.KYCErrorResponse"
                         }
                     }
                 }
@@ -379,6 +515,38 @@
                 }
             }
         },
+        "/request-kyc": {
+            "post": {
+                "description": "Allows a logged-in user to request KYC. This creates a pending KYC request that a regulator can later approve.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Request KYC (user)",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/main.KYCRequestEntry"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.KYCErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/main.KYCErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/request-mortgage": {
             "post": {
                 "description": "Allows a logged-in user (the lendee) to request a mortgage from a specified lender. This request is stored by the sidecar and does not submit a transaction. It creates a pending request that the lender can later approve.",
@@ -522,6 +690,41 @@
         }
     },
     "definitions": {
+        "main.AdminLoginErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "main.AdminLoginRequest": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.AdminLoginResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "main.ApproveKYCRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
         "main.CreateMortgageRequest": {
             "type": "object",
             "properties": {
@@ -586,10 +789,45 @@
                 }
             }
         },
+        "main.KYCErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
         "main.KYCRequest": {
             "type": "object",
             "properties": {
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.KYCRequestEntry": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "requester": {
+                    "description": "Name of the user requesting KYC",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "\"pending\", \"approved\", \"rejected\"",
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.KYCStatusResponse": {
+            "type": "object",
+            "properties": {
+                "status": {
                     "type": "string"
                 }
             }

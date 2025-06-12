@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	zlog "github.com/rs/zerolog/log"
 
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/google/uuid"
 )
 
 // UserData holds the information for a created user.
@@ -48,6 +50,29 @@ type UserDetailResponse struct {
 	Role    string `json:"role"`
 	Type    string `json:"type"`
 	PubKey  string `json:"pubkey"`
+}
+
+// KYCRequestEntry defines a pending KYC request.
+type KYCRequestEntry struct {
+	ID        string    `json:"id"`
+	Requester string    `json:"requester"` // Name of the user requesting KYC
+	Status    string    `json:"status"`    // "pending", "approved", "rejected"
+	Timestamp time.Time `json:"timestamp"`
+}
+
+// ApproveKYCRequest defines the request body for approving a KYC request.
+type ApproveKYCRequest struct {
+	ID string `json:"id"`
+}
+
+// KYCStatusResponse defines a standard status response for KYC endpoints.
+type KYCStatusResponse struct {
+	Status string `json:"status"`
+}
+
+// KYCErrorResponse defines a standard error response for KYC endpoints.
+type KYCErrorResponse struct {
+	Error string `json:"error"`
 }
 
 // loginHandler handles user login and registration
@@ -418,4 +443,154 @@ func (s *Server) initUsers() error {
 	}
 
 	return nil
+}
+
+// requestKYCHandler allows a user to request KYC.
+// @Summary Request KYC (user)
+// @Description Allows a logged-in user to request KYC. This creates a pending KYC request that a regulator can later approve.
+// @Accept json
+// @Produce json
+// @Success 201 {object} KYCRequestEntry
+// @Failure 400 {object} KYCErrorResponse
+// @Failure 401 {object} KYCErrorResponse
+// @Router /request-kyc [post]
+func (s *Server) requestKYCHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+	if s.loggedInUser == "" {
+		http.Error(w, "No user is logged in. Please log in to request KYC.", http.StatusUnauthorized)
+		return
+	}
+	// Check if user already has a pending KYC request
+	for _, req := range s.kycRequests {
+		if req.Requester == s.loggedInUser && req.Status == "pending" {
+			http.Error(w, "You already have a pending KYC request.", http.StatusBadRequest)
+			return
+		}
+	}
+	newReq := KYCRequestEntry{
+		ID:        uuid.New().String(),
+		Requester: s.loggedInUser,
+		Status:    "pending",
+		Timestamp: time.Now(),
+	}
+	s.kycRequests = append(s.kycRequests, newReq)
+	if err := s.saveKYCRequestsToFile(); err != nil {
+		http.Error(w, "Failed to save KYC request", http.StatusInternalServerError)
+		zlog.Error().Err(err).Msg("failed to save KYC requests file")
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(newReq)
+}
+
+// getKYCRequestsHandler allows a regulator to view all pending KYC requests.
+// @Summary Get pending KYC requests (regulator)
+// @Description Allows a logged-in regulator to view all pending KYC requests.
+// @Produce json
+// @Success 200 {array} KYCRequestEntry
+// @Failure 401 {object} KYCErrorResponse
+// @Failure 403 {object} KYCErrorResponse
+// @Router /kyc-requests [get]
+func (s *Server) getKYCRequestsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+	if s.loggedInUser == "" {
+		http.Error(w, "No user is logged in.", http.StatusUnauthorized)
+		return
+	}
+	userData, ok := s.users[s.loggedInUser]
+	if !ok || userData.Role != "regulator" {
+		http.Error(w, "Only regulators can view KYC requests.", http.StatusForbidden)
+		return
+	}
+	pending := make([]KYCRequestEntry, 0)
+	for _, req := range s.kycRequests {
+		if req.Status == "pending" {
+			pending = append(pending, req)
+		}
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(pending)
+}
+
+// approveKYCHandler allows a regulator to approve a KYC request.
+// @Summary Approve KYC request (regulator)
+// @Description Allows a logged-in regulator to approve a pending KYC request. The user's role will be updated to 'investor'.
+// @Accept json
+// @Produce json
+// @Param request body ApproveKYCRequest true "KYC approval request"
+// @Success 200 {object} KYCStatusResponse
+// @Failure 400 {object} KYCErrorResponse
+// @Failure 401 {object} KYCErrorResponse
+// @Failure 403 {object} KYCErrorResponse
+// @Failure 404 {object} KYCErrorResponse
+// @Router /approve-kyc [post]
+func (s *Server) approveKYCHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+	if s.loggedInUser == "" {
+		http.Error(w, "No user is logged in.", http.StatusUnauthorized)
+		return
+	}
+	userData, ok := s.users[s.loggedInUser]
+	if !ok || userData.Role != "regulator" {
+		http.Error(w, "Only regulators can approve KYC requests.", http.StatusForbidden)
+		return
+	}
+	var req ApproveKYCRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+	found := false
+	for i, kycReq := range s.kycRequests {
+		if kycReq.ID == req.ID && kycReq.Status == "pending" {
+			s.kycRequests[i].Status = "approved"
+			// Mark user as KYC'd (role = investor)
+			requesterData, ok := s.users[kycReq.Requester]
+			if ok && requesterData.Role == "user" {
+				requesterData.Role = "investor"
+				s.users[kycReq.Requester] = requesterData
+				s.saveUsersToFile()
+			}
+			found = true
+			break
+		}
+	}
+	if !found {
+		http.Error(w, "KYC request not found or already processed", http.StatusNotFound)
+		return
+	}
+	s.saveKYCRequestsToFile()
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(KYCStatusResponse{Status: "approved"})
+}
+
+// Save/load KYC requests to/from file
+func (s *Server) saveKYCRequestsToFile() error {
+	data, err := json.MarshalIndent(s.kycRequests, "", "  ")
+	if err != nil {
+		return fmt.Errorf("failed to marshal KYC requests: %w", err)
+	}
+	return os.WriteFile(s.kycRequestsFile, data, 0644)
+}
+
+func (s *Server) loadKYCRequestsFromFile() error {
+	data, err := os.ReadFile(s.kycRequestsFile)
+	if err != nil {
+		if os.IsNotExist(err) {
+			s.kycRequests = []KYCRequestEntry{}
+			return nil
+		}
+		return err
+	}
+	return json.Unmarshal(data, &s.kycRequests)
 }

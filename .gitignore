@@ -8,6 +8,7 @@ release/
 *.log
 *.ign
 
+kyc_requests.json
 users.json
 logins.json
 tx.json

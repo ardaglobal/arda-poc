@@ -1,5 +1,27 @@
 basePath: /
 definitions:
+  main.AdminLoginErrorResponse:
+    properties:
+      error:
+        type: string
+      success:
+        type: boolean
+    type: object
+  main.AdminLoginRequest:
+    properties:
+      key:
+        type: string
+    type: object
+  main.AdminLoginResponse:
+    properties:
+      success:
+        type: boolean
+    type: object
+  main.ApproveKYCRequest:
+    properties:
+      id:
+        type: string
+    type: object
   main.CreateMortgageRequest:
     properties:
       amount:
@@ -42,9 +64,32 @@ definitions:
       zoning_classification:
         type: string
     type: object
+  main.KYCErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
   main.KYCRequest:
     properties:
       name:
+        type: string
+    type: object
+  main.KYCRequestEntry:
+    properties:
+      id:
+        type: string
+      requester:
+        description: Name of the user requesting KYC
+        type: string
+      status:
+        description: '"pending", "approved", "rejected"'
+        type: string
+      timestamp:
+        type: string
+    type: object
+  main.KYCStatusResponse:
+    properties:
+      status:
         type: string
     type: object
   main.LoginRequest:
@@ -201,6 +246,76 @@ info:
   title: Transaction Sidecar API
   version: "1.0"
 paths:
+  /admin-login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates an admin using a key. Returns success if the provided
+        key matches the ADMIN_KEY environment variable.
+      parameters:
+      - description: Admin login key
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.AdminLoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.AdminLoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.AdminLoginErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/main.AdminLoginErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.AdminLoginErrorResponse'
+      summary: Admin login
+  /approve-kyc:
+    post:
+      consumes:
+      - application/json
+      description: Allows a logged-in regulator to approve a pending KYC request.
+        The user's role will be updated to 'investor'.
+      parameters:
+      - description: KYC approval request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.ApproveKYCRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.KYCStatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.KYCErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/main.KYCErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/main.KYCErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.KYCErrorResponse'
+      summary: Approve KYC request (regulator)
   /create-mortgage:
     post:
       consumes:
@@ -259,6 +374,27 @@ paths:
                 type: object
             type: object
       summary: Edit property metadata
+  /kyc-requests:
+    get:
+      description: Allows a logged-in regulator to view all pending KYC requests.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.KYCRequestEntry'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/main.KYCErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/main.KYCErrorResponse'
+      summary: Get pending KYC requests (regulator)
   /kyc-user:
     post:
       consumes:
@@ -438,6 +574,28 @@ paths:
                 type: object
             type: object
       summary: Request funds from faucet
+  /request-kyc:
+    post:
+      consumes:
+      - application/json
+      description: Allows a logged-in user to request KYC. This creates a pending
+        KYC request that a regulator can later approve.
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.KYCRequestEntry'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.KYCErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/main.KYCErrorResponse'
+      summary: Request KYC (user)
   /request-mortgage:
     post:
       consumes:
