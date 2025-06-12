@@ -39,7 +39,10 @@ import (
 	"cosmossdk.io/x/feegrant"
 	"cosmossdk.io/x/nft"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
+	mortgagemodulev1 "github.com/ardaglobal/arda-poc/api/ardapoc/mortgage/module"
 	usdardamodulev1 "github.com/ardaglobal/arda-poc/api/ardapoc/usdarda/module"
+	_ "github.com/ardaglobal/arda-poc/x/mortgage/module" // import for side-effects
+	mortgagemoduletypes "github.com/ardaglobal/arda-poc/x/mortgage/types"
 	_ "github.com/ardaglobal/arda-poc/x/usdarda/module" // import for side-effects
 	usdardamoduletypes "github.com/ardaglobal/arda-poc/x/usdarda/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
@@ -103,6 +106,7 @@ var (
 		ardamoduletypes.ModuleName,
 		propertymoduletypes.ModuleName,
 		usdardamoduletypes.ModuleName,
+		mortgagemoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 
@@ -130,6 +134,7 @@ var (
 		ardamoduletypes.ModuleName,
 		propertymoduletypes.ModuleName,
 		usdardamoduletypes.ModuleName,
+		mortgagemoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	}
 
@@ -151,6 +156,7 @@ var (
 		ardamoduletypes.ModuleName,
 		propertymoduletypes.ModuleName,
 		usdardamoduletypes.ModuleName,
+		mortgagemoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	}
 
@@ -173,6 +179,7 @@ var (
 		{Account: icatypes.ModuleName},
 		{Account: propertymoduletypes.ModuleName, Permissions: []string{authtypes.Minter}},
 		{Account: usdardamoduletypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
+		{Account: mortgagemoduletypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner, authtypes.Staking}},
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 
@@ -319,6 +326,10 @@ var (
 			{
 				Name:   usdardamoduletypes.ModuleName,
 				Config: appconfig.WrapAny(&usdardamodulev1.Module{}),
+			},
+			{
+				Name:   mortgagemoduletypes.ModuleName,
+				Config: appconfig.WrapAny(&mortgagemodulev1.Module{}),
 			},
 			// this line is used by starport scaffolding # stargate/app/moduleConfig
 		},
