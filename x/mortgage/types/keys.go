@@ -24,5 +24,6 @@ func KeyPrefix(p string) []byte {
 // MortgageMarkerDenom returns the sanitized bank denom for a mortgage marker token.
 func MortgageMarkerDenom(collateral, index string) string {
 	sanitizedCollateral := strings.ReplaceAll(collateral, " ", "")
-	return "mortgage/" + sanitizedCollateral + "/" + index
+	sanitizedIndex := strings.ReplaceAll(index, " ", "")
+	return "mortgage/" + sanitizedCollateral + "/" + sanitizedIndex
 }
