@@ -107,6 +107,78 @@ A successful broadcast will return a JSON object containing the transaction hash
 }
 ``` 
 
+### `POST /create-mortgage`
+
+Submits a transaction to create a new mortgage. This must be called by the **lender**, who must be logged in. The sidecar will use the logged-in user's account to sign the transaction, funding the mortgage from their account.
+
+**Request Body:**
+
+```json
+{
+  "index": "mortgage-001",
+  "lendee": "arda1un6a2k876hqwhe75zv0k369yqmwexfj6qkuzsk",
+  "collateral": "property-123",
+  "amount": 250000,
+  "interest_rate": "5",
+  "term": "360 months",
+  "gas": "auto"
+}
+```
+
+**Example `curl` Request:**
+
+*Assumes the lender is already logged into the sidecar.*
+```bash
+curl -X POST http://localhost:8080/create-mortgage -H "Content-Type: application/json" -d '{
+  "index": "mortgage-001",
+  "lendee": "arda1un6a2k876hqwhe75zv0k369yqmwexfj6qkuzsk",
+  "collateral": "property-123",
+  "amount": 250000,
+  "interest_rate": "5",
+  "term": "360 months"
+}'
+```
+
+**Success Response:**
+
+```json
+{
+  "tx_hash": "C3D4E5F6A1B2..."
+}
+```
+
+### `POST /repay-mortgage`
+
+Submits a transaction to repay a portion of an outstanding mortgage. This must be called by the **lendee**, who must be logged in.
+
+**Request Body:**
+
+```json
+{
+  "mortgage_id": "mortgage-001",
+  "amount": 5000,
+  "gas": "auto"
+}
+```
+
+**Example `curl` Request:**
+
+*Assumes the lendee is already logged into the sidecar.*
+```bash
+curl -X POST http://localhost:8080/repay-mortgage -H "Content-Type: application/json" -d '{
+  "mortgage_id": "mortgage-001",
+  "amount": 5000
+}'
+```
+
+**Success Response:**
+
+```json
+{
+  "tx_hash": "D4E5F6A1B2C3..."
+}
+```
+
 ### `POST /login`
 
 Handles user login, registration, and linking.

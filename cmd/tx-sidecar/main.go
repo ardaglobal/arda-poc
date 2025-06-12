@@ -245,6 +245,10 @@ func main() {
 	app.Get("/transaction/*", fiberadaptor.HTTPHandlerFunc(server.getTransactionHandler))
 	app.Post("/kyc-user", fiberadaptor.HTTPHandlerFunc(server.kycUserHandler))
 
+	// Mortgage endpoints
+	app.Post("/create-mortgage", fiberadaptor.HTTPHandlerFunc(server.createMortgageHandler))
+	app.Post("/repay-mortgage", fiberadaptor.HTTPHandlerFunc(server.repayMortgageHandler))
+
 	zlog.Info().Msg("Starting transaction sidecar server on :8080...")
 	if err := app.Listen(":8080"); err != nil {
 		zlog.Fatal().Msgf("Failed to start server: %v", err)
