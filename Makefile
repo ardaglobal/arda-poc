@@ -1,4 +1,4 @@
-BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+			BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 COMMIT := $(shell git log -1 --format='%H')
 APPNAME := arda
 
@@ -141,7 +141,12 @@ dev:
 dev-sidecar:
 	@echo "--> Running dev-sidecar"
 	@go run ./cmd/tx-sidecar
-.PHONY: dev-sidecar
+
+sidecar-docs:
+	@echo "--> Generating sidecar OpenAPI docs"
+	@go install github.com/swaggo/swag/cmd/swag@v1.16.4
+	@swag init --dir cmd/tx-sidecar --output cmd/tx-sidecar/docs
+.PHONY: dev-sidecar sidecar-docs
 
 govet:
 	@echo Running go vet...
