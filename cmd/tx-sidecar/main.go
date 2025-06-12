@@ -78,6 +78,11 @@ type Server struct {
 
 	forSaleProperties     []ForSaleProperty
 	forSalePropertiesFile string
+
+	offPlanProperties           []OffPlanProperty
+	offPlanPropertiesFile       string
+	offPlanPurchaseRequests     []OffPlanPurchaseRequest
+	offPlanPurchaseRequestsFile string
 }
 
 // NewServer creates a new instance of the Server with all its dependencies.
@@ -207,23 +212,49 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		return nil, fmt.Errorf("failed to read for sale properties file: %w", err)
 	}
 
+	offPlanPropertiesFile := "offplan_properties.json"
+	offPlanProperties := make([]OffPlanProperty, 0)
+	oppData, err := os.ReadFile(offPlanPropertiesFile)
+	if err == nil {
+		if err := json.Unmarshal(oppData, &offPlanProperties); err != nil {
+			zlog.Warn().Msgf("failed to unmarshal off plan properties file, starting with empty list: %v", err)
+		}
+	} else if !os.IsNotExist(err) {
+		return nil, fmt.Errorf("failed to read off plan properties file: %w", err)
+	}
+
+	offPlanPurchaseRequestsFile := "offplan_purchase_requests.json"
+	offPlanPurchaseRequests := make([]OffPlanPurchaseRequest, 0)
+	opprData, err := os.ReadFile(offPlanPurchaseRequestsFile)
+	if err == nil {
+		if err := json.Unmarshal(opprData, &offPlanPurchaseRequests); err != nil {
+			zlog.Warn().Msgf("failed to unmarshal off plan purchase requests file, starting with empty list: %v", err)
+		}
+	} else if !os.IsNotExist(err) {
+		return nil, fmt.Errorf("failed to read off plan purchase requests file: %w", err)
+	}
+
 	s := &Server{
-		clientCtx:             clientCtx,
-		authClient:            authtypes.NewQueryClient(grpcConn),
-		txClient:              txtypes.NewServiceClient(grpcConn),
-		users:                 users,
-		usersFile:             usersFile,
-		logins:                logins,
-		loginsFile:            loginsFile,
-		faucetName:            appConfig.Faucet.Name,
-		transactions:          transactions,
-		transactionsFile:      transactionsFile,
-		mortgageRequests:      mortgageRequests,
-		mortgageRequestsFile:  mortgageRequestsFile,
-		kycRequests:           kycRequests,
-		kycRequestsFile:       kycRequestsFile,
-		forSaleProperties:     forSaleProperties,
-		forSalePropertiesFile: forSalePropertiesFile,
+		clientCtx:                   clientCtx,
+		authClient:                  authtypes.NewQueryClient(grpcConn),
+		txClient:                    txtypes.NewServiceClient(grpcConn),
+		users:                       users,
+		usersFile:                   usersFile,
+		logins:                      logins,
+		loginsFile:                  loginsFile,
+		faucetName:                  appConfig.Faucet.Name,
+		transactions:                transactions,
+		transactionsFile:            transactionsFile,
+		mortgageRequests:            mortgageRequests,
+		mortgageRequestsFile:        mortgageRequestsFile,
+		kycRequests:                 kycRequests,
+		kycRequestsFile:             kycRequestsFile,
+		forSaleProperties:           forSaleProperties,
+		forSalePropertiesFile:       forSalePropertiesFile,
+		offPlanProperties:           offPlanProperties,
+		offPlanPropertiesFile:       offPlanPropertiesFile,
+		offPlanPurchaseRequests:     offPlanPurchaseRequests,
+		offPlanPurchaseRequestsFile: offPlanPurchaseRequestsFile,
 	}
 
 	// Ensure that the faucet account from config exists in the keyring.
@@ -366,6 +397,13 @@ func main() {
 	app.Post("/admin-login", server.adminLoginHandler)
 
 	app.Post("/request-equity-mortgage", fiberadaptor.HTTPHandlerFunc(server.requestEquityMortgageHandler))
+
+	app.Get("/offplan-purchase-requests", fiberadaptor.HTTPHandlerFunc(server.getOffPlanPurchaseRequestsHandler))
+
+	app.Post("/offplan-property", fiberadaptor.HTTPHandlerFunc(server.postOffPlanPropertyHandler))
+	app.Post("/offplan-purchase-request", fiberadaptor.HTTPHandlerFunc(server.postOffPlanPurchaseRequestHandler))
+
+	app.Post("/approve-offplan-property", fiberadaptor.HTTPHandlerFunc(server.approveOffPlanPropertyHandler))
 
 	zlog.Info().Msg("Starting transaction sidecar server on :8080...")
 	if err := app.Listen(":8080"); err != nil {

@@ -112,6 +112,49 @@
                 }
             }
         },
+        "/approve-offplan-property": {
+            "post": {
+                "description": "Regulator approves a fully funded off plan property, registering it on-chain with the owners from the purchase requests. Status is updated to 'registered'.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Approve off plan property (regulator)",
+                "parameters": [
+                    {
+                        "description": "Off plan property ID",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.ApproveOffPlanPropertyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.OffPlanProperty"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.KYCErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/main.KYCErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/create-mortgage": {
             "post": {
                 "description": "Submits a transaction to create a new mortgage, effectively approving a pending request. This must be called by the **lender**, who must be logged in. The sidecar will use the logged-in user's account to sign the transaction, funding the mortgage from their account. The details in the request body should match the details from a pending mortgage request.",
@@ -408,6 +451,109 @@
                             "type": "array",
                             "items": {
                                 "$ref": "#/definitions/main.MortgageRequest"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/offplan-property": {
+            "post": {
+                "description": "Developer submits a new off plan property to be funded. Status is set to 'for_sale'.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Submit off plan property",
+                "parameters": [
+                    {
+                        "description": "off plan property info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.OffPlanPropertyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/main.OffPlanProperty"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.KYCErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/offplan-purchase-request": {
+            "post": {
+                "description": "User submits a request to purchase shares in an off plan property. Auto-accepted if not fully funded. Rejected if \u003e100% funded. If 100% funded, property status is set to 'pending_regulator_approval'.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Submit off plan property purchase request",
+                "parameters": [
+                    {
+                        "description": "purchase request info",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.OffPlanPurchaseRequestPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/main.OffPlanPurchaseRequest"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.KYCErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/offplan-purchase-requests": {
+            "get": {
+                "description": "Returns all purchase requests for a given off plan property.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get off plan property purchase requests",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Off plan property ID",
+                        "name": "property_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/main.OffPlanPurchaseRequest"
                             }
                         }
                     }
@@ -825,6 +971,14 @@
                 }
             }
         },
+        "main.ApproveOffPlanPropertyRequest": {
+            "type": "object",
+            "properties": {
+                "property_id": {
+                    "type": "string"
+                }
+            }
+        },
         "main.EditPropertyMetadataRequest": {
             "type": "object",
             "properties": {
@@ -1116,6 +1270,85 @@
                     "items": {
                         "type": "integer"
                     }
+                }
+            }
+        },
+        "main.OffPlanProperty": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "developer": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "region": {
+                    "type": "string"
+                },
+                "status": {
+                    "description": "\"for_sale\", \"pending_regulator_approval\", \"registered\"",
+                    "type": "string"
+                },
+                "total_shares": {
+                    "type": "integer"
+                },
+                "value": {
+                    "type": "integer"
+                }
+            }
+        },
+        "main.OffPlanPropertyRequest": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "region": {
+                    "type": "string"
+                },
+                "total_shares": {
+                    "type": "integer"
+                },
+                "value": {
+                    "type": "integer"
+                }
+            }
+        },
+        "main.OffPlanPurchaseRequest": {
+            "type": "object",
+            "properties": {
+                "amount_usd": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "percent": {
+                    "type": "number"
+                },
+                "property_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "description": "\"accepted\"",
+                    "type": "string"
+                },
+                "user": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.OffPlanPurchaseRequestPayload": {
+            "type": "object",
+            "properties": {
+                "amount_usd": {
+                    "type": "integer"
+                },
+                "property_id": {
+                    "type": "string"
                 }
             }
         },

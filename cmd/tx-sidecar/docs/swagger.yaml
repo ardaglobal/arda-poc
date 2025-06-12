@@ -22,6 +22,11 @@ definitions:
       id:
         type: string
     type: object
+  main.ApproveOffPlanPropertyRequest:
+    properties:
+      property_id:
+        type: string
+    type: object
   main.EditPropertyMetadataRequest:
     properties:
       construction_information:
@@ -218,6 +223,58 @@ definitions:
           type: integer
         type: array
     type: object
+  main.OffPlanProperty:
+    properties:
+      address:
+        type: string
+      developer:
+        type: string
+      id:
+        type: string
+      region:
+        type: string
+      status:
+        description: '"for_sale", "pending_regulator_approval", "registered"'
+        type: string
+      total_shares:
+        type: integer
+      value:
+        type: integer
+    type: object
+  main.OffPlanPropertyRequest:
+    properties:
+      address:
+        type: string
+      region:
+        type: string
+      total_shares:
+        type: integer
+      value:
+        type: integer
+    type: object
+  main.OffPlanPurchaseRequest:
+    properties:
+      amount_usd:
+        type: integer
+      id:
+        type: string
+      percent:
+        type: number
+      property_id:
+        type: string
+      status:
+        description: '"accepted"'
+        type: string
+      user:
+        type: string
+    type: object
+  main.OffPlanPurchaseRequestPayload:
+    properties:
+      amount_usd:
+        type: integer
+      property_id:
+        type: string
+    type: object
   main.RegisterPropertyRequest:
     properties:
       address:
@@ -378,6 +435,36 @@ paths:
           schema:
             $ref: '#/definitions/main.KYCErrorResponse'
       summary: Approve KYC request (regulator)
+  /approve-offplan-property:
+    post:
+      consumes:
+      - application/json
+      description: Regulator approves a fully funded off plan property, registering
+        it on-chain with the owners from the purchase requests. Status is updated
+        to 'registered'.
+      parameters:
+      - description: Off plan property ID
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.ApproveOffPlanPropertyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.OffPlanProperty'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.KYCErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/main.KYCErrorResponse'
+      summary: Approve off plan property (regulator)
   /create-mortgage:
     post:
       consumes:
@@ -574,6 +661,76 @@ paths:
               $ref: '#/definitions/main.MortgageRequest'
             type: array
       summary: Get pending mortgage requests
+  /offplan-property:
+    post:
+      consumes:
+      - application/json
+      description: Developer submits a new off plan property to be funded. Status
+        is set to 'for_sale'.
+      parameters:
+      - description: off plan property info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.OffPlanPropertyRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.OffPlanProperty'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.KYCErrorResponse'
+      summary: Submit off plan property
+  /offplan-purchase-request:
+    post:
+      consumes:
+      - application/json
+      description: User submits a request to purchase shares in an off plan property.
+        Auto-accepted if not fully funded. Rejected if >100% funded. If 100% funded,
+        property status is set to 'pending_regulator_approval'.
+      parameters:
+      - description: purchase request info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.OffPlanPurchaseRequestPayload'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.OffPlanPurchaseRequest'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.KYCErrorResponse'
+      summary: Submit off plan property purchase request
+  /offplan-purchase-requests:
+    get:
+      description: Returns all purchase requests for a given off plan property.
+      parameters:
+      - description: Off plan property ID
+        in: query
+        name: property_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.OffPlanPurchaseRequest'
+            type: array
+      summary: Get off plan property purchase requests
   /properties-for-sale:
     get:
       description: Returns all properties currently listed for sale.
