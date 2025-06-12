@@ -11,6 +11,7 @@ release/
 users.json
 logins.json
 tx.json 
+mortgage_requests.json 
 
 .arda_data/
 
