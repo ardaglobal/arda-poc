@@ -437,6 +437,7 @@ func main() {
 	app.Get("/user/list", fiberadaptor.HTTPHandlerFunc(server.listUsersHandler))
 	app.Post("/user/login", fiberadaptor.HTTPHandlerFunc(server.loginHandler))
 	app.Post("/user/logout", fiberadaptor.HTTPHandlerFunc(server.logoutHandler))
+	app.Get("/user/status", fiberadaptor.HTTPHandlerFunc(server.loginStatusHandler))
 
 	// Property routes
 	app.Post("/property/register", fiberadaptor.HTTPHandlerFunc(server.registerPropertyHandler))
@@ -446,6 +447,7 @@ func main() {
 	app.Get("/property/for-sale", fiberadaptor.HTTPHandlerFunc(server.getPropertiesForSaleHandler))
 
 	// Off plan property routes
+	app.Get("/property/offplans", fiberadaptor.HTTPHandlerFunc(server.getOffPlanPropertiesHandler))
 	app.Post("/property/offplan", fiberadaptor.HTTPHandlerFunc(server.postOffPlanPropertyHandler))
 	app.Post("/property/offplan/purchase-request", fiberadaptor.HTTPHandlerFunc(server.postOffPlanPurchaseRequestHandler))
 	app.Get("/property/offplan/purchase-requests", fiberadaptor.HTTPHandlerFunc(server.getOffPlanPurchaseRequestsHandler))

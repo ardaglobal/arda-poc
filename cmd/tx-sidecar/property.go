@@ -315,6 +315,22 @@ func (s *Server) getOffPlanPurchaseRequestsHandler(w http.ResponseWriter, r *htt
 	json.NewEncoder(w).Encode(requests)
 }
 
+// getOffPlanPropertiesHandler returns all off-plan properties.
+// @Summary Get all off-plan properties
+// @Description Returns all off-plan properties, regardless of status.
+// @Produce json
+// @Success 200 {array} OffPlanProperty
+// @Router /property/offplans [get]
+func (s *Server) getOffPlanPropertiesHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+	zlog.Info().Str("handler", "getOffPlanPropertiesHandler").Msg("received request")
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(s.offPlanProperties)
+}
+
 // Persistence helpers for off plan properties and purchase requests
 func (s *Server) saveOffPlanPropertiesToFile() error {
 	data, err := json.MarshalIndent(s.offPlanProperties, "", "  ")

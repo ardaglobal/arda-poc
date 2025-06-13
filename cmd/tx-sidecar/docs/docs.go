@@ -644,6 +644,26 @@ const docTemplate = `{
                 }
             }
         },
+        "/property/offplans": {
+            "get": {
+                "description": "Returns all off-plan properties, regardless of status.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get all off-plan properties",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/main.OffPlanProperty"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/property/register": {
             "post": {
                 "description": "Submits a transaction to register a new property on the blockchain.",
@@ -984,6 +1004,23 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/user/status": {
+            "get": {
+                "description": "Returns the currently logged in user, if any.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get login status",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.LoginStatusResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -1175,6 +1212,20 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
+                    "type": "string"
+                },
+                "user": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.LoginStatusResponse": {
+            "type": "object",
+            "properties": {
+                "logged_in": {
+                    "type": "boolean"
+                },
+                "role": {
                     "type": "string"
                 },
                 "user": {

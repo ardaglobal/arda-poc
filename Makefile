@@ -139,7 +139,7 @@ dev:
 	@ignite chain serve 
 .PHONY: dev
 
-dev-sidecar: sidecar-docs
+dev-sidecar:
 	@echo "--> Running dev-sidecar"
 	@go run ./cmd/tx-sidecar
 .PHONY: dev-sidecar
