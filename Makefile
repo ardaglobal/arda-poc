@@ -1,6 +1,6 @@
 			BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 COMMIT := $(shell git log -1 --format='%H')
-APPNAME := arda
+APPNAME := arda-poc
 
 # don't override user values
 ifeq (,$(VERSION))
@@ -162,7 +162,14 @@ govulncheck:
 
 clean:
 	rm -rf ~/.arda-poc
-	rm users.json
-	rm logins.json
-	rm tx.json
+	rm -rf cmd/tx-sidecar/local_data
 .PHONY: clean
+
+prod:
+	ignite chain build
+	@if [ ! -d $$HOME/.arda-poc ]; then \
+		echo "Home directory not found, running ignite chain init..."; \
+		ignite chain init; \
+	fi
+	$(APPNAME)d start
+.PHONY: prod

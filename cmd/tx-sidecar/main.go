@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strings"
 
 	fiberadaptor "github.com/gofiber/adaptor/v2"
@@ -94,7 +95,12 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		return nil, fmt.Errorf("failed to connect to gRPC server at %s: %w", grpcAddr, err)
 	}
 
-	usersFile := "users.json"
+	dataDir := "cmd/tx-sidecar/local_data"
+	if err := os.MkdirAll(dataDir, 0755); err != nil {
+		return nil, fmt.Errorf("failed to create data directory: %w", err)
+	}
+
+	usersFile := filepath.Join(dataDir, "users.json")
 	users := make(map[string]UserData)
 
 	file, err := os.ReadFile(usersFile)
@@ -142,7 +148,7 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		}
 	}
 
-	loginsFile := "logins.json"
+	loginsFile := filepath.Join(dataDir, "logins.json")
 	logins := make(map[string]string)
 
 	loginData, err := os.ReadFile(loginsFile)
@@ -154,7 +160,7 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		return nil, fmt.Errorf("failed to read logins file: %w", err)
 	}
 
-	transactionsFile := "tx.json"
+	transactionsFile := filepath.Join(dataDir, "tx.json")
 	transactions := make([]TrackedTx, 0)
 	txData, err := os.ReadFile(transactionsFile)
 	if err == nil {
@@ -165,7 +171,7 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		return nil, fmt.Errorf("failed to read transactions file: %w", err)
 	}
 
-	mortgageRequestsFile := "mortgage_requests.json"
+	mortgageRequestsFile := filepath.Join(dataDir, "mortgage_requests.json")
 	mortgageRequests := make([]MortgageRequest, 0)
 	mrData, err := os.ReadFile(mortgageRequestsFile)
 	if err == nil {
@@ -192,7 +198,7 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		return nil, fmt.Errorf("faucet name is not defined in config.yml")
 	}
 
-	kycRequestsFile := "kyc_requests.json"
+	kycRequestsFile := filepath.Join(dataDir, "kyc_requests.json")
 	kycRequests := make([]KYCRequestEntry, 0)
 	krData, err := os.ReadFile(kycRequestsFile)
 	if err == nil {
@@ -203,7 +209,7 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		return nil, fmt.Errorf("failed to read kyc requests file: %w", err)
 	}
 
-	forSalePropertiesFile := "for_sale_properties.json"
+	forSalePropertiesFile := filepath.Join(dataDir, "for_sale_properties.json")
 	forSaleProperties := make([]ForSaleProperty, 0)
 	fspData, err := os.ReadFile(forSalePropertiesFile)
 	if err == nil {
@@ -214,7 +220,7 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		return nil, fmt.Errorf("failed to read for sale properties file: %w", err)
 	}
 
-	offPlanPropertiesFile := "offplan_properties.json"
+	offPlanPropertiesFile := filepath.Join(dataDir, "offplan_properties.json")
 	offPlanProperties := make([]OffPlanProperty, 0)
 	oppData, err := os.ReadFile(offPlanPropertiesFile)
 	if err == nil {
@@ -225,7 +231,7 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		return nil, fmt.Errorf("failed to read off plan properties file: %w", err)
 	}
 
-	offPlanPurchaseRequestsFile := "offplan_purchase_requests.json"
+	offPlanPurchaseRequestsFile := filepath.Join(dataDir, "offplan_purchase_requests.json")
 	offPlanPurchaseRequests := make([]OffPlanPurchaseRequest, 0)
 	opprData, err := os.ReadFile(offPlanPurchaseRequestsFile)
 	if err == nil {
@@ -315,7 +321,7 @@ type AdminLoginErrorResponse struct {
 // @Failure 400 {object} AdminLoginErrorResponse
 // @Failure 401 {object} AdminLoginErrorResponse
 // @Failure 500 {object} AdminLoginErrorResponse
-// @Router /admin-login [post]
+// @Router /admin/login [post]
 func (s *Server) adminLoginHandler(c *fiber.Ctx) error {
 	type reqBody AdminLoginRequest
 	var body reqBody
@@ -437,6 +443,7 @@ func main() {
 	app.Get("/user/list", fiberadaptor.HTTPHandlerFunc(server.listUsersHandler))
 	app.Post("/user/login", fiberadaptor.HTTPHandlerFunc(server.loginHandler))
 	app.Post("/user/logout", fiberadaptor.HTTPHandlerFunc(server.logoutHandler))
+	app.Get("/user/status", fiberadaptor.HTTPHandlerFunc(server.loginStatusHandler))
 
 	// Property routes
 	app.Post("/property/register", fiberadaptor.HTTPHandlerFunc(server.registerPropertyHandler))
@@ -446,6 +453,7 @@ func main() {
 	app.Get("/property/for-sale", fiberadaptor.HTTPHandlerFunc(server.getPropertiesForSaleHandler))
 
 	// Off plan property routes
+	app.Get("/property/offplans", fiberadaptor.HTTPHandlerFunc(server.getOffPlanPropertiesHandler))
 	app.Post("/property/offplan", fiberadaptor.HTTPHandlerFunc(server.postOffPlanPropertyHandler))
 	app.Post("/property/offplan/purchase-request", fiberadaptor.HTTPHandlerFunc(server.postOffPlanPurchaseRequestHandler))
 	app.Get("/property/offplan/purchase-requests", fiberadaptor.HTTPHandlerFunc(server.getOffPlanPurchaseRequestsHandler))

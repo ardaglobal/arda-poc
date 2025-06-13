@@ -285,7 +285,54 @@ func (s *Server) saveForSalePropertiesToFile() error {
 
 // updateForSalePropertiesOnTransfer updates/removes for-sale listings after a transfer.
 func (s *Server) updateForSalePropertiesOnTransfer(propertyID string, fromOwners []string, fromShares []uint64) {
-	// TODO: Implement logic to match and update for-sale listings when shares are transferred.
+	updatedListings := make([]ForSaleProperty, 0, len(s.forSaleProperties))
+
+	for _, listing := range s.forSaleProperties {
+		// Only update listings for the affected property and owner
+		if listing.PropertyID == propertyID {
+			for i, owner := range fromOwners {
+				if listing.Owner == owner {
+					// Update shares slice by subtracting the transferred shares
+					if len(listing.Shares) == len(fromShares) {
+						newShares := make([]uint64, len(listing.Shares))
+						allZero := true
+						for j := range listing.Shares {
+							if i == j {
+								if listing.Shares[j] > fromShares[j] {
+									newShares[j] = listing.Shares[j] - fromShares[j]
+									if newShares[j] > 0 {
+										allZero = false
+									}
+								} else {
+									newShares[j] = 0
+								}
+							} else {
+								newShares[j] = listing.Shares[j]
+								if newShares[j] > 0 {
+									allZero = false
+								}
+							}
+						}
+						if !allZero {
+							listing.Shares = newShares
+							updatedListings = append(updatedListings, listing)
+						}
+						// If allZero, do not add this listing (it is now 0 shares)
+						goto nextListing
+					}
+				}
+			}
+		}
+		// If not updated, keep the listing as is
+		updatedListings = append(updatedListings, listing)
+		continue
+
+	nextListing:
+		continue
+	}
+
+	s.forSaleProperties = updatedListings
+	s.saveForSalePropertiesToFile()
 }
 
 // getOffPlanPurchaseRequestsHandler returns all purchase requests for a given off plan property.
@@ -313,6 +360,22 @@ func (s *Server) getOffPlanPurchaseRequestsHandler(w http.ResponseWriter, r *htt
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(requests)
+}
+
+// getOffPlanPropertiesHandler returns all off-plan properties.
+// @Summary Get all off-plan properties
+// @Description Returns all off-plan properties, regardless of status.
+// @Produce json
+// @Success 200 {array} OffPlanProperty
+// @Router /property/offplans [get]
+func (s *Server) getOffPlanPropertiesHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+	zlog.Info().Str("handler", "getOffPlanPropertiesHandler").Msg("received request")
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(s.offPlanProperties)
 }
 
 // Persistence helpers for off plan properties and purchase requests

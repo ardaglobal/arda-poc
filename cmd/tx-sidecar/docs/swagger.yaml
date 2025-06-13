@@ -127,6 +127,15 @@ definitions:
       user:
         type: string
     type: object
+  main.LoginStatusResponse:
+    properties:
+      logged_in:
+        type: boolean
+      role:
+        type: string
+      user:
+        type: string
+    type: object
   main.MortgageRequest:
     properties:
       amount:
@@ -360,7 +369,7 @@ info:
   title: Transaction Sidecar API
   version: "1.0"
 paths:
-  /admin-login:
+  /admin/login:
     post:
       consumes:
       - application/json
@@ -783,6 +792,19 @@ paths:
               $ref: '#/definitions/main.OffPlanPurchaseRequest'
             type: array
       summary: Get off plan property purchase requests
+  /property/offplans:
+    get:
+      description: Returns all off-plan properties, regardless of status.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.OffPlanProperty'
+            type: array
+      summary: Get all off-plan properties
   /property/register:
     post:
       consumes:
@@ -931,7 +953,8 @@ paths:
       summary: Request KYC (user)
   /user/kyc/requests:
     get:
-      description: Allows a logged-in regulator to view all pending KYC requests.
+      description: Regulators see all pending KYC requests. Regular users see only
+        their own pending KYC request(s).
       produces:
       - application/json
       responses:
@@ -945,11 +968,7 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/main.KYCErrorResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/main.KYCErrorResponse'
-      summary: Get pending KYC requests (regulator)
+      summary: Get pending KYC requests
   /user/list:
     get:
       description: Lists all registered users and their key details.
@@ -1011,4 +1030,15 @@ paths:
                 type: object
             type: object
       summary: User logout
+  /user/status:
+    get:
+      description: Returns the currently logged in user, if any.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.LoginStatusResponse'
+      summary: Get login status
 swagger: "2.0"
