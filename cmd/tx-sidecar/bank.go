@@ -119,17 +119,19 @@ func (s *Server) createMortgageHandler(w http.ResponseWriter, r *http.Request) {
 		if mr.Index == req.Index && mr.Lender == fromName && mr.Status == "pending" {
 			s.mortgageRequests[i].Status = "completed"
 			// After mortgage approval, immediately send transfer shares request if property purchase details are present
-			if req.PropertyID != "" && len(req.FromOwners) > 0 && len(req.FromShares) > 0 && len(req.ToOwners) > 0 && len(req.ToShares) > 0 {
-				transferReq := TransferSharesRequest{
-					PropertyID: req.PropertyID,
-					FromOwners: req.FromOwners,
-					FromShares: req.FromShares,
-					ToOwners:   req.ToOwners,
-					ToShares:   req.ToShares,
+			if req.Index != "equity" {
+				if req.PropertyID != "" && len(req.FromOwners) > 0 && len(req.FromShares) > 0 && len(req.ToOwners) > 0 && len(req.ToShares) > 0 {
+					transferReq := TransferSharesRequest{
+						PropertyID: req.PropertyID,
+						FromOwners: req.FromOwners,
+						FromShares: req.FromShares,
+						ToOwners:   req.ToOwners,
+						ToShares:   req.ToShares,
+					}
+					transferReqBody, _ := json.Marshal(transferReq)
+					r2 := &http.Request{Body: io.NopCloser(strings.NewReader(string(transferReqBody))), Method: http.MethodPost}
+					s.transferSharesHandler(w, r2)
 				}
-				transferReqBody, _ := json.Marshal(transferReq)
-				r2 := &http.Request{Body: io.NopCloser(strings.NewReader(string(transferReqBody))), Method: http.MethodPost}
-				s.transferSharesHandler(w, r2)
 			}
 			if err := s.saveMortgageRequestsToFile(); err != nil {
 				zlog.Error().Err(err).Msgf("failed to update status for mortgage request index %s", req.Index)
