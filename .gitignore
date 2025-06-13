@@ -17,6 +17,8 @@ for_sale_properties.json
 test.*
 cmd/tx-sidecar/local_data/
 
+tmp/
+
 .arda_data/
 
 **/.claude/settings.local.json
