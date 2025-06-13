@@ -127,6 +127,15 @@ definitions:
       user:
         type: string
     type: object
+  main.LoginStatusResponse:
+    properties:
+      logged_in:
+        type: boolean
+      role:
+        type: string
+      user:
+        type: string
+    type: object
   main.MortgageRequest:
     properties:
       amount:
@@ -783,6 +792,19 @@ paths:
               $ref: '#/definitions/main.OffPlanPurchaseRequest'
             type: array
       summary: Get off plan property purchase requests
+  /property/offplans:
+    get:
+      description: Returns all off-plan properties, regardless of status.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.OffPlanProperty'
+            type: array
+      summary: Get all off-plan properties
   /property/register:
     post:
       consumes:
@@ -1008,4 +1030,15 @@ paths:
                 type: object
             type: object
       summary: User logout
+  /user/status:
+    get:
+      description: Returns the currently logged in user, if any.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.LoginStatusResponse'
+      summary: Get login status
 swagger: "2.0"

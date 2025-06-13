@@ -38,6 +38,13 @@ type LoginResponse struct {
 	Role    string `json:"role,omitempty"`
 }
 
+// LoginStatusResponse defines the structure of the response for the login status endpoint.
+type LoginStatusResponse struct {
+	LoggedIn bool   `json:"logged_in"`
+	User     string `json:"user,omitempty"`
+	Role     string `json:"role,omitempty"`
+}
+
 // KYCRequest defines the request body for KYC'ing a user.
 type KYCRequest struct {
 	Name string `json:"name"`
@@ -209,6 +216,45 @@ func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{
 		"status":  "success",
 		"message": fmt.Sprintf("User %s logged out", loggedOutUser),
+	})
+}
+
+// loginStatusHandler returns the currently logged in user.
+// @Summary Get login status
+// @Description Returns the currently logged in user, if any.
+// @Produce json
+// @Success 200 {object} LoginStatusResponse
+// @Router /user/status [get]
+func (s *Server) loginStatusHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	zlog.Info().Str("handler", "loginStatusHandler").Str("loggedInUser", s.loggedInUser).Msg("received request")
+
+	w.Header().Set("Content-Type", "application/json")
+	if s.loggedInUser == "" {
+		json.NewEncoder(w).Encode(LoginStatusResponse{
+			LoggedIn: false,
+		})
+		return
+	}
+
+	userData, ok := s.users[s.loggedInUser]
+	if !ok {
+		// This is an inconsistent state, log out the user
+		oldUser := s.loggedInUser
+		s.loggedInUser = ""
+		zlog.Error().Msgf("data inconsistency: logged in user '%s' not found in user map. Forcing logout.", oldUser)
+		http.Error(w, fmt.Sprintf("internal data inconsistency: logged in user '%s' not found", oldUser), http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(LoginStatusResponse{
+		LoggedIn: true,
+		User:     s.loggedInUser,
+		Role:     userData.Role,
 	})
 }
 
