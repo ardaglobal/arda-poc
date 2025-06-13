@@ -96,7 +96,7 @@ const docTemplate = `{
         },
         "/bank/mortgage/create": {
             "post": {
-                "description": "Submits a transaction to create a new mortgage, effectively approving a pending request. This must be called by the **lender**, who must be logged in. The sidecar will use the logged-in user's account to sign the transaction, funding the mortgage from their account. The details in the request body should match the details from a pending mortgage request.",
+                "description": "Submits a transaction to create a new mortgage, effectively approving a pending request. This must be called by the **lender**, who must be logged in. The sidecar will use the logged-in user's account to sign the transaction, funding the mortgage from their account. The request body should only contain the ID of a pending mortgage request.",
                 "consumes": [
                     "application/json"
                 ],
@@ -106,12 +106,12 @@ const docTemplate = `{
                 "summary": "Create a mortgage (lender)",
                 "parameters": [
                     {
-                        "description": "mortgage details (with property purchase details)",
+                        "description": "mortgage request ID",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.MortgageRequestPayload"
+                            "$ref": "#/definitions/main.CreateMortgageByIDRequest"
                         }
                     }
                 ],
@@ -1063,6 +1063,17 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "property_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.CreateMortgageByIDRequest": {
+            "type": "object",
+            "properties": {
+                "gas": {
+                    "type": "string"
+                },
+                "id": {
                     "type": "string"
                 }
             }

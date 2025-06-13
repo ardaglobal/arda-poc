@@ -27,6 +27,13 @@ definitions:
       property_id:
         type: string
     type: object
+  main.CreateMortgageByIDRequest:
+    properties:
+      gas:
+        type: string
+      id:
+        type: string
+    type: object
   main.EditPropertyMetadataRequest:
     properties:
       construction_information:
@@ -430,15 +437,15 @@ paths:
       description: Submits a transaction to create a new mortgage, effectively approving
         a pending request. This must be called by the **lender**, who must be logged
         in. The sidecar will use the logged-in user's account to sign the transaction,
-        funding the mortgage from their account. The details in the request body should
-        match the details from a pending mortgage request.
+        funding the mortgage from their account. The request body should only contain
+        the ID of a pending mortgage request.
       parameters:
-      - description: mortgage details (with property purchase details)
+      - description: mortgage request ID
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/main.MortgageRequestPayload'
+          $ref: '#/definitions/main.CreateMortgageByIDRequest'
       produces:
       - application/json
       responses:

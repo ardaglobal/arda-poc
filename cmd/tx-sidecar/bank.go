@@ -67,12 +67,18 @@ type RepayMortgageRequest struct {
 	Gas        string `json:"gas,omitempty"`
 }
 
+// CreateMortgageByIDRequest defines the request body for creating a mortgage by ID.
+type CreateMortgageByIDRequest struct {
+	ID  string `json:"id"`
+	Gas string `json:"gas,omitempty"`
+}
+
 // createMortgageHandler handles the creation of a mortgage, approving a pending request.
 // @Summary Create a mortgage (lender)
-// @Description Submits a transaction to create a new mortgage, effectively approving a pending request. This must be called by the **lender**, who must be logged in. The sidecar will use the logged-in user's account to sign the transaction, funding the mortgage from their account. The details in the request body should match the details from a pending mortgage request.
+// @Description Submits a transaction to create a new mortgage, effectively approving a pending request. This must be called by the **lender**, who must be logged in. The sidecar will use the logged-in user's account to sign the transaction, funding the mortgage from their account. The request body should only contain the ID of a pending mortgage request.
 // @Accept json
 // @Produce json
-// @Param request body MortgageRequestPayload true "mortgage details (with property purchase details)"
+// @Param request body CreateMortgageByIDRequest true "mortgage request ID"
 // @Success 200 {object} map[string]string{tx_hash=string}
 // @Router /bank/mortgage/create [post]
 func (s *Server) createMortgageHandler(w http.ResponseWriter, r *http.Request) {
@@ -86,7 +92,7 @@ func (s *Server) createMortgageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req MortgageRequestPayload
+	var req CreateMortgageByIDRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		zlog.Error().Err(err).Msg("failed to decode request body")
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
@@ -95,17 +101,38 @@ func (s *Server) createMortgageHandler(w http.ResponseWriter, r *http.Request) {
 
 	zlog.Info().Str("handler", "createMortgageHandler").Interface("request", req).Msg("received request")
 
+	// Find the mortgage request by ID
+	var mr *MortgageRequest
+	for i := range s.mortgageRequests {
+		if s.mortgageRequests[i].ID == req.ID {
+			mr = &s.mortgageRequests[i]
+			break
+		}
+	}
+	if mr == nil {
+		http.Error(w, "Mortgage request not found", http.StatusNotFound)
+		return
+	}
+	if mr.Status != "pending" {
+		http.Error(w, "Mortgage request is not pending", http.StatusBadRequest)
+		return
+	}
+	if mr.Lender != s.loggedInUser {
+		http.Error(w, "Only the lender assigned to this request can approve it", http.StatusUnauthorized)
+		return
+	}
+
 	fromName := s.loggedInUser
 	msgBuilder := func(fromAddr string) sdk.Msg {
 		return mortgagetypes.NewMsgCreateMortgage(
 			fromAddr, // creator
-			req.Index,
+			mr.Index,
 			fromAddr, // lender is the creator
-			req.Lendee,
-			req.Collateral,
-			req.Amount,
-			req.InterestRate,
-			req.Term,
+			mr.LendeeAddr,
+			mr.Collateral,
+			mr.Amount,
+			mr.InterestRate,
+			mr.Term,
 		)
 	}
 
@@ -117,33 +144,24 @@ func (s *Server) createMortgageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// After successfully broadcasting, update the original request's status
-	for i, mr := range s.mortgageRequests {
-		zlog.Info().Str("handler", "createMortgageHandler").Interface("mr", mr).Msg("checking mortgage request")
-		zlog.Info().Str("handler", "createMortgageHandler").Interface("req", req).Msg("checking mortgage request")
-		if mr.Index == req.Index && mr.Lender == fromName && mr.Status == "pending" {
-			zlog.Info().Str("handler", "createMortgageHandler").Msg("updating mortgage request status")
-			s.mortgageRequests[i].Status = "completed"
-			// After mortgage approval, immediately send transfer shares request if property purchase details are present
-			if req.Index != "equity" {
-				if req.PropertyID != "" && len(req.FromOwners) > 0 && len(req.FromShares) > 0 && len(req.ToOwners) > 0 && len(req.ToShares) > 0 {
-					transferReq := TransferSharesRequest{
-						PropertyID: req.PropertyID,
-						FromOwners: req.FromOwners,
-						FromShares: req.FromShares,
-						ToOwners:   req.ToOwners,
-						ToShares:   req.ToShares,
-					}
-					transferReqBody, _ := json.Marshal(transferReq)
-					r2 := &http.Request{Body: io.NopCloser(strings.NewReader(string(transferReqBody))), Method: http.MethodPost}
-					s.transferSharesHandler(w, r2)
-				}
+	mr.Status = "completed"
+	// After mortgage approval, immediately send transfer shares request if property purchase details are present
+	if mr.Index != "equity" {
+		if mr.PropertyID != "" && len(mr.FromOwners) > 0 && len(mr.FromShares) > 0 && len(mr.ToOwners) > 0 && len(mr.ToShares) > 0 {
+			transferReq := TransferSharesRequest{
+				PropertyID: mr.PropertyID,
+				FromOwners: mr.FromOwners,
+				FromShares: mr.FromShares,
+				ToOwners:   mr.ToOwners,
+				ToShares:   mr.ToShares,
 			}
-			if err := s.saveMortgageRequestsToFile(); err != nil {
-				zlog.Error().Err(err).Msgf("failed to update status for mortgage request index %s", req.Index)
-			}
-			break // Assume index is unique per lender
+			transferReqBody, _ := json.Marshal(transferReq)
+			r2 := &http.Request{Body: io.NopCloser(strings.NewReader(string(transferReqBody))), Method: http.MethodPost}
+			s.transferSharesHandler(w, r2)
 		}
-		zlog.Info().Str("handler", "createMortgageHandler").Msg("no mortgage request found")
+	}
+	if err := s.saveMortgageRequestsToFile(); err != nil {
+		zlog.Error().Err(err).Msgf("failed to update status for mortgage request id %s", mr.ID)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
