@@ -161,12 +161,5 @@ govulncheck:
 
 clean:
 	rm -rf ~/.arda-poc
-	rm users.json
-	rm logins.json
-	rm tx.json
-	rm mortgage_requests.json
-	rm kyc_requests.json
-	rm for_sale_properties.json
-	rm offplan_properties.json
-	rm offplan_purchase_requests.json
+	rm -rf cmd/tx-sidecar/local_data
 .PHONY: clean
