@@ -1,0 +1,35 @@
+syntax = "proto3";
+package ardapoc.rent;
+
+import "cosmos/msg/v1/msg.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/ardaglobal/arda-poc/x/rent/types";
+
+service Msg {
+  option (cosmos.msg.v1.service) = true;
+  rpc CreateLease (MsgCreateLease) returns (MsgCreateLeaseResponse);
+  rpc PayRent (MsgPayRent) returns (MsgPayRentResponse);
+}
+
+message MsgCreateLease {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string property_id = 2;
+  string tenant = 3 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  uint64 rent_amount = 4;
+  string rent_due_date = 5;
+  string status = 6;
+}
+
+message MsgCreateLeaseResponse {}
+
+message MsgPayRent {
+  option (cosmos.msg.v1.signer) = "tenant";
+  string tenant = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string lease_id = 2;
+  uint64 amount = 3;
+}
+
+message MsgPayRentResponse {}

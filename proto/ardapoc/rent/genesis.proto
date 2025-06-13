@@ -1,0 +1,8 @@
+syntax = "proto3";
+package ardapoc.rent;
+
+option go_package = "github.com/ardaglobal/arda-poc/x/rent/types";
+
+message GenesisState {
+  repeated Lease lease_list = 1 [(gogoproto.nullable) = false];
+}
