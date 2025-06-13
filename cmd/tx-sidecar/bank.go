@@ -111,13 +111,17 @@ func (s *Server) createMortgageHandler(w http.ResponseWriter, r *http.Request) {
 
 	txHash, err := s.buildSignAndBroadcastInternal(r.Context(), fromName, req.Gas, "create_mortgage", msgBuilder)
 	if err != nil {
+		zlog.Error().Err(err).Msg("failed to build sign and broadcast")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// After successfully broadcasting, update the original request's status
 	for i, mr := range s.mortgageRequests {
+		zlog.Info().Str("handler", "createMortgageHandler").Interface("mr", mr).Msg("checking mortgage request")
+		zlog.Info().Str("handler", "createMortgageHandler").Interface("req", req).Msg("checking mortgage request")
 		if mr.Index == req.Index && mr.Lender == fromName && mr.Status == "pending" {
+			zlog.Info().Str("handler", "createMortgageHandler").Msg("updating mortgage request status")
 			s.mortgageRequests[i].Status = "completed"
 			// After mortgage approval, immediately send transfer shares request if property purchase details are present
 			if req.Index != "equity" {
@@ -139,6 +143,7 @@ func (s *Server) createMortgageHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			break // Assume index is unique per lender
 		}
+		zlog.Info().Str("handler", "createMortgageHandler").Msg("no mortgage request found")
 	}
 
 	w.Header().Set("Content-Type", "application/json")

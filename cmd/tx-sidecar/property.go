@@ -143,12 +143,14 @@ func (s *Server) registerPropertyHandler(w http.ResponseWriter, r *http.Request)
 // @Router /property/transfer-shares [post]
 func (s *Server) transferSharesHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
+		zlog.Error().Str("method", r.Method).Msg("invalid request method")
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
 
 	var req TransferSharesRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		zlog.Error().Err(err).Msg("failed to decode request body")
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}

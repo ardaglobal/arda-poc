@@ -28,6 +28,7 @@ type TrackedTx struct {
 func (s *Server) buildSignAndBroadcast(w http.ResponseWriter, r *http.Request, fromName, gasStr, txType string, msgBuilder func(fromAddr string) sdk.Msg) {
 	txHash, err := s.buildSignAndBroadcastInternal(r.Context(), fromName, gasStr, txType, msgBuilder)
 	if err != nil {
+		zlog.Error().Err(err).Msg("failed to build sign and broadcast")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
