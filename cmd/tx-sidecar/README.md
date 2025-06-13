@@ -20,8 +20,18 @@ Ensure your `ard-pocd` node is running first. Then, from the root of the `arda-p
 
 ```bash
 make dev-sidecar
-# Or alternatively:
-# go run ./cmd/tx-sidecar/main.go
+```
+This command uses [Air](https://github.com/cosmtrek/air) to watch the
+`cmd/tx-sidecar` sources and automatically rebuild and restart the server when
+files change. Make sure Air is installed:
+
+```bash
+go install github.com/cosmtrek/air@latest
+```
+
+Alternatively you can run:
+```bash
+go run ./cmd/tx-sidecar/main.go
 ```
 The service will start and listen on port `8080`.
 

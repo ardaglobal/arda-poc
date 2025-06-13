@@ -140,8 +140,8 @@ dev:
 .PHONY: dev
 
 dev-sidecar: sidecar-docs
-	@echo "--> Running dev-sidecar"
-	@go run ./cmd/tx-sidecar
+       @echo "--> Running dev-sidecar with Air hot reload"
+       @air -c .air.toml
 .PHONY: dev-sidecar
 
 sidecar-docs:
