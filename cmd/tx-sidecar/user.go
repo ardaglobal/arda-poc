@@ -428,13 +428,12 @@ func (s *Server) requestKYCHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(newReq)
 }
 
-// getKYCRequestsHandler allows a regulator to view all pending KYC requests.
-// @Summary Get pending KYC requests (regulator)
-// @Description Allows a logged-in regulator to view all pending KYC requests.
+// getKYCRequestsHandler allows a regulator to view all pending KYC requests or a user to view their own pending request(s).
+// @Summary Get pending KYC requests
+// @Description Regulators see all pending KYC requests. Regular users see only their own pending KYC request(s).
 // @Produce json
 // @Success 200 {array} KYCRequestEntry
 // @Failure 401 {object} KYCErrorResponse
-// @Failure 403 {object} KYCErrorResponse
 // @Router /user/kyc/requests [get]
 func (s *Server) getKYCRequestsHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
@@ -446,18 +445,27 @@ func (s *Server) getKYCRequestsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	userData, ok := s.users[s.loggedInUser]
-	if !ok || userData.Role != "regulator" {
-		http.Error(w, "Only regulators can view KYC requests.", http.StatusForbidden)
+	if ok && userData.Role == "regulator" {
+		// Regulator: see all pending requests
+		pending := make([]KYCRequestEntry, 0)
+		for _, req := range s.kycRequests {
+			if req.Status == "pending" {
+				pending = append(pending, req)
+			}
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(pending)
 		return
 	}
-	pending := make([]KYCRequestEntry, 0)
+	// Non-regulator: see only their own pending request(s)
+	userPending := make([]KYCRequestEntry, 0)
 	for _, req := range s.kycRequests {
-		if req.Status == "pending" {
-			pending = append(pending, req)
+		if req.Status == "pending" && req.Requester == s.loggedInUser {
+			userPending = append(userPending, req)
 		}
 	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(pending)
+	json.NewEncoder(w).Encode(userPending)
 }
 
 // approveKYCHandler allows a regulator to approve a KYC request.
@@ -473,6 +481,9 @@ func (s *Server) getKYCRequestsHandler(w http.ResponseWriter, r *http.Request) {
 // @Failure 404 {object} KYCErrorResponse
 // @Router /user/kyc/approve [post]
 func (s *Server) approveKYCHandler(w http.ResponseWriter, r *http.Request) {
+	zlog.Info().Str("handler", "approveKYCHandler").Str("loggedInUser", s.loggedInUser).Fields(map[string]interface{}{
+		"request": r.Body,
+	}).Msg("received request")
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return

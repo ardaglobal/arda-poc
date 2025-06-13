@@ -315,7 +315,7 @@ type AdminLoginErrorResponse struct {
 // @Failure 400 {object} AdminLoginErrorResponse
 // @Failure 401 {object} AdminLoginErrorResponse
 // @Failure 500 {object} AdminLoginErrorResponse
-// @Router /admin-login [post]
+// @Router /admin/login [post]
 func (s *Server) adminLoginHandler(c *fiber.Ctx) error {
 	type reqBody AdminLoginRequest
 	var body reqBody

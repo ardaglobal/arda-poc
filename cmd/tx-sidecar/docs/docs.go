@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/admin-login": {
+        "/admin/login": {
             "post": {
                 "description": "Authenticates an admin using a key. Returns success if the provided key matches the ADMIN_KEY environment variable.",
                 "consumes": [
@@ -869,11 +869,11 @@ const docTemplate = `{
         },
         "/user/kyc/requests": {
             "get": {
-                "description": "Allows a logged-in regulator to view all pending KYC requests.",
+                "description": "Regulators see all pending KYC requests. Regular users see only their own pending KYC request(s).",
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Get pending KYC requests (regulator)",
+                "summary": "Get pending KYC requests",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -886,12 +886,6 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/main.KYCErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
                         "schema": {
                             "$ref": "#/definitions/main.KYCErrorResponse"
                         }

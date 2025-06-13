@@ -360,7 +360,7 @@ info:
   title: Transaction Sidecar API
   version: "1.0"
 paths:
-  /admin-login:
+  /admin/login:
     post:
       consumes:
       - application/json
@@ -931,7 +931,8 @@ paths:
       summary: Request KYC (user)
   /user/kyc/requests:
     get:
-      description: Allows a logged-in regulator to view all pending KYC requests.
+      description: Regulators see all pending KYC requests. Regular users see only
+        their own pending KYC request(s).
       produces:
       - application/json
       responses:
@@ -945,11 +946,7 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/main.KYCErrorResponse'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/main.KYCErrorResponse'
-      summary: Get pending KYC requests (regulator)
+      summary: Get pending KYC requests
   /user/list:
     get:
       description: Lists all registered users and their key details.
