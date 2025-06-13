@@ -2,10 +2,9 @@ package main
 
 import (
 	"encoding/json"
-	"io"
-	"net/http"
 	"os"
-	"strings"
+
+	fiber "github.com/gofiber/fiber/v2"
 
 	propertytypes "github.com/ardaglobal/arda-poc/x/property/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -104,16 +103,14 @@ type ApproveOffPlanPropertyRequest struct {
 // @Param request body RegisterPropertyRequest true "property info"
 // @Success 200 {object} map[string]string{tx_hash=string}
 // @Router /property/register [post]
-func (s *Server) registerPropertyHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
+func (s *Server) registerPropertyHandler(c *fiber.Ctx) error {
+	if c.Method() != fiber.MethodPost {
+		return c.Status(fiber.StatusMethodNotAllowed).SendString("Invalid request method")
 	}
 
 	var req RegisterPropertyRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid request body")
 	}
 
 	zlog.Info().Str("handler", "registerPropertyHandler").Interface("request", req).Msg("received request")
@@ -130,7 +127,7 @@ func (s *Server) registerPropertyHandler(w http.ResponseWriter, r *http.Request)
 		)
 	}
 
-	s.buildSignAndBroadcast(w, r, fromName, req.Gas, "register_property", msgBuilder)
+	return s.buildSignAndBroadcast(c, fromName, req.Gas, "register_property", msgBuilder)
 }
 
 // transferSharesHandler handles share transfer
@@ -141,16 +138,14 @@ func (s *Server) registerPropertyHandler(w http.ResponseWriter, r *http.Request)
 // @Param request body TransferSharesRequest true "transfer details"
 // @Success 200 {object} map[string]string{tx_hash=string}
 // @Router /property/transfer-shares [post]
-func (s *Server) transferSharesHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
+func (s *Server) transferSharesHandler(c *fiber.Ctx) error {
+	if c.Method() != fiber.MethodPost {
+		return c.Status(fiber.StatusMethodNotAllowed).SendString("Invalid request method")
 	}
 
 	var req TransferSharesRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid request body")
 	}
 
 	zlog.Info().Str("handler", "transferSharesHandler").Interface("request", req).Msg("received request")
@@ -167,10 +162,13 @@ func (s *Server) transferSharesHandler(w http.ResponseWriter, r *http.Request) {
 		)
 	}
 
-	s.buildSignAndBroadcast(w, r, fromName, req.Gas, "transfer_shares", msgBuilder)
+	if err := s.buildSignAndBroadcast(c, fromName, req.Gas, "transfer_shares", msgBuilder); err != nil {
+		return err
+	}
 
 	// After transfer, update for-sale listings
 	s.updateForSalePropertiesOnTransfer(req.PropertyID, req.FromOwners, req.FromShares)
+	return nil
 }
 
 // editPropertyMetadataHandler edits property metadata
@@ -181,16 +179,14 @@ func (s *Server) transferSharesHandler(w http.ResponseWriter, r *http.Request) {
 // @Param request body EditPropertyMetadataRequest true "metadata"
 // @Success 200 {object} map[string]string{tx_hash=string}
 // @Router /property/edit [post]
-func (s *Server) editPropertyMetadataHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
+func (s *Server) editPropertyMetadataHandler(c *fiber.Ctx) error {
+	if c.Method() != fiber.MethodPost {
+		return c.Status(fiber.StatusMethodNotAllowed).SendString("Invalid request method")
 	}
 
 	var req EditPropertyMetadataRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid request body")
 	}
 
 	zlog.Info().Str("handler", "editPropertyMetadataHandler").Interface("request", req).Msg("received request")
@@ -212,7 +208,7 @@ func (s *Server) editPropertyMetadataHandler(w http.ResponseWriter, r *http.Requ
 		)
 	}
 
-	s.buildSignAndBroadcast(w, r, fromName, req.Gas, "edit_property_metadata", msgBuilder)
+	return s.buildSignAndBroadcast(c, fromName, req.Gas, "edit_property_metadata", msgBuilder)
 }
 
 // listPropertyForSaleHandler allows an owner to list a property for sale.
@@ -224,19 +220,16 @@ func (s *Server) editPropertyMetadataHandler(w http.ResponseWriter, r *http.Requ
 // @Success 201 {object} ForSaleProperty
 // @Failure 400 {object} KYCErrorResponse
 // @Router /property/list-for-sale [post]
-func (s *Server) listPropertyForSaleHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
+func (s *Server) listPropertyForSaleHandler(c *fiber.Ctx) error {
+	if c.Method() != fiber.MethodPost {
+		return c.Status(fiber.StatusMethodNotAllowed).SendString("Invalid request method")
 	}
 	var req ListPropertyForSaleRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid request body")
 	}
 	if req.PropertyID == "" || req.Owner == "" || len(req.Shares) == 0 || req.Price == 0 {
-		http.Error(w, "property_id, owner, shares, and price are required", http.StatusBadRequest)
-		return
+		return c.Status(fiber.StatusBadRequest).SendString("property_id, owner, shares, and price are required")
 	}
 	listing := ForSaleProperty{
 		ID:         uuid.New().String(),
@@ -248,9 +241,7 @@ func (s *Server) listPropertyForSaleHandler(w http.ResponseWriter, r *http.Reque
 	}
 	s.forSaleProperties = append(s.forSaleProperties, listing)
 	s.saveForSalePropertiesToFile()
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(listing)
+	return c.Status(fiber.StatusCreated).JSON(listing)
 }
 
 // getPropertiesForSaleHandler returns all properties currently for sale.
@@ -259,10 +250,9 @@ func (s *Server) listPropertyForSaleHandler(w http.ResponseWriter, r *http.Reque
 // @Produce json
 // @Success 200 {array} ForSaleProperty
 // @Router /property/for-sale [get]
-func (s *Server) getPropertiesForSaleHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
+func (s *Server) getPropertiesForSaleHandler(c *fiber.Ctx) error {
+	if c.Method() != fiber.MethodGet {
+		return c.Status(fiber.StatusMethodNotAllowed).SendString("Invalid request method")
 	}
 	listings := make([]ForSaleProperty, 0)
 	for _, l := range s.forSaleProperties {
@@ -270,8 +260,7 @@ func (s *Server) getPropertiesForSaleHandler(w http.ResponseWriter, r *http.Requ
 			listings = append(listings, l)
 		}
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(listings)
+	return c.JSON(listings)
 }
 
 // saveForSalePropertiesToFile persists the forSaleProperties slice.
@@ -295,15 +284,13 @@ func (s *Server) updateForSalePropertiesOnTransfer(propertyID string, fromOwners
 // @Param property_id query string true "Off plan property ID"
 // @Success 200 {array} OffPlanPurchaseRequest
 // @Router /property/offplan/purchase-requests [get]
-func (s *Server) getOffPlanPurchaseRequestsHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
+func (s *Server) getOffPlanPurchaseRequestsHandler(c *fiber.Ctx) error {
+	if c.Method() != fiber.MethodGet {
+		return c.Status(fiber.StatusMethodNotAllowed).SendString("Invalid request method")
 	}
-	propertyID := r.URL.Query().Get("property_id")
+	propertyID := c.Query("property_id")
 	if propertyID == "" {
-		http.Error(w, "property_id is required", http.StatusBadRequest)
-		return
+		return c.Status(fiber.StatusBadRequest).SendString("property_id is required")
 	}
 	requests := make([]OffPlanPurchaseRequest, 0)
 	for _, req := range s.offPlanPurchaseRequests {
@@ -311,8 +298,7 @@ func (s *Server) getOffPlanPurchaseRequestsHandler(w http.ResponseWriter, r *htt
 			requests = append(requests, req)
 		}
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(requests)
+	return c.JSON(requests)
 }
 
 // Persistence helpers for off plan properties and purchase requests
@@ -341,28 +327,23 @@ func (s *Server) saveOffPlanPurchaseRequestsToFile() error {
 // @Success 201 {object} OffPlanProperty
 // @Failure 400 {object} KYCErrorResponse
 // @Router /property/offplan [post]
-func (s *Server) postOffPlanPropertyHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
+func (s *Server) postOffPlanPropertyHandler(c *fiber.Ctx) error {
+	if c.Method() != fiber.MethodPost {
+		return c.Status(fiber.StatusMethodNotAllowed).SendString("Invalid request method")
 	}
 	if s.loggedInUser == "" {
-		http.Error(w, "No user is logged in.", http.StatusUnauthorized)
-		return
+		return c.Status(fiber.StatusUnauthorized).SendString("No user is logged in.")
 	}
 	userData, ok := s.users[s.loggedInUser]
 	if !ok || userData.Role != "developer" {
-		http.Error(w, "Only developers can submit off plan properties.", http.StatusForbidden)
-		return
+		return c.Status(fiber.StatusForbidden).SendString("Only developers can submit off plan properties.")
 	}
 	var req OffPlanPropertyRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid request body")
 	}
 	if req.Address == "" || req.Region == "" || req.Value == 0 || req.TotalShares == 0 {
-		http.Error(w, "address, region, value, and total_shares are required", http.StatusBadRequest)
-		return
+		return c.Status(fiber.StatusBadRequest).SendString("address, region, value, and total_shares are required")
 	}
 	newProp := OffPlanProperty{
 		ID:          uuid.New().String(),
@@ -375,9 +356,7 @@ func (s *Server) postOffPlanPropertyHandler(w http.ResponseWriter, r *http.Reque
 	}
 	s.offPlanProperties = append(s.offPlanProperties, newProp)
 	s.saveOffPlanPropertiesToFile()
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(newProp)
+	return c.Status(fiber.StatusCreated).JSON(newProp)
 }
 
 // postOffPlanPurchaseRequestHandler allows a user to submit a purchase request for an off plan property.
@@ -389,19 +368,16 @@ func (s *Server) postOffPlanPropertyHandler(w http.ResponseWriter, r *http.Reque
 // @Success 201 {object} OffPlanPurchaseRequest
 // @Failure 400 {object} KYCErrorResponse
 // @Router /property/offplan/purchase-request [post]
-func (s *Server) postOffPlanPurchaseRequestHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
+func (s *Server) postOffPlanPurchaseRequestHandler(c *fiber.Ctx) error {
+	if c.Method() != fiber.MethodPost {
+		return c.Status(fiber.StatusMethodNotAllowed).SendString("Invalid request method")
 	}
 	if s.loggedInUser == "" {
-		http.Error(w, "No user is logged in.", http.StatusUnauthorized)
-		return
+		return c.Status(fiber.StatusUnauthorized).SendString("No user is logged in.")
 	}
 	var req OffPlanPurchaseRequestPayload
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid request body")
 	}
 	// Find the property
 	var prop *OffPlanProperty
@@ -412,12 +388,10 @@ func (s *Server) postOffPlanPurchaseRequestHandler(w http.ResponseWriter, r *htt
 		}
 	}
 	if prop == nil {
-		http.Error(w, "Off plan property not found", http.StatusBadRequest)
-		return
+		return c.Status(fiber.StatusBadRequest).SendString("Off plan property not found")
 	}
 	if prop.Status != "for_sale" {
-		http.Error(w, "Property is not for sale", http.StatusBadRequest)
-		return
+		return c.Status(fiber.StatusBadRequest).SendString("Property is not for sale")
 	}
 	// Calculate current funding
 	totalUSD := uint64(0)
@@ -427,8 +401,7 @@ func (s *Server) postOffPlanPurchaseRequestHandler(w http.ResponseWriter, r *htt
 		}
 	}
 	if totalUSD+req.AmountUSD > prop.Value {
-		http.Error(w, "Purchase would exceed 100% funding", http.StatusBadRequest)
-		return
+		return c.Status(fiber.StatusBadRequest).SendString("Purchase would exceed 100% funding")
 	}
 	percent := float64(req.AmountUSD) / float64(prop.Value) * 100.0
 	newReq := OffPlanPurchaseRequest{
@@ -447,9 +420,7 @@ func (s *Server) postOffPlanPurchaseRequestHandler(w http.ResponseWriter, r *htt
 		prop.Status = "pending_regulator_approval"
 		s.saveOffPlanPropertiesToFile()
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(newReq)
+	return c.Status(fiber.StatusCreated).JSON(newReq)
 }
 
 // approveOffPlanPropertyHandler allows a regulator to approve a fully funded off plan property, registering it on-chain.
@@ -462,24 +433,20 @@ func (s *Server) postOffPlanPurchaseRequestHandler(w http.ResponseWriter, r *htt
 // @Failure 400 {object} KYCErrorResponse
 // @Failure 401 {object} KYCErrorResponse
 // @Router /property/offplan/approve [post]
-func (s *Server) approveOffPlanPropertyHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
+func (s *Server) approveOffPlanPropertyHandler(c *fiber.Ctx) error {
+	if c.Method() != fiber.MethodPost {
+		return c.Status(fiber.StatusMethodNotAllowed).SendString("Invalid request method")
 	}
 	if s.loggedInUser == "" {
-		http.Error(w, "No user is logged in.", http.StatusUnauthorized)
-		return
+		return c.Status(fiber.StatusUnauthorized).SendString("No user is logged in.")
 	}
 	userData, ok := s.users[s.loggedInUser]
 	if !ok || userData.Role != "regulator" {
-		http.Error(w, "Only regulators can approve off plan properties.", http.StatusForbidden)
-		return
+		return c.Status(fiber.StatusForbidden).SendString("Only regulators can approve off plan properties.")
 	}
 	var req ApproveOffPlanPropertyRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid request body")
 	}
 	// Find the property
 	var prop *OffPlanProperty
@@ -490,12 +457,10 @@ func (s *Server) approveOffPlanPropertyHandler(w http.ResponseWriter, r *http.Re
 		}
 	}
 	if prop == nil {
-		http.Error(w, "Off plan property not found", http.StatusBadRequest)
-		return
+		return c.Status(fiber.StatusBadRequest).SendString("Off plan property not found")
 	}
 	if prop.Status != "pending_regulator_approval" {
-		http.Error(w, "Property is not pending regulator approval", http.StatusBadRequest)
-		return
+		return c.Status(fiber.StatusBadRequest).SendString("Property is not pending regulator approval")
 	}
 	// Gather owners and shares from purchase requests
 	owners := []string{}
@@ -512,11 +477,8 @@ func (s *Server) approveOffPlanPropertyHandler(w http.ResponseWriter, r *http.Re
 		}
 	}
 	if len(owners) == 0 {
-		http.Error(w, "No purchase requests found for this property", http.StatusBadRequest)
-		return
+		return c.Status(fiber.StatusBadRequest).SendString("No purchase requests found for this property")
 	}
-	// Register property on-chain (simulate by calling registerPropertyHandler logic)
-	r2 := &http.Request{Body: io.NopCloser(strings.NewReader("")), Method: http.MethodPost}
 	regReq := RegisterPropertyRequest{
 		Address: prop.Address,
 		Region:  prop.Region,
@@ -524,12 +486,20 @@ func (s *Server) approveOffPlanPropertyHandler(w http.ResponseWriter, r *http.Re
 		Owners:  owners,
 		Shares:  shares,
 	}
-	regReqBody, _ := json.Marshal(regReq)
-	r2.Body = io.NopCloser(strings.NewReader(string(regReqBody)))
-	s.registerPropertyHandler(w, r2)
-	// Update property status
+	// Broadcast property registration
+	if err := s.buildSignAndBroadcast(c, "ERES", "", "register_property", func(fromAddr string) sdk.Msg {
+		return propertytypes.NewMsgRegisterProperty(
+			fromAddr,
+			regReq.Address,
+			regReq.Region,
+			regReq.Value,
+			regReq.Owners,
+			regReq.Shares,
+		)
+	}); err != nil {
+		return err
+	}
 	prop.Status = "registered"
 	s.saveOffPlanPropertiesToFile()
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(prop)
+	return c.JSON(prop)
 }

@@ -14,7 +14,6 @@ import (
 	"os"
 	"strings"
 
-	fiberadaptor "github.com/gofiber/adaptor/v2"
 	fiber "github.com/gofiber/fiber/v2"
 	fibercors "github.com/gofiber/fiber/v2/middleware/cors"
 	fiberSwagger "github.com/gofiber/swagger"
@@ -371,39 +370,39 @@ func main() {
 	app.Get("/swagger/*", fiberSwagger.HandlerDefault)
 
 	// User routes
-	app.Get("/user/list", fiberadaptor.HTTPHandlerFunc(server.listUsersHandler))
-	app.Post("/user/login", fiberadaptor.HTTPHandlerFunc(server.loginHandler))
-	app.Post("/user/logout", fiberadaptor.HTTPHandlerFunc(server.logoutHandler))
+	app.Get("/user/list", server.listUsersHandler)
+	app.Post("/user/login", server.loginHandler)
+	app.Post("/user/logout", server.logoutHandler)
 
 	// Property routes
-	app.Post("/property/register", fiberadaptor.HTTPHandlerFunc(server.registerPropertyHandler))
-	app.Post("/property/transfer-shares", fiberadaptor.HTTPHandlerFunc(server.transferSharesHandler))
-	app.Post("/property/edit", fiberadaptor.HTTPHandlerFunc(server.editPropertyMetadataHandler))
-	app.Post("/property/list-for-sale", fiberadaptor.HTTPHandlerFunc(server.listPropertyForSaleHandler))
-	app.Get("/property/for-sale", fiberadaptor.HTTPHandlerFunc(server.getPropertiesForSaleHandler))
+	app.Post("/property/register", server.registerPropertyHandler)
+	app.Post("/property/transfer-shares", server.transferSharesHandler)
+	app.Post("/property/edit", server.editPropertyMetadataHandler)
+	app.Post("/property/list-for-sale", server.listPropertyForSaleHandler)
+	app.Get("/property/for-sale", server.getPropertiesForSaleHandler)
 
 	// Off plan property routes
-	app.Post("/property/offplan", fiberadaptor.HTTPHandlerFunc(server.postOffPlanPropertyHandler))
-	app.Post("/property/offplan/purchase-request", fiberadaptor.HTTPHandlerFunc(server.postOffPlanPurchaseRequestHandler))
-	app.Get("/property/offplan/purchase-requests", fiberadaptor.HTTPHandlerFunc(server.getOffPlanPurchaseRequestsHandler))
-	app.Post("/property/offplan/approve", fiberadaptor.HTTPHandlerFunc(server.approveOffPlanPropertyHandler))
+	app.Post("/property/offplan", server.postOffPlanPropertyHandler)
+	app.Post("/property/offplan/purchase-request", server.postOffPlanPurchaseRequestHandler)
+	app.Get("/property/offplan/purchase-requests", server.getOffPlanPurchaseRequestsHandler)
+	app.Post("/property/offplan/approve", server.approveOffPlanPropertyHandler)
 
 	// Bank/mortgage routes
-	app.Post("/bank/mortgage/request", fiberadaptor.HTTPHandlerFunc(server.requestMortgageHandler))
-	app.Get("/bank/mortgage/requests", fiberadaptor.HTTPHandlerFunc(server.getMortgageRequestsHandler))
-	app.Post("/bank/mortgage/create", fiberadaptor.HTTPHandlerFunc(server.createMortgageHandler))
-	app.Post("/bank/mortgage/repay", fiberadaptor.HTTPHandlerFunc(server.repayMortgageHandler))
-	app.Post("/bank/request-funds", fiberadaptor.HTTPHandlerFunc(server.requestFundsHandler))
-	app.Post("/bank/mortgage/request-equity", fiberadaptor.HTTPHandlerFunc(server.requestEquityMortgageHandler))
+	app.Post("/bank/mortgage/request", server.requestMortgageHandler)
+	app.Get("/bank/mortgage/requests", server.getMortgageRequestsHandler)
+	app.Post("/bank/mortgage/create", server.createMortgageHandler)
+	app.Post("/bank/mortgage/repay", server.repayMortgageHandler)
+	app.Post("/bank/request-funds", server.requestFundsHandler)
+	app.Post("/bank/mortgage/request-equity", server.requestEquityMortgageHandler)
 
 	// KYC workflow
-	app.Post("/user/kyc/request", fiberadaptor.HTTPHandlerFunc(server.requestKYCHandler))
-	app.Get("/user/kyc/requests", fiberadaptor.HTTPHandlerFunc(server.getKYCRequestsHandler))
-	app.Post("/user/kyc/approve", fiberadaptor.HTTPHandlerFunc(server.approveKYCHandler))
+	app.Post("/user/kyc/request", server.requestKYCHandler)
+	app.Get("/user/kyc/requests", server.getKYCRequestsHandler)
+	app.Post("/user/kyc/approve", server.approveKYCHandler)
 
 	// Transaction routes
-	app.Get("/tx/list", fiberadaptor.HTTPHandlerFunc(server.listTransactionsHandler))
-	app.Get("/tx/:hash", fiberadaptor.HTTPHandlerFunc(server.getTransactionHandler))
+	app.Get("/tx/list", server.listTransactionsHandler)
+	app.Get("/tx/:hash", server.getTransactionHandler)
 
 	// Admin
 	app.Post("/admin/login", server.adminLoginHandler)

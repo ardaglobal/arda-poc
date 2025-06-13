@@ -3,14 +3,14 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 	"os"
-	"strings"
 	"time"
+
+	fiber "github.com/gofiber/fiber/v2"
 
 	"cosmossdk.io/math"
 	mortgagetypes "github.com/ardaglobal/arda-poc/x/mortgage/types"
+	propertytypes "github.com/ardaglobal/arda-poc/x/property/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/google/uuid"
@@ -75,21 +75,18 @@ type RepayMortgageRequest struct {
 // @Param request body MortgageRequestPayload true "mortgage details (with property purchase details)"
 // @Success 200 {object} map[string]string{tx_hash=string}
 // @Router /bank/mortgage/create [post]
-func (s *Server) createMortgageHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
+func (s *Server) createMortgageHandler(c *fiber.Ctx) error {
+	if c.Method() != fiber.MethodPost {
+		return c.Status(fiber.StatusMethodNotAllowed).SendString("Invalid request method")
 	}
 
 	if s.loggedInUser == "" {
-		http.Error(w, "No user is logged in. The lender must be logged in to create a mortgage.", http.StatusUnauthorized)
-		return
+		return c.Status(fiber.StatusUnauthorized).SendString("No user is logged in. The lender must be logged in to create a mortgage.")
 	}
 
 	var req MortgageRequestPayload
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid request body")
 	}
 
 	zlog.Info().Str("handler", "createMortgageHandler").Interface("request", req).Msg("received request")
@@ -108,10 +105,9 @@ func (s *Server) createMortgageHandler(w http.ResponseWriter, r *http.Request) {
 		)
 	}
 
-	txHash, err := s.buildSignAndBroadcastInternal(r.Context(), fromName, req.Gas, "create_mortgage", msgBuilder)
+	txHash, err := s.buildSignAndBroadcastInternal(c.Context(), fromName, req.Gas, "create_mortgage", msgBuilder)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
 
 	// After successfully broadcasting, update the original request's status
@@ -120,16 +116,19 @@ func (s *Server) createMortgageHandler(w http.ResponseWriter, r *http.Request) {
 			s.mortgageRequests[i].Status = "completed"
 			// After mortgage approval, immediately send transfer shares request if property purchase details are present
 			if req.PropertyID != "" && len(req.FromOwners) > 0 && len(req.FromShares) > 0 && len(req.ToOwners) > 0 && len(req.ToShares) > 0 {
-				transferReq := TransferSharesRequest{
-					PropertyID: req.PropertyID,
-					FromOwners: req.FromOwners,
-					FromShares: req.FromShares,
-					ToOwners:   req.ToOwners,
-					ToShares:   req.ToShares,
+				_, err := s.buildSignAndBroadcastInternal(c.Context(), "ERES", req.Gas, "transfer_shares", func(fromAddr string) sdk.Msg {
+					return propertytypes.NewMsgTransferShares(
+						fromAddr,
+						req.PropertyID,
+						req.FromOwners,
+						req.FromShares,
+						req.ToOwners,
+						req.ToShares,
+					)
+				})
+				if err != nil {
+					zlog.Error().Err(err).Msg("failed to broadcast transfer after mortgage")
 				}
-				transferReqBody, _ := json.Marshal(transferReq)
-				r2 := &http.Request{Body: io.NopCloser(strings.NewReader(string(transferReqBody))), Method: http.MethodPost}
-				s.transferSharesHandler(w, r2)
 			}
 			if err := s.saveMortgageRequestsToFile(); err != nil {
 				zlog.Error().Err(err).Msgf("failed to update status for mortgage request index %s", req.Index)
@@ -138,8 +137,7 @@ func (s *Server) createMortgageHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"tx_hash": txHash})
+	return c.JSON(fiber.Map{"tx_hash": txHash})
 }
 
 // repayMortgageHandler handles the repayment of a mortgage.
@@ -150,21 +148,18 @@ func (s *Server) createMortgageHandler(w http.ResponseWriter, r *http.Request) {
 // @Param request body RepayMortgageRequest true "repayment details"
 // @Success 200 {object} map[string]string{tx_hash=string}
 // @Router /bank/mortgage/repay [post]
-func (s *Server) repayMortgageHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
+func (s *Server) repayMortgageHandler(c *fiber.Ctx) error {
+	if c.Method() != fiber.MethodPost {
+		return c.Status(fiber.StatusMethodNotAllowed).SendString("Invalid request method")
 	}
 
 	if s.loggedInUser == "" {
-		http.Error(w, "No user is logged in. The lendee must be logged in to repay a mortgage.", http.StatusUnauthorized)
-		return
+		return c.Status(fiber.StatusUnauthorized).SendString("No user is logged in. The lendee must be logged in to repay a mortgage.")
 	}
 
 	var req RepayMortgageRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid request body")
 	}
 
 	zlog.Info().Str("handler", "repayMortgageHandler").Interface("request", req).Msg("received request")
@@ -178,7 +173,7 @@ func (s *Server) repayMortgageHandler(w http.ResponseWriter, r *http.Request) {
 		)
 	}
 
-	s.buildSignAndBroadcast(w, r, fromName, req.Gas, "repay_mortgage", msgBuilder)
+	return s.buildSignAndBroadcast(c, fromName, req.Gas, "repay_mortgage", msgBuilder)
 }
 
 // RequestFundsRequest defines the request body for requesting funds from the bank.
@@ -197,28 +192,24 @@ type RequestFundsRequest struct {
 // @Param request body RequestFundsRequest true "request details"
 // @Success 200 {object} map[string]string{tx_hash=string}
 // @Router /bank/request-funds [post]
-func (s *Server) requestFundsHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
+func (s *Server) requestFundsHandler(c *fiber.Ctx) error {
+	if c.Method() != fiber.MethodPost {
+		return c.Status(fiber.StatusMethodNotAllowed).SendString("Invalid request method")
 	}
 
 	var req RequestFundsRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid request body")
 	}
 
 	zlog.Info().Str("handler", "requestFundsHandler").Interface("request", req).Msg("received request")
 
 	if req.Amount == 0 || req.Denom == "" || req.Address == "" {
-		http.Error(w, "address, amount, and denom must be provided, and amount must be positive", http.StatusBadRequest)
-		return
+		return c.Status(fiber.StatusBadRequest).SendString("address, amount, and denom must be provided, and amount must be positive")
 	}
 
 	if _, err := sdk.AccAddressFromBech32(req.Address); err != nil {
-		http.Error(w, fmt.Sprintf("Invalid recipient address: %v", err), http.StatusBadRequest)
-		return
+		return c.Status(fiber.StatusBadRequest).SendString(fmt.Sprintf("Invalid recipient address: %v", err))
 	}
 
 	fromName := s.faucetName
@@ -230,7 +221,7 @@ func (s *Server) requestFundsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	s.buildSignAndBroadcast(w, r, fromName, req.Gas, "request_funds", msgBuilder)
+	return s.buildSignAndBroadcast(c, fromName, req.Gas, "request_funds", msgBuilder)
 }
 
 // requestMortgageHandler allows a user to request a mortgage from a lender.
@@ -241,29 +232,25 @@ func (s *Server) requestFundsHandler(w http.ResponseWriter, r *http.Request) {
 // @Param request body MortgageRequestPayload true "mortgage request (with property purchase details)"
 // @Success 201 {object} MortgageRequest
 // @Router /bank/mortgage/request [post]
-func (s *Server) requestMortgageHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
+func (s *Server) requestMortgageHandler(c *fiber.Ctx) error {
+	if c.Method() != fiber.MethodPost {
+		return c.Status(fiber.StatusMethodNotAllowed).SendString("Invalid request method")
 	}
 
 	if s.loggedInUser == "" {
-		http.Error(w, "No user is logged in. The lendee must be logged in to request a mortgage.", http.StatusUnauthorized)
-		return
+		return c.Status(fiber.StatusUnauthorized).SendString("No user is logged in. The lendee must be logged in to request a mortgage.")
 	}
 
 	var req MortgageRequestPayload
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid request body")
 	}
 
 	zlog.Info().Str("handler", "requestMortgageHandler").Interface("request", req).Msg("received request")
 
 	// Validate that the lender exists
 	if _, ok := s.users[req.Lender]; !ok {
-		http.Error(w, fmt.Sprintf("Lender '%s' not found.", req.Lender), http.StatusBadRequest)
-		return
+		return c.Status(fiber.StatusBadRequest).SendString(fmt.Sprintf("Lender '%s' not found.", req.Lender))
 	}
 
 	// Get the requester's (lendee's) address
@@ -291,14 +278,10 @@ func (s *Server) requestMortgageHandler(w http.ResponseWriter, r *http.Request) 
 
 	s.mortgageRequests = append(s.mortgageRequests, newReq)
 	if err := s.saveMortgageRequestsToFile(); err != nil {
-		http.Error(w, "Failed to save mortgage request", http.StatusInternalServerError)
 		zlog.Error().Err(err).Msg("failed to save mortgage requests file")
-		return
+		return c.Status(fiber.StatusInternalServerError).SendString("Failed to save mortgage request")
 	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(newReq)
+	return c.Status(fiber.StatusCreated).JSON(newReq)
 }
 
 // getMortgageRequestsHandler allows a logged-in user to retrieve their pending mortgage requests.
@@ -307,17 +290,15 @@ func (s *Server) requestMortgageHandler(w http.ResponseWriter, r *http.Request) 
 // @Produce json
 // @Success 200 {array} MortgageRequest
 // @Router /bank/mortgage/requests [get]
-func (s *Server) getMortgageRequestsHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
+func (s *Server) getMortgageRequestsHandler(c *fiber.Ctx) error {
+	if c.Method() != fiber.MethodGet {
+		return c.Status(fiber.StatusMethodNotAllowed).SendString("Invalid request method")
 	}
 
 	zlog.Info().Str("handler", "getMortgageRequestsHandler").Str("loggedInUser", s.loggedInUser).Msg("received request")
 
 	if s.loggedInUser == "" {
-		http.Error(w, "No user is logged in. A user must be logged in to view their requests.", http.StatusUnauthorized)
-		return
+		return c.Status(fiber.StatusUnauthorized).SendString("No user is logged in. A user must be logged in to view their requests.")
 	}
 
 	userRequests := make([]MortgageRequest, 0)
@@ -328,8 +309,7 @@ func (s *Server) getMortgageRequestsHandler(w http.ResponseWriter, r *http.Reque
 		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(userRequests)
+	return c.JSON(userRequests)
 }
 
 // requestEquityMortgageHandler allows a user to request a home equity mortgage against a property they own, routed to a lender for approval.
@@ -342,24 +322,20 @@ func (s *Server) getMortgageRequestsHandler(w http.ResponseWriter, r *http.Reque
 // @Failure 400 {object} KYCErrorResponse
 // @Failure 401 {object} KYCErrorResponse
 // @Router /bank/mortgage/request-equity [post]
-func (s *Server) requestEquityMortgageHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
+func (s *Server) requestEquityMortgageHandler(c *fiber.Ctx) error {
+	if c.Method() != fiber.MethodPost {
+		return c.Status(fiber.StatusMethodNotAllowed).SendString("Invalid request method")
 	}
 	if s.loggedInUser == "" {
-		http.Error(w, "No user is logged in. Please log in to request a home equity mortgage.", http.StatusUnauthorized)
-		return
+		return c.Status(fiber.StatusUnauthorized).SendString("No user is logged in. Please log in to request a home equity mortgage.")
 	}
 	var req MortgageRequestPayload
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid request body")
 	}
 	// Validate that the lender exists
 	if _, ok := s.users[req.Lender]; !ok {
-		http.Error(w, "Lender not found.", http.StatusBadRequest)
-		return
+		return c.Status(fiber.StatusBadRequest).SendString("Lender not found.")
 	}
 	// Validate that the requester owns the property (simple check: must be in ToOwners)
 	ownsProperty := false
@@ -370,8 +346,7 @@ func (s *Server) requestEquityMortgageHandler(w http.ResponseWriter, r *http.Req
 		}
 	}
 	if !ownsProperty {
-		http.Error(w, "You must be an owner of the property to request a home equity mortgage.", http.StatusBadRequest)
-		return
+		return c.Status(fiber.StatusBadRequest).SendString("You must be an owner of the property to request a home equity mortgage.")
 	}
 	requesterData := s.users[s.loggedInUser]
 	newReq := MortgageRequest{
@@ -395,13 +370,10 @@ func (s *Server) requestEquityMortgageHandler(w http.ResponseWriter, r *http.Req
 	}
 	s.mortgageRequests = append(s.mortgageRequests, newReq)
 	if err := s.saveMortgageRequestsToFile(); err != nil {
-		http.Error(w, "Failed to save mortgage request", http.StatusInternalServerError)
 		zlog.Error().Err(err).Msg("failed to save mortgage requests file")
-		return
+		return c.Status(fiber.StatusInternalServerError).SendString("Failed to save mortgage request")
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(newReq)
+	return c.Status(fiber.StatusCreated).JSON(newReq)
 }
 
 func (s *Server) saveMortgageRequestsToFile() error {

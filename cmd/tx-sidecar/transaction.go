@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	fiber "github.com/gofiber/fiber/v2"
 
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -25,15 +26,13 @@ type TrackedTx struct {
 }
 
 // buildSignAndBroadcast handles the common logic for creating, signing, and broadcasting a transaction.
-func (s *Server) buildSignAndBroadcast(w http.ResponseWriter, r *http.Request, fromName, gasStr, txType string, msgBuilder func(fromAddr string) sdk.Msg) {
-	txHash, err := s.buildSignAndBroadcastInternal(r.Context(), fromName, gasStr, txType, msgBuilder)
+func (s *Server) buildSignAndBroadcast(c *fiber.Ctx, fromName, gasStr, txType string, msgBuilder func(fromAddr string) sdk.Msg) error {
+	txHash, err := s.buildSignAndBroadcastInternal(c.UserContext(), fromName, gasStr, txType, msgBuilder)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"tx_hash": txHash})
+	return c.JSON(fiber.Map{"tx_hash": txHash})
 }
 
 // buildSignAndBroadcastInternal handles the core logic for creating, signing, and broadcasting a transaction
@@ -186,10 +185,9 @@ func (s *Server) saveTransactionsToFile() {
 // @Produce json
 // @Success 200 {array} TrackedTx
 // @Router /tx/list [get]
-func (s *Server) listTransactionsHandler(w http.ResponseWriter, r *http.Request) {
+func (s *Server) listTransactionsHandler(c *fiber.Ctx) error {
 	zlog.Info().Str("handler", "listTransactionsHandler").Msg("received request")
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(s.transactions)
+	return c.JSON(s.transactions)
 }
 
 // getTransactionHandler returns a specific transaction by its hash
@@ -199,17 +197,15 @@ func (s *Server) listTransactionsHandler(w http.ResponseWriter, r *http.Request)
 // @Param hash path string true "Transaction hash"
 // @Success 200 {object} interface{}
 // @Router /tx/{hash} [get]
-func (s *Server) getTransactionHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
+func (s *Server) getTransactionHandler(c *fiber.Ctx) error {
+	if c.Method() != fiber.MethodGet {
+		return c.Status(fiber.StatusMethodNotAllowed).SendString("Invalid request method")
 	}
 
-	txHash := strings.TrimPrefix(r.URL.Path, "/tx/")
+	txHash := c.Params("hash")
 	zlog.Info().Str("handler", "getTransactionHandler").Str("tx_hash", txHash).Msg("received request")
 	if txHash == "" {
-		http.Error(w, "Transaction hash must be provided in the path", http.StatusBadRequest)
-		return
+		return c.Status(fiber.StatusBadRequest).SendString("Transaction hash must be provided in the path")
 	}
 
 	// Find our internal transaction type from the cache.
@@ -224,20 +220,17 @@ func (s *Server) getTransactionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !found {
-		http.Error(w, "Transaction not found in local cache", http.StatusNotFound)
-		return
+		return c.Status(fiber.StatusNotFound).SendString("Transaction not found in local cache")
 	}
 
 	// Query the blockchain for the full transaction details
-	getTxRes, err := s.txClient.GetTx(r.Context(), &txtypes.GetTxRequest{Hash: txHash})
+	getTxRes, err := s.txClient.GetTx(c.Context(), &txtypes.GetTxRequest{Hash: txHash})
 	if err != nil {
-		http.Error(w, fmt.Sprintf("Failed to get transaction from blockchain: %v", err), http.StatusNotFound)
-		return
+		return c.Status(fiber.StatusNotFound).SendString(fmt.Sprintf("Failed to get transaction from blockchain: %v", err))
 	}
 
 	if getTxRes.TxResponse.Code != 0 {
-		http.Error(w, fmt.Sprintf("Transaction failed on-chain with code %d: %s", getTxRes.TxResponse.Code, getTxRes.TxResponse.RawLog), http.StatusInternalServerError)
-		return
+		return c.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("Transaction failed on-chain with code %d: %s", getTxRes.TxResponse.Code, getTxRes.TxResponse.RawLog))
 	}
 
 	// Process the response based on the transaction type from tx.json
@@ -263,8 +256,7 @@ func (s *Server) getTransactionHandler(w http.ResponseWriter, r *http.Request) {
 		// Decode the transaction from the response to access its messages.
 		sdkTx, err := s.clientCtx.TxConfig.TxDecoder()(getTxRes.TxResponse.Tx.Value)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("Failed to decode tx: %v", err), http.StatusInternalServerError)
-			return
+			return c.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("Failed to decode tx: %v", err))
 		}
 
 		// Marshal each message into its JSON representation.
@@ -273,8 +265,7 @@ func (s *Server) getTransactionHandler(w http.ResponseWriter, r *http.Request) {
 			jsonBytes, err := s.clientCtx.Codec.MarshalJSON(msg)
 			if err != nil {
 				zlog.Warn().Msgf("failed to marshal message to JSON: %v", err)
-				http.Error(w, "Failed to marshal a transaction message to JSON", http.StatusInternalServerError)
-				return
+				return c.Status(fiber.StatusInternalServerError).SendString("Failed to marshal a transaction message to JSON")
 			}
 			messages = append(messages, json.RawMessage(jsonBytes))
 		}
@@ -286,13 +277,9 @@ func (s *Server) getTransactionHandler(w http.ResponseWriter, r *http.Request) {
 			},
 		}
 
-		w.Header().Set("Content-Type", "application/json")
-		if err := json.NewEncoder(w).Encode(response); err != nil {
-			http.Error(w, "Failed to encode response", http.StatusInternalServerError)
-		}
+		return c.JSON(response)
 
 	default:
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(getTxRes.TxResponse)
+		return c.JSON(getTxRes.TxResponse)
 	}
 }

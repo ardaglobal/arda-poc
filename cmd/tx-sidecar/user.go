@@ -3,9 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"os"
 	"time"
+
+	fiber "github.com/gofiber/fiber/v2"
 
 	zlog "github.com/rs/zerolog/log"
 
@@ -84,41 +85,35 @@ type KYCErrorResponse struct {
 // @Success 200 {object} LoginResponse
 // @Success 201 {object} LoginResponse
 // @Router /user/login [post]
-func (s *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
+func (s *Server) loginHandler(c *fiber.Ctx) error {
+	if c.Method() != fiber.MethodPost {
+		return c.Status(fiber.StatusMethodNotAllowed).SendString("Invalid request method")
 	}
 
 	var req LoginRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid request body")
 	}
 
 	zlog.Info().Str("handler", "loginHandler").Str("email", req.Email).Str("name", req.Name).Str("role", req.Role).Msg("received login request")
 
 	if req.Email == "" {
-		http.Error(w, "Email cannot be empty", http.StatusBadRequest)
-		return
+		return c.Status(fiber.StatusBadRequest).SendString("Email cannot be empty")
 	}
 
 	name, emailExists := s.logins[req.Email]
 
 	if s.loggedInUser != "" {
 		if emailExists && name == s.loggedInUser {
-			w.Header().Set("Content-Type", "application/json")
 			userData := s.users[s.loggedInUser]
-			json.NewEncoder(w).Encode(LoginResponse{
+			return c.JSON(LoginResponse{
 				Status:  "success",
 				Message: fmt.Sprintf("User %s is already logged in", s.loggedInUser),
 				User:    s.loggedInUser,
 				Role:    userData.Role,
 			})
-			return
 		}
-		http.Error(w, fmt.Sprintf("User '%s' is already logged in. Please log out first.", s.loggedInUser), http.StatusConflict)
-		return
+		return c.Status(fiber.StatusConflict).SendString(fmt.Sprintf("User '%s' is already logged in. Please log out first.", s.loggedInUser))
 	}
 
 	// from here, we know s.loggedInUser == ""
@@ -127,23 +122,19 @@ func (s *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
 		s.loggedInUser = name
 		userData, ok := s.users[name]
 		if !ok {
-			http.Error(w, fmt.Sprintf("internal data inconsistency: user %s not found", name), http.StatusInternalServerError)
-			return
+			return c.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("internal data inconsistency: user %s not found", name))
 		}
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(LoginResponse{
+		return c.JSON(LoginResponse{
 			Status:  "success",
 			Message: fmt.Sprintf("User %s logged in", name),
 			User:    name,
 			Role:    userData.Role,
 		})
-		return
 	}
 
 	// Email doesn't exist. This is a registration/linking flow.
 	if req.Name == "" {
-		http.Error(w, "Email not registered. Please provide a name to create a new user.", http.StatusBadRequest)
-		return
+		return c.Status(fiber.StatusBadRequest).SendString("Email not registered. Please provide a name to create a new user.")
 	}
 
 	var finalUserData UserData
@@ -152,16 +143,14 @@ func (s *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil { // User does not exist, create new one
 		createdUser, err := s.createUser(req.Name, req.Role)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("Failed to create user: %v", err), http.StatusBadRequest)
-			return
+			return c.Status(fiber.StatusBadRequest).SendString(fmt.Sprintf("Failed to create user: %v", err))
 		}
 		finalUserData = *createdUser
 		zlog.Info().Msgf("Created new user '%s' with address %s and role %s", finalUserData.Name, finalUserData.Address, finalUserData.Role)
 	} else {
 		existingUser, ok := s.users[req.Name]
 		if !ok {
-			http.Error(w, fmt.Sprintf("internal data inconsistency: user %s not found", req.Name), http.StatusInternalServerError)
-			return
+			return c.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("internal data inconsistency: user %s not found", req.Name))
 		}
 		finalUserData = existingUser
 		zlog.Info().Msgf("User with name '%s' already exists, linking to email '%s'", req.Name, req.Email)
@@ -174,9 +163,7 @@ func (s *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.loggedInUser = req.Name
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(LoginResponse{
+	return c.Status(fiber.StatusCreated).JSON(LoginResponse{
 		Status:  "success",
 		Message: fmt.Sprintf("User %s created/linked and logged in", req.Name),
 		User:    req.Name,
@@ -190,23 +177,20 @@ func (s *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Success 200 {object} map[string]string{status=string,message=string}
 // @Router /user/logout [post]
-func (s *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
+func (s *Server) logoutHandler(c *fiber.Ctx) error {
+	if c.Method() != fiber.MethodPost {
+		return c.Status(fiber.StatusMethodNotAllowed).SendString("Invalid request method")
 	}
 
 	zlog.Info().Str("handler", "logoutHandler").Str("loggedInUser", s.loggedInUser).Msg("received logout request")
 
 	if s.loggedInUser == "" {
-		http.Error(w, "No user is currently logged in", http.StatusBadRequest)
-		return
+		return c.Status(fiber.StatusBadRequest).SendString("No user is currently logged in")
 	}
 
 	loggedOutUser := s.loggedInUser
 	s.loggedInUser = ""
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{
+	return c.JSON(fiber.Map{
 		"status":  "success",
 		"message": fmt.Sprintf("User %s logged out", loggedOutUser),
 	})
@@ -289,10 +273,9 @@ func (s *Server) saveLoginsToFile() error {
 // @Produce json
 // @Success 200 {array} UserDetailResponse
 // @Router /user/list [get]
-func (s *Server) listUsersHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
+func (s *Server) listUsersHandler(c *fiber.Ctx) error {
+	if c.Method() != fiber.MethodGet {
+		return c.Status(fiber.StatusMethodNotAllowed).SendString("Invalid request method")
 	}
 
 	zlog.Info().Str("handler", "listUsersHandler").Msg("received request")
@@ -314,14 +297,12 @@ func (s *Server) listUsersHandler(w http.ResponseWriter, r *http.Request) {
 
 		addr, err := record.GetAddress()
 		if err != nil {
-			http.Error(w, fmt.Sprintf("Failed to get address for key '%s': %v", record.Name, err), http.StatusInternalServerError)
-			return
+			return c.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("Failed to get address for key '%s': %v", record.Name, err))
 		}
 
 		pubKeyJSON, err := s.clientCtx.Codec.MarshalJSON(record.PubKey)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("Failed to marshal pubkey for key '%s': %v", record.Name, err), http.StatusInternalServerError)
-			return
+			return c.Status(fiber.StatusInternalServerError).SendString(fmt.Sprintf("Failed to marshal pubkey for key '%s': %v", record.Name, err))
 		}
 
 		userInfos = append(userInfos, UserDetailResponse{
@@ -333,11 +314,7 @@ func (s *Server) listUsersHandler(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(userInfos); err != nil {
-		http.Error(w, "Failed to encode users to JSON", http.StatusInternalServerError)
-		return
-	}
+	return c.JSON(userInfos)
 }
 
 func (s *Server) initUsers() error {
@@ -395,20 +372,17 @@ func (s *Server) initUsers() error {
 // @Failure 400 {object} KYCErrorResponse
 // @Failure 401 {object} KYCErrorResponse
 // @Router /user/kyc/request [post]
-func (s *Server) requestKYCHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
+func (s *Server) requestKYCHandler(c *fiber.Ctx) error {
+	if c.Method() != fiber.MethodPost {
+		return c.Status(fiber.StatusMethodNotAllowed).SendString("Invalid request method")
 	}
 	if s.loggedInUser == "" {
-		http.Error(w, "No user is logged in. Please log in to request KYC.", http.StatusUnauthorized)
-		return
+		return c.Status(fiber.StatusUnauthorized).SendString("No user is logged in. Please log in to request KYC.")
 	}
 	// Check if user already has a pending KYC request
 	for _, req := range s.kycRequests {
 		if req.Requester == s.loggedInUser && req.Status == "pending" {
-			http.Error(w, "You already have a pending KYC request.", http.StatusBadRequest)
-			return
+			return c.Status(fiber.StatusBadRequest).SendString("You already have a pending KYC request.")
 		}
 	}
 	newReq := KYCRequestEntry{
@@ -419,13 +393,10 @@ func (s *Server) requestKYCHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	s.kycRequests = append(s.kycRequests, newReq)
 	if err := s.saveKYCRequestsToFile(); err != nil {
-		http.Error(w, "Failed to save KYC request", http.StatusInternalServerError)
 		zlog.Error().Err(err).Msg("failed to save KYC requests file")
-		return
+		return c.Status(fiber.StatusInternalServerError).SendString("Failed to save KYC request")
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(newReq)
+	return c.Status(fiber.StatusCreated).JSON(newReq)
 }
 
 // getKYCRequestsHandler allows a regulator to view all pending KYC requests.
@@ -436,19 +407,16 @@ func (s *Server) requestKYCHandler(w http.ResponseWriter, r *http.Request) {
 // @Failure 401 {object} KYCErrorResponse
 // @Failure 403 {object} KYCErrorResponse
 // @Router /user/kyc/requests [get]
-func (s *Server) getKYCRequestsHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
+func (s *Server) getKYCRequestsHandler(c *fiber.Ctx) error {
+	if c.Method() != fiber.MethodGet {
+		return c.Status(fiber.StatusMethodNotAllowed).SendString("Invalid request method")
 	}
 	if s.loggedInUser == "" {
-		http.Error(w, "No user is logged in.", http.StatusUnauthorized)
-		return
+		return c.Status(fiber.StatusUnauthorized).SendString("No user is logged in.")
 	}
 	userData, ok := s.users[s.loggedInUser]
 	if !ok || userData.Role != "regulator" {
-		http.Error(w, "Only regulators can view KYC requests.", http.StatusForbidden)
-		return
+		return c.Status(fiber.StatusForbidden).SendString("Only regulators can view KYC requests.")
 	}
 	pending := make([]KYCRequestEntry, 0)
 	for _, req := range s.kycRequests {
@@ -456,8 +424,7 @@ func (s *Server) getKYCRequestsHandler(w http.ResponseWriter, r *http.Request) {
 			pending = append(pending, req)
 		}
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(pending)
+	return c.JSON(pending)
 }
 
 // approveKYCHandler allows a regulator to approve a KYC request.
@@ -472,24 +439,20 @@ func (s *Server) getKYCRequestsHandler(w http.ResponseWriter, r *http.Request) {
 // @Failure 403 {object} KYCErrorResponse
 // @Failure 404 {object} KYCErrorResponse
 // @Router /user/kyc/approve [post]
-func (s *Server) approveKYCHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
+func (s *Server) approveKYCHandler(c *fiber.Ctx) error {
+	if c.Method() != fiber.MethodPost {
+		return c.Status(fiber.StatusMethodNotAllowed).SendString("Invalid request method")
 	}
 	if s.loggedInUser == "" {
-		http.Error(w, "No user is logged in.", http.StatusUnauthorized)
-		return
+		return c.Status(fiber.StatusUnauthorized).SendString("No user is logged in.")
 	}
 	userData, ok := s.users[s.loggedInUser]
 	if !ok || userData.Role != "regulator" {
-		http.Error(w, "Only regulators can approve KYC requests.", http.StatusForbidden)
-		return
+		return c.Status(fiber.StatusForbidden).SendString("Only regulators can approve KYC requests.")
 	}
 	var req ApproveKYCRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid request body")
 	}
 	found := false
 	for i, kycReq := range s.kycRequests {
@@ -507,12 +470,10 @@ func (s *Server) approveKYCHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if !found {
-		http.Error(w, "KYC request not found or already processed", http.StatusNotFound)
-		return
+		return c.Status(fiber.StatusNotFound).SendString("KYC request not found or already processed")
 	}
 	s.saveKYCRequestsToFile()
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(KYCStatusResponse{Status: "approved"})
+	return c.JSON(KYCStatusResponse{Status: "approved"})
 }
 
 // Save/load KYC requests to/from file
