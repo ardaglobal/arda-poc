@@ -6,10 +6,9 @@ tmp_dir = "tmp"
   cmd = "go build -o ./tmp/tx-sidecar ./cmd/tx-sidecar"
   bin = "tmp/tx-sidecar"
   include_ext = ["go", "tpl", "tmpl", "html"]
-  exclude_dir = ["tmp", "vendor", "cmd/tx-sidecar/docs"]
+  include_dir = ["cmd/tx-sidecar"]
+  exclude_dir = ["tmp", "vendor", "cmd/tx-sidecar/docs", "cmd/tx-sidecar/local_data"]
   exclude_regex = ["_test.go"]
-  follow_symlink = true
-  delay = 1000
 
 [log]
   time = true

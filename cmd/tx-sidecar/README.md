@@ -21,12 +21,12 @@ Ensure your `ard-pocd` node is running first. Then, from the root of the `arda-p
 ```bash
 make dev-sidecar
 ```
-This command uses [Air](https://github.com/cosmtrek/air) to watch the
+This command uses [Air](https://github.com/air-verse/air) to watch the
 `cmd/tx-sidecar` sources and automatically rebuild and restart the server when
 files change. Make sure Air is installed:
 
 ```bash
-go install github.com/cosmtrek/air@latest
+go install github.com/air-verse/air@latest
 ```
 
 Alternatively you can run:

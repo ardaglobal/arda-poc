@@ -128,6 +128,7 @@ setup-dev: setup-script proto-deps
 	@go install golang.org/x/vuln/cmd/govulncheck@latest
 	@go install golang.org/x/tools/cmd/goimports@latest
 	@go install github.com/swaggo/swag/cmd/swag@latest
+	@go install github.com/air-verse/air@latest
 .PHONY: setup-dev
 
 ###################
@@ -139,9 +140,9 @@ dev:
 	@ignite chain serve 
 .PHONY: dev
 
-dev-sidecar: sidecar-docs
-       @echo "--> Running dev-sidecar with Air hot reload"
-       @air -c .air.toml
+dev-sidecar:
+	@echo "--> Running dev-sidecar with Air hot reload"
+	@air -c .air.toml
 .PHONY: dev-sidecar
 
 sidecar-docs:
