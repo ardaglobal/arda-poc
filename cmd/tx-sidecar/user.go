@@ -557,7 +557,6 @@ func (s *Server) approveKYCHandler(w http.ResponseWriter, r *http.Request) {
 			if ok && requesterData.Role == "user" {
 				requesterData.Role = "investor"
 				s.users[kycReq.Requester] = requesterData
-				s.saveUsersToFile()
 			}
 			found = true
 			break
@@ -567,6 +566,7 @@ func (s *Server) approveKYCHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "KYC request not found or already processed", http.StatusNotFound)
 		return
 	}
+	s.saveUsersToFile()
 	s.saveKYCRequestsToFile()
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(KYCStatusResponse{Status: "approved"})

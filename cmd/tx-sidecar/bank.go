@@ -88,6 +88,7 @@ func (s *Server) createMortgageHandler(w http.ResponseWriter, r *http.Request) {
 
 	var req MortgageRequestPayload
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		zlog.Error().Err(err).Msg("failed to decode request body")
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
@@ -256,6 +257,7 @@ func (s *Server) requestMortgageHandler(w http.ResponseWriter, r *http.Request) 
 
 	var req MortgageRequestPayload
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		zlog.Error().Err(err).Msg("failed to decode request body")
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
@@ -264,6 +266,7 @@ func (s *Server) requestMortgageHandler(w http.ResponseWriter, r *http.Request) 
 
 	// Validate that the lender exists
 	if _, ok := s.users[req.Lender]; !ok {
+		zlog.Error().Str("lender", req.Lender).Msg("lender not found")
 		http.Error(w, fmt.Sprintf("Lender '%s' not found.", req.Lender), http.StatusBadRequest)
 		return
 	}
