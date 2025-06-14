@@ -372,33 +372,26 @@ func (s *Server) getMortgageRequestsHandler(w http.ResponseWriter, r *http.Reque
 // @Router /bank/mortgage/request-equity [post]
 func (s *Server) requestEquityMortgageHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
+		zlog.Error().Msg("invalid request method")
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
 	if s.loggedInUser == "" {
+		zlog.Error().Msg("no user is logged in")
 		http.Error(w, "No user is logged in. Please log in to request a home equity mortgage.", http.StatusUnauthorized)
 		return
 	}
 	var req MortgageRequestPayload
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		zlog.Error().Err(err).Msg("failed to decode request body")
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
+	zlog.Info().Str("handler", "requestEquityMortgageHandler").Interface("request", req).Msg("received request")
 	// Validate that the lender exists
 	if _, ok := s.users[req.Lender]; !ok {
+		zlog.Error().Str("lender", req.Lender).Msg("lender not found")
 		http.Error(w, "Lender not found.", http.StatusBadRequest)
-		return
-	}
-	// Validate that the requester owns the property (simple check: must be in ToOwners)
-	ownsProperty := false
-	for _, owner := range req.ToOwners {
-		if owner == s.loggedInUser {
-			ownsProperty = true
-			break
-		}
-	}
-	if !ownsProperty {
-		http.Error(w, "You must be an owner of the property to request a home equity mortgage.", http.StatusBadRequest)
 		return
 	}
 	requesterData := s.users[s.loggedInUser]
