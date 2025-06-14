@@ -58,13 +58,14 @@ type ListPropertyForSaleRequest struct {
 
 // OffPlanProperty represents a property to be funded off plan.
 type OffPlanProperty struct {
-	ID          string `json:"id"`
-	Address     string `json:"address"`
-	Region      string `json:"region"`
-	Value       uint64 `json:"value"`
-	TotalShares uint64 `json:"total_shares"`
-	Status      string `json:"status"` // "for_sale", "pending_regulator_approval", "registered"
-	Developer   string `json:"developer"`
+	ID               string                   `json:"id"`
+	Address          string                   `json:"address"`
+	Region           string                   `json:"region"`
+	Value            uint64                   `json:"value"`
+	TotalShares      uint64                   `json:"total_shares"`
+	Status           string                   `json:"status"` // "for_sale", "pending_regulator_approval", "registered"
+	Developer        string                   `json:"developer"`
+	PurchaseRequests []OffPlanPurchaseRequest `json:"purchase_requests,omitempty"`
 }
 
 // OffPlanPurchaseRequest represents a user's request to purchase shares in an off plan property.
@@ -337,33 +338,6 @@ func (s *Server) updateForSalePropertiesOnTransfer(propertyID string, fromOwners
 	s.saveForSalePropertiesToFile()
 }
 
-// getOffPlanPurchaseRequestsHandler returns all purchase requests for a given off plan property.
-// @Summary Get off plan property purchase requests
-// @Description Returns all purchase requests for a given off plan property.
-// @Produce json
-// @Param property_id query string true "Off plan property ID"
-// @Success 200 {array} OffPlanPurchaseRequest
-// @Router /property/offplan/purchase-requests [get]
-func (s *Server) getOffPlanPurchaseRequestsHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
-	}
-	propertyID := r.URL.Query().Get("property_id")
-	if propertyID == "" {
-		http.Error(w, "property_id is required", http.StatusBadRequest)
-		return
-	}
-	requests := make([]OffPlanPurchaseRequest, 0)
-	for _, req := range s.offPlanPurchaseRequests {
-		if req.PropertyID == propertyID {
-			requests = append(requests, req)
-		}
-	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(requests)
-}
-
 // getOffPlanPropertiesHandler returns all off-plan properties.
 // @Summary Get all off-plan properties
 // @Description Returns all off-plan properties, regardless of status.
@@ -387,14 +361,6 @@ func (s *Server) saveOffPlanPropertiesToFile() error {
 		return err
 	}
 	return os.WriteFile(s.offPlanPropertiesFile, data, 0644)
-}
-
-func (s *Server) saveOffPlanPurchaseRequestsToFile() error {
-	data, err := json.MarshalIndent(s.offPlanPurchaseRequests, "", "  ")
-	if err != nil {
-		return err
-	}
-	return os.WriteFile(s.offPlanPurchaseRequestsFile, data, 0644)
 }
 
 // postOffPlanPropertyHandler allows a developer to submit a new off plan property.
@@ -430,13 +396,14 @@ func (s *Server) postOffPlanPropertyHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	newProp := OffPlanProperty{
-		ID:          uuid.New().String(),
-		Address:     req.Address,
-		Region:      req.Region,
-		Value:       req.Value,
-		TotalShares: req.TotalShares,
-		Status:      "for_sale",
-		Developer:   s.loggedInUser,
+		ID:               uuid.New().String(),
+		Address:          req.Address,
+		Region:           req.Region,
+		Value:            req.Value,
+		TotalShares:      req.TotalShares,
+		Status:           "for_sale",
+		Developer:        s.loggedInUser,
+		PurchaseRequests: []OffPlanPurchaseRequest{}, // Initialize with empty slice
 	}
 	s.offPlanProperties = append(s.offPlanProperties, newProp)
 	s.saveOffPlanPropertiesToFile()
@@ -486,11 +453,10 @@ func (s *Server) postOffPlanPurchaseRequestHandler(w http.ResponseWriter, r *htt
 	}
 	// Calculate current funding
 	totalUSD := uint64(0)
-	for _, pr := range s.offPlanPurchaseRequests {
-		if pr.PropertyID == req.PropertyID {
-			totalUSD += pr.AmountUSD
-		}
+	for _, pr := range prop.PurchaseRequests {
+		totalUSD += pr.AmountUSD
 	}
+
 	if totalUSD+req.AmountUSD > prop.Value {
 		http.Error(w, "Purchase would exceed 100% funding", http.StatusBadRequest)
 		return
@@ -504,14 +470,14 @@ func (s *Server) postOffPlanPurchaseRequestHandler(w http.ResponseWriter, r *htt
 		Percent:    percent,
 		Status:     "accepted",
 	}
-	s.offPlanPurchaseRequests = append(s.offPlanPurchaseRequests, newReq)
-	s.saveOffPlanPurchaseRequestsToFile()
+	prop.PurchaseRequests = append(prop.PurchaseRequests, newReq)
+
 	// Check if property is now fully funded
-	totalUSD += req.AmountUSD
-	if totalUSD == prop.Value {
+	if totalUSD+req.AmountUSD == prop.Value {
 		prop.Status = "pending_regulator_approval"
-		s.saveOffPlanPropertiesToFile()
 	}
+	s.saveOffPlanPropertiesToFile()
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(newReq)
@@ -565,16 +531,14 @@ func (s *Server) approveOffPlanPropertyHandler(w http.ResponseWriter, r *http.Re
 	// Gather owners and shares from purchase requests
 	owners := []string{}
 	shares := []uint64{}
-	for _, pr := range s.offPlanPurchaseRequests {
-		if pr.PropertyID == prop.ID {
-			owners = append(owners, pr.User)
-			// Shares proportional to percent of total shares
-			share := uint64(float64(prop.TotalShares) * pr.Percent / 100.0)
-			if share == 0 {
-				share = 1
-			} // Ensure at least 1 share
-			shares = append(shares, share)
-		}
+	for _, pr := range prop.PurchaseRequests {
+		owners = append(owners, pr.User)
+		// Shares proportional to percent of total shares
+		share := uint64(float64(prop.TotalShares) * pr.Percent / 100.0)
+		if share == 0 {
+			share = 1
+		} // Ensure at least 1 share
+		shares = append(shares, share)
 	}
 	if len(owners) == 0 {
 		http.Error(w, "No purchase requests found for this property", http.StatusBadRequest)

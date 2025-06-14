@@ -231,38 +231,25 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		return nil, fmt.Errorf("failed to read off plan properties file: %w", err)
 	}
 
-	offPlanPurchaseRequestsFile := filepath.Join(dataDir, "offplan_purchase_requests.json")
-	offPlanPurchaseRequests := make([]OffPlanPurchaseRequest, 0)
-	opprData, err := os.ReadFile(offPlanPurchaseRequestsFile)
-	if err == nil {
-		if err := json.Unmarshal(opprData, &offPlanPurchaseRequests); err != nil {
-			zlog.Warn().Msgf("failed to unmarshal off plan purchase requests file, starting with empty list: %v", err)
-		}
-	} else if !os.IsNotExist(err) {
-		return nil, fmt.Errorf("failed to read off plan purchase requests file: %w", err)
-	}
-
 	s := &Server{
-		clientCtx:                   clientCtx,
-		authClient:                  authtypes.NewQueryClient(grpcConn),
-		txClient:                    txtypes.NewServiceClient(grpcConn),
-		users:                       users,
-		usersFile:                   usersFile,
-		logins:                      logins,
-		loginsFile:                  loginsFile,
-		faucetName:                  appConfig.Faucet.Name,
-		transactions:                transactions,
-		transactionsFile:            transactionsFile,
-		mortgageRequests:            mortgageRequests,
-		mortgageRequestsFile:        mortgageRequestsFile,
-		kycRequests:                 kycRequests,
-		kycRequestsFile:             kycRequestsFile,
-		forSaleProperties:           forSaleProperties,
-		forSalePropertiesFile:       forSalePropertiesFile,
-		offPlanProperties:           offPlanProperties,
-		offPlanPropertiesFile:       offPlanPropertiesFile,
-		offPlanPurchaseRequests:     offPlanPurchaseRequests,
-		offPlanPurchaseRequestsFile: offPlanPurchaseRequestsFile,
+		clientCtx:             clientCtx,
+		authClient:            authtypes.NewQueryClient(grpcConn),
+		txClient:              txtypes.NewServiceClient(grpcConn),
+		users:                 users,
+		usersFile:             usersFile,
+		logins:                logins,
+		loginsFile:            loginsFile,
+		faucetName:            appConfig.Faucet.Name,
+		transactions:          transactions,
+		transactionsFile:      transactionsFile,
+		mortgageRequests:      mortgageRequests,
+		mortgageRequestsFile:  mortgageRequestsFile,
+		kycRequests:           kycRequests,
+		kycRequestsFile:       kycRequestsFile,
+		forSaleProperties:     forSaleProperties,
+		forSalePropertiesFile: forSalePropertiesFile,
+		offPlanProperties:     offPlanProperties,
+		offPlanPropertiesFile: offPlanPropertiesFile,
 	}
 
 	// Ensure that the faucet account from config exists in the keyring.
@@ -456,7 +443,6 @@ func main() {
 	app.Get("/property/offplans", fiberadaptor.HTTPHandlerFunc(server.getOffPlanPropertiesHandler))
 	app.Post("/property/offplan", fiberadaptor.HTTPHandlerFunc(server.postOffPlanPropertyHandler))
 	app.Post("/property/offplan/purchase-request", fiberadaptor.HTTPHandlerFunc(server.postOffPlanPurchaseRequestHandler))
-	app.Get("/property/offplan/purchase-requests", fiberadaptor.HTTPHandlerFunc(server.getOffPlanPurchaseRequestsHandler))
 	app.Post("/property/offplan/approve", fiberadaptor.HTTPHandlerFunc(server.approveOffPlanPropertyHandler))
 
 	// Bank/mortgage routes

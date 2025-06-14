@@ -615,35 +615,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/property/offplan/purchase-requests": {
-            "get": {
-                "description": "Returns all purchase requests for a given off plan property.",
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Get off plan property purchase requests",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Off plan property ID",
-                        "name": "property_id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/main.OffPlanPurchaseRequest"
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/property/offplans": {
             "get": {
                 "description": "Returns all off-plan properties, regardless of status.",
@@ -1389,6 +1360,12 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "string"
+                },
+                "purchase_requests": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/main.OffPlanPurchaseRequest"
+                    }
                 },
                 "region": {
                     "type": "string"
