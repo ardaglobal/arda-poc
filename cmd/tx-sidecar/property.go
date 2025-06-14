@@ -427,6 +427,7 @@ func (s *Server) postOffPlanPurchaseRequestHandler(w http.ResponseWriter, r *htt
 		return
 	}
 	if s.loggedInUser == "" {
+		zlog.Error().Msg("no user is logged in")
 		http.Error(w, "No user is logged in.", http.StatusUnauthorized)
 		return
 	}
@@ -435,6 +436,7 @@ func (s *Server) postOffPlanPurchaseRequestHandler(w http.ResponseWriter, r *htt
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
+	zlog.Info().Str("handler", "postOffPlanPurchaseRequestHandler").Interface("request", req).Msg("received request")
 	// Find the property
 	var prop *OffPlanProperty
 	for i := range s.offPlanProperties {
@@ -444,10 +446,12 @@ func (s *Server) postOffPlanPurchaseRequestHandler(w http.ResponseWriter, r *htt
 		}
 	}
 	if prop == nil {
+		zlog.Error().Str("property_id", req.PropertyID).Msg("off plan property not found")
 		http.Error(w, "Off plan property not found", http.StatusBadRequest)
 		return
 	}
 	if prop.Status != "for_sale" {
+		zlog.Error().Str("property_id", req.PropertyID).Msg("property is not for sale")
 		http.Error(w, "Property is not for sale", http.StatusBadRequest)
 		return
 	}
@@ -458,10 +462,12 @@ func (s *Server) postOffPlanPurchaseRequestHandler(w http.ResponseWriter, r *htt
 	}
 
 	if totalUSD+req.AmountUSD > prop.Value {
+		zlog.Error().Str("property_id", req.PropertyID).Msg("purchase would exceed 100% funding")
 		http.Error(w, "Purchase would exceed 100% funding", http.StatusBadRequest)
 		return
 	}
 	percent := float64(req.AmountUSD) / float64(prop.Value) * 100.0
+	zlog.Info().Str("handler", "postOffPlanPurchaseRequestHandler").Interface("percent", percent).Msg("calculated percent")
 	newReq := OffPlanPurchaseRequest{
 		ID:         uuid.New().String(),
 		PropertyID: req.PropertyID,
