@@ -70,12 +70,11 @@ type OffPlanProperty struct {
 
 // OffPlanPurchaseRequest represents a user's request to purchase shares in an off plan property.
 type OffPlanPurchaseRequest struct {
-	ID         string  `json:"id"`
-	PropertyID string  `json:"property_id"`
-	User       string  `json:"user"`
-	AmountUSD  uint64  `json:"amount_usd"`
-	Percent    float64 `json:"percent"`
-	Status     string  `json:"status"` // "accepted"
+	ID         string `json:"id"`
+	PropertyID string `json:"property_id"`
+	User       string `json:"user"`
+	Shares     uint64 `json:"shares"`
+	Status     string `json:"status"` // "accepted"
 }
 
 // OffPlanPropertyRequest defines the request body for submitting a new off plan property.
@@ -89,7 +88,7 @@ type OffPlanPropertyRequest struct {
 // OffPlanPurchaseRequestPayload defines the request body for submitting a purchase request.
 type OffPlanPurchaseRequestPayload struct {
 	PropertyID string `json:"property_id"`
-	AmountUSD  uint64 `json:"amount_usd"`
+	Shares     uint64 `json:"shares"`
 }
 
 // ApproveOffPlanPropertyRequest defines the request body for approving an off plan property.
@@ -455,31 +454,29 @@ func (s *Server) postOffPlanPurchaseRequestHandler(w http.ResponseWriter, r *htt
 		http.Error(w, "Property is not for sale", http.StatusBadRequest)
 		return
 	}
-	// Calculate current funding
-	totalUSD := uint64(0)
+	// Calculate current purchased shares
+	totalSharesPurchased := uint64(0)
 	for _, pr := range prop.PurchaseRequests {
-		totalUSD += pr.AmountUSD
+		totalSharesPurchased += pr.Shares
 	}
 
-	if totalUSD+req.AmountUSD > prop.Value {
-		zlog.Error().Str("property_id", req.PropertyID).Msg("purchase would exceed 100% funding")
-		http.Error(w, "Purchase would exceed 100% funding", http.StatusBadRequest)
+	if totalSharesPurchased+req.Shares > prop.TotalShares {
+		zlog.Error().Str("property_id", req.PropertyID).Msg("purchase would exceed total shares")
+		http.Error(w, "Purchase would exceed total shares", http.StatusBadRequest)
 		return
 	}
-	percent := float64(req.AmountUSD) / float64(prop.Value) * 100.0
-	zlog.Info().Str("handler", "postOffPlanPurchaseRequestHandler").Interface("percent", percent).Msg("calculated percent")
+
 	newReq := OffPlanPurchaseRequest{
 		ID:         uuid.New().String(),
 		PropertyID: req.PropertyID,
 		User:       s.loggedInUser,
-		AmountUSD:  req.AmountUSD,
-		Percent:    percent,
+		Shares:     req.Shares,
 		Status:     "accepted",
 	}
 	prop.PurchaseRequests = append(prop.PurchaseRequests, newReq)
 
 	// Check if property is now fully funded
-	if totalUSD+req.AmountUSD == prop.Value {
+	if totalSharesPurchased+req.Shares == prop.TotalShares {
 		prop.Status = "pending_regulator_approval"
 	}
 	s.saveOffPlanPropertiesToFile()
@@ -539,12 +536,7 @@ func (s *Server) approveOffPlanPropertyHandler(w http.ResponseWriter, r *http.Re
 	shares := []uint64{}
 	for _, pr := range prop.PurchaseRequests {
 		owners = append(owners, pr.User)
-		// Shares proportional to percent of total shares
-		share := uint64(float64(prop.TotalShares) * pr.Percent / 100.0)
-		if share == 0 {
-			share = 1
-		} // Ensure at least 1 share
-		shares = append(shares, share)
+		shares = append(shares, pr.Shares)
 	}
 	if len(owners) == 0 {
 		http.Error(w, "No purchase requests found for this property", http.StatusBadRequest)

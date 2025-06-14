@@ -1402,17 +1402,14 @@ const docTemplate = `{
         "main.OffPlanPurchaseRequest": {
             "type": "object",
             "properties": {
-                "amount_usd": {
-                    "type": "integer"
-                },
                 "id": {
                     "type": "string"
                 },
-                "percent": {
-                    "type": "number"
-                },
                 "property_id": {
                     "type": "string"
+                },
+                "shares": {
+                    "type": "integer"
                 },
                 "status": {
                     "description": "\"accepted\"",
@@ -1426,11 +1423,11 @@ const docTemplate = `{
         "main.OffPlanPurchaseRequestPayload": {
             "type": "object",
             "properties": {
-                "amount_usd": {
-                    "type": "integer"
-                },
                 "property_id": {
                     "type": "string"
+                },
+                "shares": {
+                    "type": "integer"
                 }
             }
         },

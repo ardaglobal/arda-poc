@@ -269,14 +269,12 @@ definitions:
     type: object
   main.OffPlanPurchaseRequest:
     properties:
-      amount_usd:
-        type: integer
       id:
         type: string
-      percent:
-        type: number
       property_id:
         type: string
+      shares:
+        type: integer
       status:
         description: '"accepted"'
         type: string
@@ -285,10 +283,10 @@ definitions:
     type: object
   main.OffPlanPurchaseRequestPayload:
     properties:
-      amount_usd:
-        type: integer
       property_id:
         type: string
+      shares:
+        type: integer
     type: object
   main.RegisterPropertyRequest:
     properties:
