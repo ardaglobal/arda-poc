@@ -339,7 +339,7 @@ func (s *Server) updateForSalePropertiesOnTransfer(propertyID string, fromOwners
 
 // getOffPlanPropertiesHandler returns all off-plan properties.
 // @Summary Get all off-plan properties
-// @Description Returns all off-plan properties, regardless of status.
+// @Description Returns a list of all off-plan properties, including their purchase requests.
 // @Produce json
 // @Success 200 {array} OffPlanProperty
 // @Router /property/offplans [get]
@@ -413,7 +413,7 @@ func (s *Server) postOffPlanPropertyHandler(w http.ResponseWriter, r *http.Reque
 
 // postOffPlanPurchaseRequestHandler allows a user to submit a purchase request for an off plan property.
 // @Summary Submit off plan property purchase request
-// @Description User submits a request to purchase shares in an off plan property. Auto-accepted if not fully funded. Rejected if >100% funded. If 100% funded, property status is set to 'pending_regulator_approval'.
+// @Description User submits a request to purchase shares in an off plan property. When all shares are purchased, property status is set to 'pending_regulator_approval'.
 // @Accept json
 // @Produce json
 // @Param request body OffPlanPurchaseRequestPayload true "purchase request info"
@@ -502,11 +502,13 @@ func (s *Server) approveOffPlanPropertyHandler(w http.ResponseWriter, r *http.Re
 		return
 	}
 	if s.loggedInUser == "" {
+		zlog.Error().Msg("no user is logged in")
 		http.Error(w, "No user is logged in.", http.StatusUnauthorized)
 		return
 	}
 	userData, ok := s.users[s.loggedInUser]
 	if !ok || userData.Role != "regulator" {
+		zlog.Error().Str("loggedInUser", s.loggedInUser).Msg("user is not a regulator")
 		http.Error(w, "Only regulators can approve off plan properties.", http.StatusForbidden)
 		return
 	}
@@ -515,6 +517,7 @@ func (s *Server) approveOffPlanPropertyHandler(w http.ResponseWriter, r *http.Re
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
+	zlog.Info().Str("handler", "approveOffPlanPropertyHandler").Interface("request", req).Msg("received request")
 	// Find the property
 	var prop *OffPlanProperty
 	for i := range s.offPlanProperties {
@@ -524,10 +527,12 @@ func (s *Server) approveOffPlanPropertyHandler(w http.ResponseWriter, r *http.Re
 		}
 	}
 	if prop == nil {
+		zlog.Error().Str("property_id", req.PropertyID).Msg("off plan property not found")
 		http.Error(w, "Off plan property not found", http.StatusBadRequest)
 		return
 	}
 	if prop.Status != "pending_regulator_approval" {
+		zlog.Error().Str("property_id", req.PropertyID).Msg("property is not pending regulator approval")
 		http.Error(w, "Property is not pending regulator approval", http.StatusBadRequest)
 		return
 	}
@@ -535,7 +540,13 @@ func (s *Server) approveOffPlanPropertyHandler(w http.ResponseWriter, r *http.Re
 	owners := []string{}
 	shares := []uint64{}
 	for _, pr := range prop.PurchaseRequests {
-		owners = append(owners, pr.User)
+		userData, ok := s.users[pr.User]
+		if !ok {
+			zlog.Error().Str("user", pr.User).Msg("user from purchase request not found")
+			http.Error(w, "User from purchase request not found", http.StatusInternalServerError)
+			return
+		}
+		owners = append(owners, userData.Address)
 		shares = append(shares, pr.Shares)
 	}
 	if len(owners) == 0 {

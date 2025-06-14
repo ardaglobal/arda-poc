@@ -580,7 +580,7 @@ const docTemplate = `{
         },
         "/property/offplan/purchase-request": {
             "post": {
-                "description": "User submits a request to purchase shares in an off plan property. Auto-accepted if not fully funded. Rejected if \u003e100% funded. If 100% funded, property status is set to 'pending_regulator_approval'.",
+                "description": "User submits a request to purchase shares in an off plan property. When all shares are purchased, property status is set to 'pending_regulator_approval'.",
                 "consumes": [
                     "application/json"
                 ],
@@ -617,7 +617,7 @@ const docTemplate = `{
         },
         "/property/offplans": {
             "get": {
-                "description": "Returns all off-plan properties, regardless of status.",
+                "description": "Returns a list of all off-plan properties, including their purchase requests.",
                 "produces": [
                     "application/json"
                 ],
