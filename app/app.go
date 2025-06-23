@@ -78,6 +78,7 @@ import (
 	ardamodulekeeper "github.com/ardaglobal/arda-poc/x/arda/keeper"
 	mortgagemodulekeeper "github.com/ardaglobal/arda-poc/x/mortgage/keeper"
 	propertymodulekeeper "github.com/ardaglobal/arda-poc/x/property/keeper"
+	rentmodulekeeper "github.com/ardaglobal/arda-poc/x/rent/keeper"
 	usdardamodulekeeper "github.com/ardaglobal/arda-poc/x/usdarda/keeper"
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
@@ -153,6 +154,7 @@ type App struct {
 
 	ArdaKeeper     ardamodulekeeper.Keeper
 	PropertyKeeper propertymodulekeeper.Keeper
+	RentKeeper     rentmodulekeeper.Keeper
 	UsdardaKeeper  usdardamodulekeeper.Keeper
 	MortgageKeeper mortgagemodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
@@ -263,6 +265,7 @@ func New(
 		&app.CircuitBreakerKeeper,
 		&app.ArdaKeeper,
 		&app.PropertyKeeper,
+		&app.RentKeeper,
 		&app.UsdardaKeeper,
 		&app.MortgageKeeper,
 		// this line is used by starport scaffolding # stargate/app/keeperDefinition

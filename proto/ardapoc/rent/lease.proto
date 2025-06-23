@@ -1,0 +1,13 @@
+syntax = "proto3";
+package ardapoc.rent;
+
+option go_package = "github.com/ardaglobal/arda-poc/x/rent/types";
+
+message Lease {
+  string id = 1;
+  string property_id = 2;
+  string tenant = 3;
+  uint64 rent_amount = 4;
+  string rent_due_date = 5;
+  string status = 6;
+}
