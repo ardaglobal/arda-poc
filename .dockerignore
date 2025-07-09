@@ -1,0 +1,32 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+CLAUDE.md
+docs/
+
+# Development files
+.air.toml
+*.log
+
+# Test files
+*_test.go
+testutil/
+
+# Scripts (except build.sh)
+scripts/
+!scripts/setup_dev_env.sh
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
