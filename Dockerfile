@@ -4,8 +4,8 @@ FROM golang:1.23-alpine AS builder
 # Set working directory
 WORKDIR /app
 
-# Install git, ca-certificates, protobuf compiler, and curl
-RUN apk add --no-cache git ca-certificates protobuf curl
+# Install git and ca-certificates
+RUN apk add --no-cache git ca-certificates
 
 # Copy go mod files
 COPY go.mod go.sum ./
@@ -14,25 +14,10 @@ COPY go.mod go.sum ./
 RUN go mod download
 RUN go mod verify
 
-# Install Ignite CLI (needed for proto generation)
-RUN curl https://get.ignite.com/cli@v28.10.0 | bash
-
-# Install proto dependencies (equivalent to make proto-deps)
-RUN go install github.com/bufbuild/buf/cmd/buf@v1.50.0 && \
-    go install github.com/cosmos/gogoproto/protoc-gen-gogo@latest && \
-    go install github.com/cosmos/cosmos-proto/cmd/protoc-gen-go-pulsar@latest && \
-    go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.1 && \
-    go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway@v1.16.0 && \
-    go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.20.0 && \
-    go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-
-# Copy source code
+# Copy source code (protobuf files are already generated and committed)
 COPY . .
 
-# Generate protobuf files (equivalent to make proto-gen)
-RUN ignite generate proto-go --yes
-
-# Run go mod tidy (equivalent to setup-dev)
+# Run go mod tidy to ensure dependencies are clean
 RUN go mod tidy
 
 # Build the application

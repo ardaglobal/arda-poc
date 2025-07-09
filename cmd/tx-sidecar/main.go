@@ -422,7 +422,10 @@ func main() {
 	go server.RunAutoProperty(developerUsers, investorUsers)
 
 	app := fiber.New()
-	app.Use(fibercors.New())
+	app.Use(fibercors.New(fibercors.Config{
+		AllowOrigins:     "http://localhost:8081",
+		AllowCredentials: true,
+	}))
 
 	app.Get("/swagger/*", fiberSwagger.HandlerDefault)
 
