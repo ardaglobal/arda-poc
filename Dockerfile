@@ -15,7 +15,7 @@ RUN go mod download
 RUN go mod verify
 
 # Install Ignite CLI (needed for proto generation)
-RUN curl https://get.ignite.com/cli@v28.10.0! | bash
+RUN curl https://get.ignite.com/cli@v28.10.0 | bash
 
 # Install proto dependencies (equivalent to make proto-deps)
 RUN go install github.com/bufbuild/buf/cmd/buf@v1.50.0 && \
