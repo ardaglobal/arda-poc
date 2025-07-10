@@ -388,19 +388,19 @@ func getMortgagesPassthrough(c *fiber.Ctx) error {
 	return passthroughGET("/ardaglobal/arda-poc/mortgage/mortgage", c)
 }
 
-// isBlockchainRunning checks if the blockchain REST API is accessible
+// isBlockchainRunning checks if both the blockchain REST API and gRPC API are accessible
 func isBlockchainRunning() bool {
+	// Check REST API
 	baseURL := os.Getenv("BLOCKCHAIN_REST_API_URL")
 	if baseURL == "" {
 		baseURL = "http://localhost:1317"
 	}
-	// Try to access a simple endpoint to check if the blockchain is running
-	url := baseURL + "/cosmos/base/tendermint/v1beta1/node_info"
+	restURL := baseURL + "/cosmos/base/tendermint/v1beta1/node_info"
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", restURL, nil)
 	if err != nil {
 		return false
 	}
@@ -411,7 +411,27 @@ func isBlockchainRunning() bool {
 	}
 	defer resp.Body.Close()
 
-	return resp.StatusCode == 200
+	if resp.StatusCode != 200 {
+		return false
+	}
+
+	// Check gRPC API
+	grpcHost := "localhost"
+	if strings.Contains(baseURL, "://") {
+		if u, err := url.Parse(baseURL); err == nil {
+			grpcHost = u.Hostname()
+		}
+	}
+	grpcAddr := fmt.Sprintf("%s:9090", grpcHost)
+
+	// Try to establish a gRPC connection
+	grpcConn, err := grpc.Dial(grpcAddr, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock(), grpc.WithTimeout(5*time.Second))
+	if err != nil {
+		return false
+	}
+	defer grpcConn.Close()
+
+	return true
 }
 
 // waitForBlockchain waits for the blockchain to be ready before proceeding
