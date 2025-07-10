@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"strings"
+	"time"
 
 	propertytypes "github.com/ardaglobal/arda-poc/x/property/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -322,49 +323,43 @@ func (s *Server) RunAutoProperty(developerUsers, investorUsers []string) {
 
 	ctx := context.Background()
 
-	// create two off plan properties
+	// Initial setup: create two off plan properties
 	for i := 0; i < 2; i++ {
 		if err := s.createOffPlanProperty(developerUsers); err != nil {
 			zlog.Error().Err(err).Msg("autoproperty create off plan")
 		}
 	}
 
-	var properties []Property
-	for i := 0; i < 8; i++ {
-		zlog.Info().Msg("AutoProperty: Registering property...")
+	// Continuous property creation loop
+	for {
+		zlog.Info().Msg("AutoProperty: Adding a new property...")
+
+		// Register a new property
 		p, err := s.registerProperty(ctx, developerUsers)
 		if err != nil {
 			zlog.Error().Err(err).Msg("autoproperty register property")
+			time.Sleep(10 * time.Second)
 			continue
 		}
-		properties = append(properties, p)
 
+		// Edit property metadata
 		zlog.Info().Msg("AutoProperty: Editing property metadata...")
-		if err := s.autoEditPropertyMetadata(ctx, &properties[len(properties)-1]); err != nil {
+		if err := s.autoEditPropertyMetadata(ctx, &p); err != nil {
 			zlog.Error().Err(err).Msg("autoproperty edit metadata")
 		}
-	}
 
-	if len(properties) == 0 {
-		zlog.Info().Msg("AutoProperty: Done")
-		return
-	}
-
-	rand.Shuffle(len(properties), func(i, j int) { properties[i], properties[j] = properties[j], properties[i] })
-
-	// list first four properties for sale
-	for i := 0; i < 4 && i < len(properties); i++ {
-		if err := s.listPropertyForSale(&properties[i]); err != nil {
-			zlog.Error().Err(err).Msg("autoproperty list for sale")
+		// Randomly decide to list for sale or transfer shares
+		if rand.Intn(2) == 0 {
+			if err := s.listPropertyForSale(&p); err != nil {
+				zlog.Error().Err(err).Msg("autoproperty list for sale")
+			}
+		} else {
+			if err := s.transferShares(ctx, &p, investorUsers); err != nil {
+				zlog.Error().Err(err).Msg("autoproperty transfer")
+			}
 		}
-	}
 
-	// remaining properties get a transfer
-	for i := 4; i < len(properties); i++ {
-		if err := s.transferShares(ctx, &properties[i], investorUsers); err != nil {
-			zlog.Error().Err(err).Msg("autoproperty transfer")
-		}
+		zlog.Info().Msg("AutoProperty: Done with this property. Waiting 10 seconds before next one...")
+		time.Sleep(10 * time.Second)
 	}
-
-	zlog.Info().Msg("AutoProperty: Done")
 }
