@@ -165,12 +165,8 @@ clean:
 	rm -rf cmd/tx-sidecar/local_data
 .PHONY: clean
 
+# prod assumes the chain binary has been built and initialized. For example you might run `make dev` first while testing a feature, and then make prod to do integration testing with the sidecar.
 prod:
-	# ignite chain build
-	# @if [ ! -d $$HOME/$(APPNAME) ]; then \
-	# 	echo "Home directory not found, running ignite chain init..."; \
-	# 	ignite chain init; \
-	# fi
 	cp config.toml ~/.$(APPNAME)/config/config.toml
 	$(APPNAME)d start
 .PHONY: prod
