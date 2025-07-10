@@ -29,16 +29,12 @@ definitions:
     type: object
   main.CreateMortgageByIDRequest:
     properties:
-      gas:
-        type: string
       id:
         type: string
     type: object
   main.EditPropertyMetadataRequest:
     properties:
       construction_information:
-        type: string
-      gas:
         type: string
       owner_information:
         type: string
@@ -207,8 +203,6 @@ definitions:
         items:
           type: integer
         type: array
-      gas:
-        type: string
       index:
         type: string
       interest_rate:
@@ -292,8 +286,6 @@ definitions:
     properties:
       address:
         type: string
-      gas:
-        type: string
       owners:
         items:
           type: string
@@ -311,8 +303,6 @@ definitions:
     properties:
       amount:
         type: integer
-      gas:
-        type: string
       mortgage_id:
         type: string
     type: object
@@ -323,8 +313,6 @@ definitions:
       amount:
         type: integer
       denom:
-        type: string
-      gas:
         type: string
     type: object
   main.TrackedTx:
@@ -346,8 +334,6 @@ definitions:
         items:
           type: integer
         type: array
-      gas:
-        type: string
       property_id:
         type: string
       to_owners:

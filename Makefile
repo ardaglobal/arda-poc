@@ -161,15 +161,16 @@ govulncheck:
 .PHONY: govet govulncheck
 
 clean:
-	rm -rf ~/.arda-poc
+	rm -rf ~/.$(APPNAME)
 	rm -rf cmd/tx-sidecar/local_data
 .PHONY: clean
 
 prod:
-	ignite chain build
-	@if [ ! -d $$HOME/.arda-poc ]; then \
-		echo "Home directory not found, running ignite chain init..."; \
-		ignite chain init; \
-	fi
+	# ignite chain build
+	# @if [ ! -d $$HOME/$(APPNAME) ]; then \
+	# 	echo "Home directory not found, running ignite chain init..."; \
+	# 	ignite chain init; \
+	# fi
+	cp config.toml ~/.$(APPNAME)/config/config.toml
 	$(APPNAME)d start
 .PHONY: prod

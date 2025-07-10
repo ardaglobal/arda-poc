@@ -1041,9 +1041,6 @@ const docTemplate = `{
         "main.CreateMortgageByIDRequest": {
             "type": "object",
             "properties": {
-                "gas": {
-                    "type": "string"
-                },
                 "id": {
                     "type": "string"
                 }
@@ -1053,9 +1050,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "construction_information": {
-                    "type": "string"
-                },
-                "gas": {
                     "type": "string"
                 },
                 "owner_information": {
@@ -1309,9 +1303,6 @@ const docTemplate = `{
                         "type": "integer"
                     }
                 },
-                "gas": {
-                    "type": "string"
-                },
                 "index": {
                     "type": "string"
                 },
@@ -1437,9 +1428,6 @@ const docTemplate = `{
                 "address": {
                     "type": "string"
                 },
-                "gas": {
-                    "type": "string"
-                },
                 "owners": {
                     "type": "array",
                     "items": {
@@ -1466,9 +1454,6 @@ const docTemplate = `{
                 "amount": {
                     "type": "integer"
                 },
-                "gas": {
-                    "type": "string"
-                },
                 "mortgage_id": {
                     "type": "string"
                 }
@@ -1484,9 +1469,6 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "denom": {
-                    "type": "string"
-                },
-                "gas": {
                     "type": "string"
                 }
             }
@@ -1519,9 +1501,6 @@ const docTemplate = `{
                     "items": {
                         "type": "integer"
                     }
-                },
-                "gas": {
-                    "type": "string"
                 },
                 "property_id": {
                     "type": "string"

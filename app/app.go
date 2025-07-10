@@ -277,7 +277,8 @@ func New(
 	// build app
 	app.App = appBuilder.Build(db, traceStore, baseAppOptions...)
 	// override ante handler to disable gas and fee checks
-	app.SetAnteHandler(GaslessAnteHandler())
+	defaultAnteHandler := app.App.AnteHandler()
+	app.App.SetAnteHandler(GaslessAnteHandler(defaultAnteHandler))
 
 	// register legacy modules
 	if err := app.registerIBCModules(appOpts); err != nil {

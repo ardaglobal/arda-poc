@@ -25,8 +25,8 @@ type TrackedTx struct {
 }
 
 // buildSignAndBroadcast handles the common logic for creating, signing, and broadcasting a transaction.
-func (s *Server) buildSignAndBroadcast(w http.ResponseWriter, r *http.Request, fromName, gasStr, txType string, msgBuilder func(fromAddr string) sdk.Msg) {
-	txHash, err := s.buildSignAndBroadcastInternal(r.Context(), fromName, gasStr, txType, msgBuilder)
+func (s *Server) buildSignAndBroadcast(w http.ResponseWriter, r *http.Request, fromName, txType string, msgBuilder func(fromAddr string) sdk.Msg) {
+	txHash, err := s.buildSignAndBroadcastInternal(r.Context(), fromName, txType, msgBuilder)
 	if err != nil {
 		zlog.Error().Err(err).Msg("failed to build sign and broadcast")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -39,7 +39,7 @@ func (s *Server) buildSignAndBroadcast(w http.ResponseWriter, r *http.Request, f
 
 // buildSignAndBroadcastInternal handles the core logic for creating, signing, and broadcasting a transaction
 // without being tied to an HTTP handler.
-func (s *Server) buildSignAndBroadcastInternal(ctx context.Context, fromName, gasStr, txType string, msgBuilder func(fromAddr string) sdk.Msg) (string, error) {
+func (s *Server) buildSignAndBroadcastInternal(ctx context.Context, fromName, txType string, msgBuilder func(fromAddr string) sdk.Msg) (string, error) {
 	clientCtx := s.clientCtx
 	// 1. Set the signer
 	fromAddrRec, err := clientCtx.Keyring.Key(fromName)
@@ -61,8 +61,7 @@ func (s *Server) buildSignAndBroadcastInternal(ctx context.Context, fromName, ga
 		WithChainID(clientCtx.ChainID).
 		WithKeybase(clientCtx.Keyring).
 		WithTxConfig(clientCtx.TxConfig).
-		WithGasAdjustment(2.0).
-		WithGasPrices("0.025uarda") // NOTE: This may need to be configurable depending on the chain's requirements.
+		WithGas(200000) // Set a dummy gas limit
 
 	acc, err := s.authClient.Account(ctx, &authtypes.QueryAccountRequest{Address: fromAddress.String()})
 	if err != nil {
@@ -80,23 +79,6 @@ func (s *Server) buildSignAndBroadcastInternal(ctx context.Context, fromName, ga
 	}
 
 	txf = txf.WithAccountNumber(baseAcc.AccountNumber).WithSequence(baseAcc.Sequence)
-
-	var gas uint64
-	// if gasStr == "auto" {
-	// 	// Gas simulation will be triggered by the factory if gas is 0.
-	// 	gas = 0
-	// } else if gasStr != "" {
-	// 	parsedGas, err := strconv.ParseUint(gasStr, 10, 64)
-	// 	if err != nil {
-	// 		return "", fmt.Errorf("invalid gas value provided: %s", gasStr)
-	// 	}
-	// 	gas = parsedGas
-	// } else {
-	// Default gas if not provided and not auto.
-	gas = 800000 // Increased from 400000
-	// }
-
-	txf = txf.WithGas(gas)
 
 	txb, err := txf.BuildUnsignedTx(msg)
 	if err != nil {

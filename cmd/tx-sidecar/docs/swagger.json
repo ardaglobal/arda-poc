@@ -1034,9 +1034,6 @@
         "main.CreateMortgageByIDRequest": {
             "type": "object",
             "properties": {
-                "gas": {
-                    "type": "string"
-                },
                 "id": {
                     "type": "string"
                 }
@@ -1046,9 +1043,6 @@
             "type": "object",
             "properties": {
                 "construction_information": {
-                    "type": "string"
-                },
-                "gas": {
                     "type": "string"
                 },
                 "owner_information": {
@@ -1302,9 +1296,6 @@
                         "type": "integer"
                     }
                 },
-                "gas": {
-                    "type": "string"
-                },
                 "index": {
                     "type": "string"
                 },
@@ -1430,9 +1421,6 @@
                 "address": {
                     "type": "string"
                 },
-                "gas": {
-                    "type": "string"
-                },
                 "owners": {
                     "type": "array",
                     "items": {
@@ -1459,9 +1447,6 @@
                 "amount": {
                     "type": "integer"
                 },
-                "gas": {
-                    "type": "string"
-                },
                 "mortgage_id": {
                     "type": "string"
                 }
@@ -1477,9 +1462,6 @@
                     "type": "integer"
                 },
                 "denom": {
-                    "type": "string"
-                },
-                "gas": {
                     "type": "string"
                 }
             }
@@ -1512,9 +1494,6 @@
                     "items": {
                         "type": "integer"
                     }
-                },
-                "gas": {
-                    "type": "string"
                 },
                 "property_id": {
                     "type": "string"
