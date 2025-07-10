@@ -1,0 +1,62 @@
+version: "3.8"
+
+services:
+  # Blockchain node service (production)
+  blockchain:
+    build:
+      context: .
+      target: production
+    container_name: arda-poc-blockchain-prod
+    ports:
+      - "26656:26656" # P2P port
+      - "26657:26657" # RPC port
+      - "1317:1317" # API port
+    volumes:
+      - blockchain_data_prod:/app/.arda-poc
+      - ./config.yml:/app/config.yml:ro
+    environment:
+      - IGNITE_HOME=/app/.arda-poc
+    command: >
+      sh -c "
+        echo 'Initializing blockchain...' &&
+        if [ ! -d /app/.arda-poc ]; then
+          echo 'Setting up new blockchain...' &&
+          ./arda-pocd init --home /app/.arda-poc
+        fi &&
+        echo 'Starting blockchain node...' &&
+        ./arda-pocd start --home /app/.arda-poc --api.enable=true --api.address=0.0.0.0:1317
+      "
+    networks:
+      - arda-network-prod
+    restart: unless-stopped
+
+  # Sidecar service (production)
+  sidecar:
+    build:
+      context: .
+      target: production
+    container_name: arda-poc-sidecar-prod
+    ports:
+      - "8080:8080" # Sidecar API port
+    volumes:
+      - sidecar_data_prod:/app/cmd/tx-sidecar/local_data
+      - ./config.yml:/app/config.yml:ro
+    environment:
+      - GRPC_ADDR=blockchain:9090
+    working_dir: /app
+    command: ["./tx-sidecar"]
+    networks:
+      - arda-network-prod
+    depends_on:
+      - blockchain
+    restart: unless-stopped
+
+volumes:
+  blockchain_data_prod:
+    driver: local
+  sidecar_data_prod:
+    driver: local
+
+networks:
+  arda-network-prod:
+    driver: bridge

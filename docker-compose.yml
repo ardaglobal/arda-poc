@@ -1,0 +1,68 @@
+version: "3.8"
+
+services:
+  # Blockchain node service (equivalent to make dev)
+  blockchain:
+    build:
+      context: .
+      target: dev
+    container_name: arda-poc-blockchain
+    ports:
+      - "26656:26656" # P2P port
+      - "26657:26657" # RPC port
+      - "1317:1317" # API port
+    volumes:
+      - blockchain_data:/app/.arda-poc
+      - ./config.yml:/app/config.yml:ro
+    environment:
+      - IGNITE_HOME=/app/.arda-poc
+    command: >
+      sh -c "
+        echo 'Initializing blockchain...' &&
+        if [ ! -d /app/.arda-poc ]; then
+          echo 'Setting up new blockchain...' &&
+          ignite chain init --home /app/.arda-poc
+        fi &&
+        echo 'Starting blockchain node...' &&
+        ignite chain serve --home /app/.arda-poc
+      "
+    networks:
+      - arda-network
+    depends_on: []
+
+  # Sidecar service (equivalent to make dev-sidecar)
+  sidecar:
+    build:
+      context: .
+      target: dev
+    container_name: arda-poc-sidecar
+    ports:
+      - "8080:8080" # Sidecar API port
+    volumes:
+      - sidecar_data:/app/cmd/tx-sidecar/local_data
+      - ./config.yml:/app/config.yml:ro
+      - ./.air.toml:/app/.air.toml:ro
+      - ./cmd/tx-sidecar:/app/cmd/tx-sidecar
+    environment:
+      - GRPC_ADDR=blockchain:9090
+    working_dir: /app
+    command: >
+      sh -c "
+        echo 'Starting sidecar service with hot reload...' &&
+        cd /app &&
+        air -c .air.toml
+      "
+    networks:
+      - arda-network
+    depends_on:
+      - blockchain
+
+volumes:
+  blockchain_data:
+    driver: local
+  sidecar_data:
+    driver: local
+
+networks:
+  arda-network:
+    driver: bridge
