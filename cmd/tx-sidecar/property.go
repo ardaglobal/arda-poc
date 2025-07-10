@@ -20,7 +20,6 @@ type RegisterPropertyRequest struct {
 	Value   uint64   `json:"value"`
 	Owners  []string `json:"owners"`
 	Shares  []uint64 `json:"shares"`
-	Gas     string   `json:"gas,omitempty"`
 }
 
 // TransferSharesRequest defines the request body for transferring property shares.
@@ -30,7 +29,6 @@ type TransferSharesRequest struct {
 	FromShares []uint64 `json:"from_shares"`
 	ToOwners   []string `json:"to_owners"`
 	ToShares   []uint64 `json:"to_shares"`
-	Gas        string   `json:"gas,omitempty"`
 }
 
 // EditPropertyMetadataRequest defines the request body for editing property metadata.
@@ -45,7 +43,6 @@ type EditPropertyMetadataRequest struct {
 	OwnerInformation        string `json:"owner_information"`
 	TenantID                string `json:"tenant_id"`
 	UnitNumber              string `json:"unit_number"`
-	Gas                     string `json:"gas,omitempty"`
 }
 
 // ListPropertyForSaleRequest defines the request body for listing a property for sale.
@@ -130,7 +127,7 @@ func (s *Server) registerPropertyHandler(w http.ResponseWriter, r *http.Request)
 		)
 	}
 
-	s.buildSignAndBroadcast(w, r, fromName, req.Gas, "register_property", msgBuilder)
+	s.buildSignAndBroadcast(w, r, fromName, "register_property", msgBuilder)
 }
 
 // transferSharesHandler handles share transfer
@@ -169,7 +166,7 @@ func (s *Server) transferSharesHandler(w http.ResponseWriter, r *http.Request) {
 		)
 	}
 
-	s.buildSignAndBroadcast(w, r, fromName, req.Gas, "transfer_shares", msgBuilder)
+	s.buildSignAndBroadcast(w, r, fromName, "transfer_shares", msgBuilder)
 
 	// After transfer, update for-sale listings
 	s.updateForSalePropertiesOnTransfer(req.PropertyID, req.FromOwners, req.FromShares)
@@ -214,7 +211,7 @@ func (s *Server) editPropertyMetadataHandler(w http.ResponseWriter, r *http.Requ
 		)
 	}
 
-	s.buildSignAndBroadcast(w, r, fromName, req.Gas, "edit_property_metadata", msgBuilder)
+	s.buildSignAndBroadcast(w, r, fromName, "edit_property_metadata", msgBuilder)
 }
 
 // listPropertyForSaleHandler allows an owner to list a property for sale.
