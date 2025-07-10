@@ -170,3 +170,17 @@ prod:
 	cp config.toml ~/.$(APPNAME)/config/config.toml
 	$(APPNAME)d start
 .PHONY: prod
+
+################
+###  Docker  ###
+################
+
+docker-build-tx-sidecar:
+	@echo "--> Building tx-sidecar docker image"
+	@docker build -t tx-sidecar -f cmd/tx-sidecar/Dockerfile .
+.PHONY: docker-build-tx-sidecar
+
+docker-run-tx-sidecar:
+	@echo "--> Running tx-sidecar docker image"
+	@docker run -p 8080:8080 -v $(shell pwd)/cmd/tx-sidecar/local_data:/app/local_data tx-sidecar
+.PHONY: docker-run-tx-sidecar
