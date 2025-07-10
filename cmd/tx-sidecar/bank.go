@@ -48,7 +48,6 @@ type MortgageRequestPayload struct {
 	Amount       uint64 `json:"amount"`
 	InterestRate string `json:"interest_rate"`
 	Term         string `json:"term"`
-	Gas          string `json:"gas,omitempty"`
 
 	// Property purchase details
 	PropertyID string   `json:"property_id"`
@@ -64,13 +63,11 @@ type MortgageRequestPayload struct {
 type RepayMortgageRequest struct {
 	MortgageID string `json:"mortgage_id"`
 	Amount     uint64 `json:"amount"`
-	Gas        string `json:"gas,omitempty"`
 }
 
 // CreateMortgageByIDRequest defines the request body for creating a mortgage by ID.
 type CreateMortgageByIDRequest struct {
-	ID  string `json:"id"`
-	Gas string `json:"gas,omitempty"`
+	ID string `json:"id"`
 }
 
 // createMortgageHandler handles the creation of a mortgage, approving a pending request.
@@ -136,7 +133,7 @@ func (s *Server) createMortgageHandler(w http.ResponseWriter, r *http.Request) {
 		)
 	}
 
-	txHash, err := s.buildSignAndBroadcastInternal(r.Context(), fromName, req.Gas, "create_mortgage", msgBuilder)
+	txHash, err := s.buildSignAndBroadcastInternal(r.Context(), fromName, "create_mortgage", msgBuilder)
 	if err != nil {
 		zlog.Error().Err(err).Msg("failed to build sign and broadcast")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -204,7 +201,7 @@ func (s *Server) repayMortgageHandler(w http.ResponseWriter, r *http.Request) {
 		)
 	}
 
-	s.buildSignAndBroadcast(w, r, fromName, req.Gas, "repay_mortgage", msgBuilder)
+	s.buildSignAndBroadcast(w, r, fromName, "repay_mortgage", msgBuilder)
 }
 
 // RequestFundsRequest defines the request body for requesting funds from the bank.
@@ -212,7 +209,6 @@ type RequestFundsRequest struct {
 	Address string `json:"address"`
 	Amount  uint64 `json:"amount"`
 	Denom   string `json:"denom"`
-	Gas     string `json:"gas,omitempty"`
 }
 
 // requestFundsHandler requests funds from the built-in faucet.
@@ -256,7 +252,7 @@ func (s *Server) requestFundsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	s.buildSignAndBroadcast(w, r, fromName, req.Gas, "request_funds", msgBuilder)
+	s.buildSignAndBroadcast(w, r, fromName, "request_funds", msgBuilder)
 }
 
 // requestMortgageHandler allows a user to request a mortgage from a lender.

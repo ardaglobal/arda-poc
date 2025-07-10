@@ -130,7 +130,7 @@ func (s *Server) registerProperty(ctx context.Context, users []string) (Property
 		)
 	}
 
-	_, err := s.buildSignAndBroadcastInternal(ctx, fromName, "auto", "register_property", msgBuilder)
+	_, err := s.buildSignAndBroadcastInternal(ctx, fromName, "register_property", msgBuilder)
 	if err != nil {
 		return Property{}, fmt.Errorf("autoproperty failed to register property: %w", err)
 	}
@@ -229,7 +229,7 @@ func (s *Server) transferShares(ctx context.Context, p *Property, investorUsers 
 		)
 	}
 
-	_, err := s.buildSignAndBroadcastInternal(ctx, fromName, "auto", "transfer_shares", msgBuilder)
+	_, err := s.buildSignAndBroadcastInternal(ctx, fromName, "transfer_shares", msgBuilder)
 	if err != nil {
 		return fmt.Errorf("autoproperty failed to transfer shares: %w", err)
 	}
@@ -301,7 +301,7 @@ func (s *Server) autoEditPropertyMetadata(ctx context.Context, p *Property) erro
 		)
 	}
 
-	_, err := s.buildSignAndBroadcastInternal(ctx, fromName, "auto", "edit_property_metadata", msgBuilder)
+	_, err := s.buildSignAndBroadcastInternal(ctx, fromName, "edit_property_metadata", msgBuilder)
 	if err != nil {
 		return fmt.Errorf("autoproperty failed to edit property metadata: %w", err)
 	}
