@@ -256,7 +256,7 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 
 	// Ensure that the faucet account from config exists in the keyring.
 	if _, err := s.clientCtx.Keyring.Key(s.faucetName); err != nil {
-		return nil, fmt.Errorf("faucet user '%s' from config.yml not found in keyring: %w", s.faucetName, err)
+		zlog.Warn().Msgf("faucet user '%s' from config.yml not found in keyring: %v", s.faucetName, err)
 	}
 	zlog.Info().Msgf("Using '%s' as the faucet account.", s.faucetName)
 
