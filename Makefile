@@ -175,27 +175,29 @@ prod:
 ###  Docker  ###
 ################
 
-docker-build-tx-sidecar:
-	@echo "--> Building tx-sidecar docker image"
-	@docker build -t tx-sidecar -f cmd/tx-sidecar/Dockerfile .
-.PHONY: docker-build-tx-sidecar
-
-docker-run-tx-sidecar:
-	@echo "--> Running tx-sidecar docker image"
-	@docker run -p 8080:8080 -v $(shell pwd)/cmd/tx-sidecar/local_data:/app/local_data tx-sidecar
-.PHONY: docker-run-tx-sidecar
-
+# Individual build commands
 docker-build-main:
 	@echo "--> Building arda-pocd docker image"
-	@docker build -t arda-pocd -f Dockerfile .
+	@docker build -t arda-pocd-ignite -f Dockerfile .
 .PHONY: docker-build-main
 
-docker-init-main:
-	@echo "--> Initializing arda-pocd chain"
-	@docker run --rm -v $(shell pwd)/.arda-pocd:/home/appuser/.arda-poc arda-pocd init arda-node --chain-id arda-chain-1
-.PHONY: docker-init-main
+docker-build-tx-sidecar:
+	@echo "--> Building tx-sidecar docker image"
+	@docker build -t tx-sidecar-compose -f cmd/tx-sidecar/Dockerfile .
+.PHONY: docker-build-tx-sidecar
 
-docker-run-main:
-	@echo "--> Running arda-pocd docker image"
-	@docker run -p 26657:26657 -p 1313:1313 -v $(shell pwd)/.arda-pocd:/home/appuser/.arda-poc arda-pocd
-.PHONY: docker-run-main
+# Docker Compose commands
+dc-up:
+	@echo "--> Starting docker-compose services"
+	@docker-compose up -d --build
+.PHONY: dc-up
+
+dc-down:
+	@echo "--> Stopping docker-compose services"
+	@docker-compose down
+.PHONY: dc-down
+
+dc-logs:
+	@echo "--> Tailing logs for all services"
+	@docker-compose logs -f
+.PHONY: dc-logs

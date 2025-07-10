@@ -1,46 +1,47 @@
-# Stage 1: Build the application
+# Stage 1: Build environment
 FROM golang:1.24-alpine AS builder
 
-# Set build arguments
-ARG APPNAME=arda-poc
-ARG VERSION=latest
-ARG COMMIT=unknown
+# Set ignite version, can be overridden at build time
+ARG IGNITE_VERSION=v28.10.0
 
+# Install build-base, git, curl and bash for ignite installation
+RUN apk add --no-cache build-base git curl bash
+
+# Install ignite
+RUN curl -L https://get.ignite.com/cli@${IGNITE_VERSION}! | bash
+
+# Copy all the source code
 WORKDIR /src
-
-# Copy go.mod and go.sum files
-COPY go.mod go.sum ./
-RUN go mod download
-
-# Copy the rest of the application source code
 COPY . .
 
-# Build the application with version information
-RUN CGO_ENABLED=0 GOOS=linux go build \
-    -ldflags "-X github.com/cosmos/cosmos-sdk/version.Name=${APPNAME} \
-    -X github.com/cosmos/cosmos-sdk/version.AppName=${APPNAME}d \
-    -X github.com/cosmos/cosmos-sdk/version.Version=${VERSION} \
-    -X github.com/cosmos/cosmos-sdk/version.Commit=${COMMIT}" \
-    -o /app/arda-pocd ./cmd/arda-pocd
+# Build the app with ignite to cache dependencies and verify it works.
+RUN ignite chain build
+RUN ignite chain init
 
-# Stage 2: Create the final image
-FROM alpine:latest
+# Move the initialized data to a template location
+RUN mv /src/.arda-poc /src/arda-poc-template
 
-# Create a non-root user
-RUN addgroup -S appuser && adduser -S -G appuser appuser
+# Stage 2: Final image for development
+# We use a golang image because ignite needs go to build and run the app.
+FROM golang:1.24-alpine
 
-# Set user and workdir
-USER appuser
-WORKDIR /home/appuser
+# Install curl for healthcheck and git, bash (needed by ignite)
+RUN apk add --no-cache curl git bash
 
-# Copy the built binary from the builder stage
-COPY --from=builder /app/arda-pocd /usr/bin/arda-pocd
+# Copy ignite and the full project source from the builder stage
+COPY --from=builder /usr/local/bin/ignite /usr/local/bin/ignite
+COPY --from=builder /src /app
 
-# Expose ports
+WORKDIR /app
+
+# Expose ports used by ignite serve
 # 26657: Tendermint RPC
-# 1313: API server
-EXPOSE 26657 1313
+# 1317: API Server
+# 9090: gRPC
+# 4500: Faucet
+EXPOSE 26657 1317 9090 4500
 
-# Set the entrypoint and default command
+# The command will be provided by docker-compose. By default, it will
+# initialize the chain from config.yml and start it.
 ENTRYPOINT ["arda-pocd"]
 CMD ["start"] 

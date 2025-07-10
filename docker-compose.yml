@@ -1,0 +1,42 @@
+services:
+  main-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: arda-pocd-ignite
+    ports:
+      - "26657:26657" # Tendermint RPC
+      - "1317:1317"   # API Server
+      - "9090:9090"   # gRPC
+      - "4500:4500"   # Faucet
+    volumes:
+      - ./arda-poc-data:/app/.arda-poc
+    entrypoint: /bin/sh
+    command: >
+      -c "
+        if [ ! -f /app/.arda-poc/config/genesis.json ]; then
+          echo 'Initializing data directory from template...';
+          cp -r /app/arda-poc-template/. /app/.arda-poc/;
+        fi;
+        arda-pocd start --home /app/.arda-poc
+      "
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:26657/status"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  sidecar:
+    build:
+      context: .
+      dockerfile: cmd/tx-sidecar/Dockerfile
+    image: tx-sidecar-compose
+    ports:
+      - "8080:8080"
+    depends_on:
+      main-app:
+        condition: service_healthy
+    volumes:
+      - ./arda-poc-data:/app/.arda-poc # Shared chain data
+      - ./sidecar-data:/app/local_data # Sidecar's own DB
+    command: ["./tx-sidecar", "--node", "tcp://main-app:26657", "--chain-id", "arda-poc", "--home", "/app/.arda-poc"]
