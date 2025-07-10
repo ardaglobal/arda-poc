@@ -1,31 +1,40 @@
 package main
 
+// Transaction Sidecar API docs
+//
+// @title Transaction Sidecar API
+// @version 1.0
+// @description Simple HTTP service for submitting blockchain transactions.
+// @BasePath /
+
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strings"
 
 	fiberadaptor "github.com/gofiber/adaptor/v2"
 	fiber "github.com/gofiber/fiber/v2"
 	fibercors "github.com/gofiber/fiber/v2/middleware/cors"
+	fiberSwagger "github.com/gofiber/swagger"
 	"github.com/rs/zerolog"
 	zlog "github.com/rs/zerolog/log"
 
-	"cosmossdk.io/math"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"gopkg.in/yaml.v3"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
+	_ "github.com/ardaglobal/arda-poc/cmd/tx-sidecar/docs"
 	sidecarclient "github.com/ardaglobal/arda-poc/pkg/client"
+	"github.com/joho/godotenv"
 )
 
 func init() {
@@ -41,19 +50,42 @@ type AppConfig struct {
 	Faucet FaucetConfig `yaml:"faucet"`
 }
 
+// ForSaleProperty represents a property or shares listed for sale.
+type ForSaleProperty struct {
+	ID         string   `json:"id"` // unique listing ID
+	PropertyID string   `json:"property_id"`
+	Owner      string   `json:"owner"`
+	Shares     []uint64 `json:"shares"`
+	Price      uint64   `json:"price"`
+	Status     string   `json:"status"` // "listed", "sold"
+}
+
 // Server holds the dependencies for the sidecar http server.
 type Server struct {
-	clientCtx        client.Context
-	authClient       authtypes.QueryClient
-	txClient         txtypes.ServiceClient
-	users            map[string]UserData
-	usersFile        string
-	logins           map[string]string // email -> name
-	loginsFile       string
-	faucetName       string
-	loggedInUser     string
-	transactions     []TrackedTx
-	transactionsFile string
+	clientCtx            client.Context
+	authClient           authtypes.QueryClient
+	txClient             txtypes.ServiceClient
+	users                map[string]UserData
+	usersFile            string
+	logins               map[string]string // email -> name
+	loginsFile           string
+	faucetName           string
+	loggedInUser         string
+	transactions         []TrackedTx
+	transactionsFile     string
+	mortgageRequests     []MortgageRequest
+	mortgageRequestsFile string
+
+	kycRequests     []KYCRequestEntry
+	kycRequestsFile string
+
+	forSaleProperties     []ForSaleProperty
+	forSalePropertiesFile string
+
+	offPlanProperties           []OffPlanProperty
+	offPlanPropertiesFile       string
+	offPlanPurchaseRequests     []OffPlanPurchaseRequest
+	offPlanPurchaseRequestsFile string
 }
 
 // NewServer creates a new instance of the Server with all its dependencies.
@@ -63,7 +95,12 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		return nil, fmt.Errorf("failed to connect to gRPC server at %s: %w", grpcAddr, err)
 	}
 
-	usersFile := "users.json"
+	dataDir := "cmd/tx-sidecar/local_data"
+	if err := os.MkdirAll(dataDir, 0755); err != nil {
+		return nil, fmt.Errorf("failed to create data directory: %w", err)
+	}
+
+	usersFile := filepath.Join(dataDir, "users.json")
 	users := make(map[string]UserData)
 
 	file, err := os.ReadFile(usersFile)
@@ -111,7 +148,7 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		}
 	}
 
-	loginsFile := "logins.json"
+	loginsFile := filepath.Join(dataDir, "logins.json")
 	logins := make(map[string]string)
 
 	loginData, err := os.ReadFile(loginsFile)
@@ -123,7 +160,7 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		return nil, fmt.Errorf("failed to read logins file: %w", err)
 	}
 
-	transactionsFile := "tx.json"
+	transactionsFile := filepath.Join(dataDir, "tx.json")
 	transactions := make([]TrackedTx, 0)
 	txData, err := os.ReadFile(transactionsFile)
 	if err == nil {
@@ -132,6 +169,17 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		}
 	} else if !os.IsNotExist(err) {
 		return nil, fmt.Errorf("failed to read transactions file: %w", err)
+	}
+
+	mortgageRequestsFile := filepath.Join(dataDir, "mortgage_requests.json")
+	mortgageRequests := make([]MortgageRequest, 0)
+	mrData, err := os.ReadFile(mortgageRequestsFile)
+	if err == nil {
+		if err := json.Unmarshal(mrData, &mortgageRequests); err != nil {
+			zlog.Warn().Msgf("failed to unmarshal mortgage requests file, starting with empty list: %v", err)
+		}
+	} else if !os.IsNotExist(err) {
+		return nil, fmt.Errorf("failed to read mortgage requests file: %w", err)
 	}
 
 	// Read faucet configuration
@@ -150,17 +198,58 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		return nil, fmt.Errorf("faucet name is not defined in config.yml")
 	}
 
+	kycRequestsFile := filepath.Join(dataDir, "kyc_requests.json")
+	kycRequests := make([]KYCRequestEntry, 0)
+	krData, err := os.ReadFile(kycRequestsFile)
+	if err == nil {
+		if err := json.Unmarshal(krData, &kycRequests); err != nil {
+			zlog.Warn().Msgf("failed to unmarshal kyc requests file, starting with empty list: %v", err)
+		}
+	} else if !os.IsNotExist(err) {
+		return nil, fmt.Errorf("failed to read kyc requests file: %w", err)
+	}
+
+	forSalePropertiesFile := filepath.Join(dataDir, "for_sale_properties.json")
+	forSaleProperties := make([]ForSaleProperty, 0)
+	fspData, err := os.ReadFile(forSalePropertiesFile)
+	if err == nil {
+		if err := json.Unmarshal(fspData, &forSaleProperties); err != nil {
+			zlog.Warn().Msgf("failed to unmarshal for sale properties file, starting with empty list: %v", err)
+		}
+	} else if !os.IsNotExist(err) {
+		return nil, fmt.Errorf("failed to read for sale properties file: %w", err)
+	}
+
+	offPlanPropertiesFile := filepath.Join(dataDir, "offplan_properties.json")
+	offPlanProperties := make([]OffPlanProperty, 0)
+	oppData, err := os.ReadFile(offPlanPropertiesFile)
+	if err == nil {
+		if err := json.Unmarshal(oppData, &offPlanProperties); err != nil {
+			zlog.Warn().Msgf("failed to unmarshal off plan properties file, starting with empty list: %v", err)
+		}
+	} else if !os.IsNotExist(err) {
+		return nil, fmt.Errorf("failed to read off plan properties file: %w", err)
+	}
+
 	s := &Server{
-		clientCtx:        clientCtx,
-		authClient:       authtypes.NewQueryClient(grpcConn),
-		txClient:         txtypes.NewServiceClient(grpcConn),
-		users:            users,
-		usersFile:        usersFile,
-		logins:           logins,
-		loginsFile:       loginsFile,
-		faucetName:       appConfig.Faucet.Name,
-		transactions:     transactions,
-		transactionsFile: transactionsFile,
+		clientCtx:             clientCtx,
+		authClient:            authtypes.NewQueryClient(grpcConn),
+		txClient:              txtypes.NewServiceClient(grpcConn),
+		users:                 users,
+		usersFile:             usersFile,
+		logins:                logins,
+		loginsFile:            loginsFile,
+		faucetName:            appConfig.Faucet.Name,
+		transactions:          transactions,
+		transactionsFile:      transactionsFile,
+		mortgageRequests:      mortgageRequests,
+		mortgageRequestsFile:  mortgageRequestsFile,
+		kycRequests:           kycRequests,
+		kycRequestsFile:       kycRequestsFile,
+		forSaleProperties:     forSaleProperties,
+		forSalePropertiesFile: forSalePropertiesFile,
+		offPlanProperties:     offPlanProperties,
+		offPlanPropertiesFile: offPlanPropertiesFile,
 	}
 
 	// Ensure that the faucet account from config exists in the keyring.
@@ -169,14 +258,14 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 	}
 	zlog.Info().Msgf("Using '%s' as the faucet account.", s.faucetName)
 
-	// Ensure faucet user has the 'faucet' role.
+	// Ensure faucet user has the 'bank' role.
 	if faucetUserData, ok := s.users[s.faucetName]; ok {
-		if faucetUserData.Role != "faucet" {
-			zlog.Info().Msgf("Updating role of faucet user '%s' to 'faucet'.", s.faucetName)
-			faucetUserData.Role = "faucet"
+		if faucetUserData.Role != "bank" {
+			zlog.Info().Msgf("Updating role of bank user '%s' to 'bank'.", s.faucetName)
+			faucetUserData.Role = "bank"
 			s.users[s.faucetName] = faucetUserData
 			if err := s.saveUsersToFile(); err != nil {
-				zlog.Warn().Msgf("failed to save users file after updating faucet role: %v", err)
+				zlog.Warn().Msgf("failed to save users file after updating bank role: %v", err)
 			}
 		}
 	}
@@ -184,6 +273,8 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 	if err := s.initUsers(); err != nil {
 		return nil, fmt.Errorf("failed to initialize users: %w", err)
 	}
+	// Load KYC requests from file (in case not loaded above)
+	_ = s.loadKYCRequestsFromFile()
 
 	return s, nil
 }
@@ -191,15 +282,114 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 // Close is a no-op for this server version but can be used for cleanup.
 func (s *Server) Close() {}
 
-// FaucetRequest defines the request body for requesting funds from the faucet.
-type FaucetRequest struct {
-	Address string `json:"address"`
-	Amount  uint64 `json:"amount"`
-	Denom   string `json:"denom"`
-	Gas     string `json:"gas,omitempty"`
+// AdminLoginRequest defines the request body for admin login.
+type AdminLoginRequest struct {
+	Key string `json:"key"`
+}
+
+// AdminLoginResponse defines the response for a successful admin login.
+type AdminLoginResponse struct {
+	Success bool `json:"success"`
+}
+
+// AdminLoginErrorResponse defines the response for an error in admin login.
+type AdminLoginErrorResponse struct {
+	Success bool   `json:"success"`
+	Error   string `json:"error"`
+}
+
+// adminLoginHandler handles admin login
+// @Summary Admin login
+// @Description Authenticates an admin using a key. Returns success if the provided key matches the ADMIN_KEY environment variable.
+// @Accept json
+// @Produce json
+// @Param request body AdminLoginRequest true "Admin login key"
+// @Success 200 {object} AdminLoginResponse
+// @Failure 400 {object} AdminLoginErrorResponse
+// @Failure 401 {object} AdminLoginErrorResponse
+// @Failure 500 {object} AdminLoginErrorResponse
+// @Router /admin/login [post]
+func (s *Server) adminLoginHandler(c *fiber.Ctx) error {
+	type reqBody AdminLoginRequest
+	var body reqBody
+	if err := c.BodyParser(&body); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(AdminLoginErrorResponse{Success: false, Error: "invalid request body"})
+	}
+	adminKey := os.Getenv("ADMIN_KEY")
+	if adminKey == "" {
+		return c.Status(fiber.StatusInternalServerError).JSON(AdminLoginErrorResponse{Success: false, Error: "admin key not set"})
+	}
+	if body.Key == adminKey {
+		return c.JSON(AdminLoginResponse{Success: true})
+	}
+	return c.Status(fiber.StatusUnauthorized).JSON(AdminLoginErrorResponse{Success: false, Error: "invalid key"})
+}
+
+// passthroughGET proxies a GET request to the blockchain REST API and returns the response as-is.
+func passthroughGET(path string, c *fiber.Ctx) error {
+	baseURL := "http://localhost:1317"
+	// Compose the full URL
+	url := baseURL + path
+	resp, err := http.Get(url)
+	if err != nil {
+		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"error": err.Error()})
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	c.Status(resp.StatusCode)
+	for k, v := range resp.Header {
+		for _, vv := range v {
+			c.Set(k, vv)
+		}
+	}
+	return c.Send(body)
+}
+
+// getPropertiesPassthrough godoc
+// @Summary      Proxy: Get all properties from blockchain
+// @Description  Proxies GET /cosmonaut/arda/property/properties to the blockchain REST API
+// @Tags         passthrough
+// @Produce      json
+// @Success      200 {object} map[string]interface{}
+// @Failure      502 {object} map[string]string
+// @Router       /cosmonaut/arda/property/properties [get]
+func getPropertiesPassthrough(c *fiber.Ctx) error {
+	return passthroughGET("/cosmonaut/arda/property/properties", c)
+}
+
+// getWalletBalancePassthrough godoc
+// @Summary      Proxy: Get wallet balances
+// @Description  Proxies GET /cosmos/bank/v1beta1/balances/{address} to the blockchain REST API
+// @Tags         passthrough
+// @Produce      json
+// @Param        address path string true "Wallet address"
+// @Success      200 {object} map[string]interface{}
+// @Failure      502 {object} map[string]string
+// @Router       /cosmos/bank/v1beta1/balances/{address} [get]
+func getWalletBalancePassthrough(c *fiber.Ctx) error {
+	address := c.Params("address")
+	return passthroughGET("/cosmos/bank/v1beta1/balances/"+address, c)
+}
+
+// getMortgagesPassthrough godoc
+// @Summary      Proxy: Get all mortgages from blockchain
+// @Description  Proxies GET /ardaglobal/arda-poc/mortgage/mortgage to the blockchain REST API
+// @Tags         passthrough
+// @Produce      json
+// @Success      200 {object} map[string]interface{}
+// @Failure      502 {object} map[string]string
+// @Router       /ardaglobal/arda-poc/mortgage/mortgage [get]
+func getMortgagesPassthrough(c *fiber.Ctx) error {
+	return passthroughGET("/ardaglobal/arda-poc/mortgage/mortgage", c)
 }
 
 func main() {
+	// Load .env file if present
+	_ = godotenv.Load()
+
 	// This context is for the main application, not for individual requests.
 	clientCtx, err := sidecarclient.NewClientContext()
 	if err != nil {
@@ -234,53 +424,54 @@ func main() {
 	app := fiber.New()
 	app.Use(fibercors.New())
 
-	app.Post("/register-property", fiberadaptor.HTTPHandlerFunc(server.registerPropertyHandler))
-	app.Post("/transfer-shares", fiberadaptor.HTTPHandlerFunc(server.transferSharesHandler))
-	app.Post("/edit-property", fiberadaptor.HTTPHandlerFunc(server.editPropertyMetadataHandler))
-	app.Get("/users", fiberadaptor.HTTPHandlerFunc(server.listUsersHandler))
-	app.Post("/login", fiberadaptor.HTTPHandlerFunc(server.loginHandler))
-	app.Post("/logout", fiberadaptor.HTTPHandlerFunc(server.logoutHandler))
-	app.Post("/faucet", fiberadaptor.HTTPHandlerFunc(server.faucetHandler))
-	app.Get("/transactions", fiberadaptor.HTTPHandlerFunc(server.listTransactionsHandler))
-	app.Get("/transaction/*", fiberadaptor.HTTPHandlerFunc(server.getTransactionHandler))
-	app.Post("/kyc-user", fiberadaptor.HTTPHandlerFunc(server.kycUserHandler))
+	app.Get("/swagger/*", fiberSwagger.HandlerDefault)
+
+	// User routes
+	app.Get("/user/list", fiberadaptor.HTTPHandlerFunc(server.listUsersHandler))
+	app.Post("/user/login", fiberadaptor.HTTPHandlerFunc(server.loginHandler))
+	app.Post("/user/logout", fiberadaptor.HTTPHandlerFunc(server.logoutHandler))
+	app.Get("/user/status", fiberadaptor.HTTPHandlerFunc(server.loginStatusHandler))
+
+	// Property routes
+	app.Post("/property/register", fiberadaptor.HTTPHandlerFunc(server.registerPropertyHandler))
+	app.Post("/property/transfer-shares", fiberadaptor.HTTPHandlerFunc(server.transferSharesHandler))
+	app.Post("/property/edit", fiberadaptor.HTTPHandlerFunc(server.editPropertyMetadataHandler))
+	app.Post("/property/list-for-sale", fiberadaptor.HTTPHandlerFunc(server.listPropertyForSaleHandler))
+	app.Get("/property/for-sale", fiberadaptor.HTTPHandlerFunc(server.getPropertiesForSaleHandler))
+
+	// Off plan property routes
+	app.Get("/property/offplans", fiberadaptor.HTTPHandlerFunc(server.getOffPlanPropertiesHandler))
+	app.Post("/property/offplan", fiberadaptor.HTTPHandlerFunc(server.postOffPlanPropertyHandler))
+	app.Post("/property/offplan/purchase-request", fiberadaptor.HTTPHandlerFunc(server.postOffPlanPurchaseRequestHandler))
+	app.Post("/property/offplan/approve", fiberadaptor.HTTPHandlerFunc(server.approveOffPlanPropertyHandler))
+
+	// Bank/mortgage routes
+	app.Post("/bank/mortgage/request", fiberadaptor.HTTPHandlerFunc(server.requestMortgageHandler))
+	app.Get("/bank/mortgage/requests", fiberadaptor.HTTPHandlerFunc(server.getMortgageRequestsHandler))
+	app.Post("/bank/mortgage/create", fiberadaptor.HTTPHandlerFunc(server.createMortgageHandler))
+	app.Post("/bank/mortgage/repay", fiberadaptor.HTTPHandlerFunc(server.repayMortgageHandler))
+	app.Post("/bank/request-funds", fiberadaptor.HTTPHandlerFunc(server.requestFundsHandler))
+	app.Post("/bank/mortgage/request-equity", fiberadaptor.HTTPHandlerFunc(server.requestEquityMortgageHandler))
+
+	// KYC workflow
+	app.Post("/user/kyc/request", fiberadaptor.HTTPHandlerFunc(server.requestKYCHandler))
+	app.Get("/user/kyc/requests", fiberadaptor.HTTPHandlerFunc(server.getKYCRequestsHandler))
+	app.Post("/user/kyc/approve", fiberadaptor.HTTPHandlerFunc(server.approveKYCHandler))
+
+	// Transaction routes
+	app.Get("/tx/list", fiberadaptor.HTTPHandlerFunc(server.listTransactionsHandler))
+	app.Get("/tx/:hash", fiberadaptor.HTTPHandlerFunc(server.getTransactionHandler))
+
+	// Admin
+	app.Post("/admin/login", server.adminLoginHandler)
+
+	// Passthrough routes for blockchain REST API (with Swagger docs)
+	app.Get("/cosmonaut/arda/property/properties", getPropertiesPassthrough)
+	app.Get("/cosmos/bank/v1beta1/balances/:address", getWalletBalancePassthrough)
+	app.Get("/ardaglobal/arda-poc/mortgage/mortgage", getMortgagesPassthrough)
 
 	zlog.Info().Msg("Starting transaction sidecar server on :8080...")
 	if err := app.Listen(":8080"); err != nil {
 		zlog.Fatal().Msgf("Failed to start server: %v", err)
 	}
-}
-
-func (s *Server) faucetHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
-		return
-	}
-
-	var req FaucetRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
-		return
-	}
-
-	if req.Amount == 0 || req.Denom == "" || req.Address == "" {
-		http.Error(w, "address, amount, and denom must be provided, and amount must be positive", http.StatusBadRequest)
-		return
-	}
-
-	if _, err := sdk.AccAddressFromBech32(req.Address); err != nil {
-		http.Error(w, fmt.Sprintf("Invalid recipient address: %v", err), http.StatusBadRequest)
-		return
-	}
-
-	fromName := s.faucetName
-	msgBuilder := func(fromAddr string) sdk.Msg {
-		return &banktypes.MsgSend{
-			FromAddress: fromAddr,
-			ToAddress:   req.Address,
-			Amount:      sdk.NewCoins(sdk.NewCoin(req.Denom, math.NewInt(int64(req.Amount)))),
-		}
-	}
-
-	s.buildSignAndBroadcast(w, r, fromName, req.Gas, "faucet", msgBuilder)
 }

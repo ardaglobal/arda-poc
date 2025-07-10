@@ -8,10 +8,19 @@ release/
 *.log
 *.ign
 
+kyc_requests.json
 users.json
 logins.json
-tx.json 
+tx.json
+mortgage_requests.json
+for_sale_properties.json
+test.*
+cmd/tx-sidecar/local_data/
+
+tmp/
 
 .arda_data/
 
 **/.claude/settings.local.json
+
+.env*

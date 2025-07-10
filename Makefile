@@ -1,6 +1,6 @@
-BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+			BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 COMMIT := $(shell git log -1 --format='%H')
-APPNAME := arda
+APPNAME := arda-poc
 
 # don't override user values
 ifeq (,$(VERSION))
@@ -127,6 +127,8 @@ setup-dev: setup-script proto-deps
 	@go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(golangci_version)
 	@go install golang.org/x/vuln/cmd/govulncheck@latest
 	@go install golang.org/x/tools/cmd/goimports@latest
+	@go install github.com/swaggo/swag/cmd/swag@latest
+	@go install github.com/air-verse/air@latest
 .PHONY: setup-dev
 
 ###################
@@ -139,9 +141,14 @@ dev:
 .PHONY: dev
 
 dev-sidecar:
-	@echo "--> Running dev-sidecar"
-	@go run ./cmd/tx-sidecar
+	@echo "--> Running dev-sidecar with Air hot reload"
+	@air -c .air.toml
 .PHONY: dev-sidecar
+
+sidecar-docs:
+	@echo "--> Generating sidecar OpenAPI docs"
+	@swag init --dir cmd/tx-sidecar --output cmd/tx-sidecar/docs
+.PHONY: sidecar-docs
 
 govet:
 	@echo Running go vet...
@@ -155,7 +162,14 @@ govulncheck:
 
 clean:
 	rm -rf ~/.arda-poc
-	rm users.json
-	rm logins.json
-	rm tx.json
+	rm -rf cmd/tx-sidecar/local_data
 .PHONY: clean
+
+prod:
+	ignite chain build
+	@if [ ! -d $$HOME/.arda-poc ]; then \
+		echo "Home directory not found, running ignite chain init..."; \
+		ignite chain init; \
+	fi
+	$(APPNAME)d start
+.PHONY: prod

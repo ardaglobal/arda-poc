@@ -8,6 +8,7 @@ import (
 
 	propertytypes "github.com/ardaglobal/arda-poc/x/property/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/google/uuid"
 	zlog "github.com/rs/zerolog/log"
 )
 
@@ -47,10 +48,55 @@ func intToUint64Slice(v []int) []uint64 {
 	return u
 }
 
+// createOffPlanProperty generates an off plan property for a random developer.
+func (s *Server) createOffPlanProperty(developerUsers []string) error {
+	if len(developerUsers) == 0 {
+		return fmt.Errorf("no developers available")
+	}
+	dev := developerUsers[rand.Intn(len(developerUsers))]
+	addr := fmt.Sprintf("%d Future Rd", rand.Intn(9000)+100)
+	value := uint64(rand.Intn(900000) + 1000000)
+	prop := OffPlanProperty{
+		ID:          uuid.New().String(),
+		Address:     addr,
+		Region:      "dubai",
+		Value:       value,
+		TotalShares: 100,
+		Status:      "for_sale",
+		Developer:   dev,
+	}
+	s.offPlanProperties = append(s.offPlanProperties, prop)
+	return s.saveOffPlanPropertiesToFile()
+}
+
+// listPropertyForSale creates a local for-sale listing for a property.
+func (s *Server) listPropertyForSale(p *Property) error {
+	if len(p.Owners) == 0 {
+		return fmt.Errorf("property has no owners")
+	}
+	idx := rand.Intn(len(p.Owners))
+	owner := p.Owners[idx]
+	owned := p.Shares[idx]
+	if owned == 0 {
+		return nil
+	}
+	shareAmt := rand.Intn(owned) + 1
+	listing := ForSaleProperty{
+		ID:         uuid.New().String(),
+		PropertyID: strings.ToLower(p.Address),
+		Owner:      owner,
+		Shares:     []uint64{uint64(shareAmt)},
+		Price:      uint64(p.Value),
+		Status:     "listed",
+	}
+	s.forSaleProperties = append(s.forSaleProperties, listing)
+	return s.saveForSalePropertiesToFile()
+}
+
 // registerProperty creates a new property with random data and sends the CLI command.
 func (s *Server) registerProperty(ctx context.Context, users []string) (Property, error) {
 	address := fmt.Sprintf("%d Main St", rand.Intn(9000)+100)
-	value := rand.Intn(900000) + 100000
+	value := rand.Intn(900000) + 1000000
 
 	// choose random number of owners
 	n := rand.Intn(len(users)) + 1
@@ -274,32 +320,51 @@ func (s *Server) RunAutoProperty(developerUsers, investorUsers []string) {
 		return
 	}
 
-	var properties []Property
 	ctx := context.Background()
 
-	for i := 0; i < 10; i++ {
+	// create two off plan properties
+	for i := 0; i < 2; i++ {
+		if err := s.createOffPlanProperty(developerUsers); err != nil {
+			zlog.Error().Err(err).Msg("autoproperty create off plan")
+		}
+	}
+
+	var properties []Property
+	for i := 0; i < 8; i++ {
 		zlog.Info().Msg("AutoProperty: Registering property...")
 		p, err := s.registerProperty(ctx, developerUsers)
 		if err != nil {
 			zlog.Error().Err(err).Msg("autoproperty register property")
-		} else {
-			properties = append(properties, p)
-
-			// Also edit the property's metadata with placeholder info.
-			zlog.Info().Msg("AutoProperty: Editing property metadata...")
-			if err := s.autoEditPropertyMetadata(ctx, &properties[len(properties)-1]); err != nil {
-				zlog.Error().Err(err).Msg("autoproperty edit metadata")
-			}
+			continue
 		}
+		properties = append(properties, p)
 
-		if len(properties) > 0 {
-			zlog.Info().Msg("AutoProperty: Creating transfer...")
-			randIdx := rand.Intn(len(properties))
-			err := s.transferShares(ctx, &properties[randIdx], investorUsers)
-			if err != nil {
-				zlog.Error().Err(err).Msg("autoproperty transfer")
-			}
+		zlog.Info().Msg("AutoProperty: Editing property metadata...")
+		if err := s.autoEditPropertyMetadata(ctx, &properties[len(properties)-1]); err != nil {
+			zlog.Error().Err(err).Msg("autoproperty edit metadata")
 		}
 	}
+
+	if len(properties) == 0 {
+		zlog.Info().Msg("AutoProperty: Done")
+		return
+	}
+
+	rand.Shuffle(len(properties), func(i, j int) { properties[i], properties[j] = properties[j], properties[i] })
+
+	// list first four properties for sale
+	for i := 0; i < 4 && i < len(properties); i++ {
+		if err := s.listPropertyForSale(&properties[i]); err != nil {
+			zlog.Error().Err(err).Msg("autoproperty list for sale")
+		}
+	}
+
+	// remaining properties get a transfer
+	for i := 4; i < len(properties); i++ {
+		if err := s.transferShares(ctx, &properties[i], investorUsers); err != nil {
+			zlog.Error().Err(err).Msg("autoproperty transfer")
+		}
+	}
+
 	zlog.Info().Msg("AutoProperty: Done")
 }

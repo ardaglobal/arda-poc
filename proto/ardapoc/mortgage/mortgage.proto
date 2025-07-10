@@ -1,0 +1,29 @@
+syntax = "proto3";
+package ardapoc.mortgage;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/ardaglobal/arda-poc/x/mortgage/types";
+
+enum MortgageStatus {
+  option (gogoproto.goproto_enum_prefix) = false;
+  REQUESTED = 0;
+  APPROVED = 1;
+  REJECTED = 2;
+  PAID = 3;
+  CANCELLED = 4;
+}
+
+message Mortgage {
+  string creator = 1; 
+  string index = 2;
+  string lender = 3; 
+  string lendee = 4; 
+  string collateral = 5; 
+  uint64 amount = 6; 
+  string interestRate = 7; 
+  string term = 8; 
+  MortgageStatus status = 9;
+  uint64 outstanding_amount = 10;
+}
+

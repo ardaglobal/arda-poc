@@ -1,0 +1,1034 @@
+basePath: /
+definitions:
+  main.AdminLoginErrorResponse:
+    properties:
+      error:
+        type: string
+      success:
+        type: boolean
+    type: object
+  main.AdminLoginRequest:
+    properties:
+      key:
+        type: string
+    type: object
+  main.AdminLoginResponse:
+    properties:
+      success:
+        type: boolean
+    type: object
+  main.ApproveKYCRequest:
+    properties:
+      id:
+        type: string
+    type: object
+  main.ApproveOffPlanPropertyRequest:
+    properties:
+      property_id:
+        type: string
+    type: object
+  main.CreateMortgageByIDRequest:
+    properties:
+      gas:
+        type: string
+      id:
+        type: string
+    type: object
+  main.EditPropertyMetadataRequest:
+    properties:
+      construction_information:
+        type: string
+      gas:
+        type: string
+      owner_information:
+        type: string
+      parcel_number:
+        type: string
+      property_id:
+        type: string
+      property_name:
+        type: string
+      property_type:
+        type: string
+      size:
+        type: string
+      tenant_id:
+        type: string
+      unit_number:
+        type: string
+      zoning_classification:
+        type: string
+    type: object
+  main.ForSaleProperty:
+    properties:
+      id:
+        description: unique listing ID
+        type: string
+      owner:
+        type: string
+      price:
+        type: integer
+      property_id:
+        type: string
+      shares:
+        items:
+          type: integer
+        type: array
+      status:
+        description: '"listed", "sold"'
+        type: string
+    type: object
+  main.KYCErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  main.KYCRequestEntry:
+    properties:
+      id:
+        type: string
+      requester:
+        description: Name of the user requesting KYC
+        type: string
+      status:
+        description: '"pending", "approved", "rejected"'
+        type: string
+      timestamp:
+        type: string
+    type: object
+  main.KYCStatusResponse:
+    properties:
+      status:
+        type: string
+    type: object
+  main.ListPropertyForSaleRequest:
+    properties:
+      owner:
+        type: string
+      price:
+        type: integer
+      property_id:
+        type: string
+      shares:
+        items:
+          type: integer
+        type: array
+    type: object
+  main.LoginRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      role:
+        type: string
+    type: object
+  main.LoginResponse:
+    properties:
+      message:
+        type: string
+      role:
+        type: string
+      status:
+        type: string
+      user:
+        type: string
+    type: object
+  main.LoginStatusResponse:
+    properties:
+      logged_in:
+        type: boolean
+      role:
+        type: string
+      user:
+        type: string
+    type: object
+  main.MortgageRequest:
+    properties:
+      amount:
+        type: integer
+      collateral:
+        type: string
+      from_owners:
+        items:
+          type: string
+        type: array
+      from_shares:
+        items:
+          type: integer
+        type: array
+      id:
+        type: string
+      index:
+        type: string
+      interest_rate:
+        type: string
+      lendee_addr:
+        description: Bech32 address of the lendee.
+        type: string
+      lender:
+        description: Name of the user (lender) the request is for.
+        type: string
+      price:
+        type: integer
+      property_id:
+        description: Property purchase details
+        type: string
+      requester:
+        description: Name of the user (lendee) who made the request.
+        type: string
+      status:
+        description: e.g., "pending", "completed"
+        type: string
+      term:
+        type: string
+      timestamp:
+        type: string
+      to_owners:
+        items:
+          type: string
+        type: array
+      to_shares:
+        items:
+          type: integer
+        type: array
+    type: object
+  main.MortgageRequestPayload:
+    properties:
+      amount:
+        type: integer
+      collateral:
+        type: string
+      from_owners:
+        items:
+          type: string
+        type: array
+      from_shares:
+        items:
+          type: integer
+        type: array
+      gas:
+        type: string
+      index:
+        type: string
+      interest_rate:
+        type: string
+      lendee:
+        description: Only used for create (lender approval)
+        type: string
+      lender:
+        type: string
+      price:
+        type: integer
+      property_id:
+        description: Property purchase details
+        type: string
+      term:
+        type: string
+      to_owners:
+        items:
+          type: string
+        type: array
+      to_shares:
+        items:
+          type: integer
+        type: array
+    type: object
+  main.OffPlanProperty:
+    properties:
+      address:
+        type: string
+      developer:
+        type: string
+      id:
+        type: string
+      purchase_requests:
+        items:
+          $ref: '#/definitions/main.OffPlanPurchaseRequest'
+        type: array
+      region:
+        type: string
+      status:
+        description: '"for_sale", "pending_regulator_approval", "registered"'
+        type: string
+      total_shares:
+        type: integer
+      value:
+        type: integer
+    type: object
+  main.OffPlanPropertyRequest:
+    properties:
+      address:
+        type: string
+      region:
+        type: string
+      total_shares:
+        type: integer
+      value:
+        type: integer
+    type: object
+  main.OffPlanPurchaseRequest:
+    properties:
+      id:
+        type: string
+      property_id:
+        type: string
+      shares:
+        type: integer
+      status:
+        description: '"accepted"'
+        type: string
+      user:
+        type: string
+    type: object
+  main.OffPlanPurchaseRequestPayload:
+    properties:
+      property_id:
+        type: string
+      shares:
+        type: integer
+    type: object
+  main.RegisterPropertyRequest:
+    properties:
+      address:
+        type: string
+      gas:
+        type: string
+      owners:
+        items:
+          type: string
+        type: array
+      region:
+        type: string
+      shares:
+        items:
+          type: integer
+        type: array
+      value:
+        type: integer
+    type: object
+  main.RepayMortgageRequest:
+    properties:
+      amount:
+        type: integer
+      gas:
+        type: string
+      mortgage_id:
+        type: string
+    type: object
+  main.RequestFundsRequest:
+    properties:
+      address:
+        type: string
+      amount:
+        type: integer
+      denom:
+        type: string
+      gas:
+        type: string
+    type: object
+  main.TrackedTx:
+    properties:
+      timestamp:
+        type: string
+      tx_hash:
+        type: string
+      type:
+        type: string
+    type: object
+  main.TransferSharesRequest:
+    properties:
+      from_owners:
+        items:
+          type: string
+        type: array
+      from_shares:
+        items:
+          type: integer
+        type: array
+      gas:
+        type: string
+      property_id:
+        type: string
+      to_owners:
+        items:
+          type: string
+        type: array
+      to_shares:
+        items:
+          type: integer
+        type: array
+    type: object
+  main.UserDetailResponse:
+    properties:
+      address:
+        type: string
+      name:
+        type: string
+      pubkey:
+        type: string
+      role:
+        type: string
+      type:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: Simple HTTP service for submitting blockchain transactions.
+  title: Transaction Sidecar API
+  version: "1.0"
+paths:
+  /admin/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates an admin using a key. Returns success if the provided
+        key matches the ADMIN_KEY environment variable.
+      parameters:
+      - description: Admin login key
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.AdminLoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.AdminLoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.AdminLoginErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/main.AdminLoginErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.AdminLoginErrorResponse'
+      summary: Admin login
+  /ardaglobal/arda-poc/mortgage/mortgage:
+    get:
+      description: Proxies GET /ardaglobal/arda-poc/mortgage/mortgage to the blockchain
+        REST API
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "502":
+          description: Bad Gateway
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 'Proxy: Get all mortgages from blockchain'
+      tags:
+      - passthrough
+  /bank/mortgage/create:
+    post:
+      consumes:
+      - application/json
+      description: Submits a transaction to create a new mortgage, effectively approving
+        a pending request. This must be called by the **lender**, who must be logged
+        in. The sidecar will use the logged-in user's account to sign the transaction,
+        funding the mortgage from their account. The request body should only contain
+        the ID of a pending mortgage request.
+      parameters:
+      - description: mortgage request ID
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.CreateMortgageByIDRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              allOf:
+              - type: string
+              - properties:
+                  tx_hash:
+                    type: string
+                type: object
+            type: object
+      summary: Create a mortgage (lender)
+  /bank/mortgage/repay:
+    post:
+      consumes:
+      - application/json
+      description: Submits a transaction to repay a portion of an outstanding mortgage.
+        This must be called by the **lendee**, who must be logged in.
+      parameters:
+      - description: repayment details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.RepayMortgageRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              allOf:
+              - type: string
+              - properties:
+                  tx_hash:
+                    type: string
+                type: object
+            type: object
+      summary: Repay a mortgage (lendee)
+  /bank/mortgage/request:
+    post:
+      consumes:
+      - application/json
+      description: Allows a logged-in user (the lendee) to request a mortgage from
+        a specified lender. This request is stored by the sidecar and does not submit
+        a transaction. It creates a pending request that the lender can later approve.
+      parameters:
+      - description: mortgage request (with property purchase details)
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.MortgageRequestPayload'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.MortgageRequest'
+      summary: Request a mortgage (lendee)
+  /bank/mortgage/request-equity:
+    post:
+      consumes:
+      - application/json
+      description: Allows a user to request a home equity mortgage against a property
+        they own. The request is routed to the specified lender for approval. The
+        index is set to 'equity'.
+      parameters:
+      - description: equity mortgage request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.MortgageRequestPayload'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.MortgageRequest'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.KYCErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/main.KYCErrorResponse'
+      summary: Request a home equity mortgage (pending lender approval)
+  /bank/mortgage/requests:
+    get:
+      description: Allows a logged-in user to retrieve a list of all their pending
+        mortgage requests, both those they have made (as the lendee) and those made
+        to them (as the lender).
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.MortgageRequest'
+            type: array
+      summary: Get pending mortgage requests
+  /bank/request-funds:
+    post:
+      consumes:
+      - application/json
+      description: Requests funds from the built-in bank/faucet. This is only available
+        for development and testing purposes. The bank account must be funded for
+        this to work. On the first run, the sidecar will generate a `bank` account
+        and print its mnemonic phrase to the console. This mnemonic must be used to
+        send funds to the bank address before it can dispense tokens.
+      parameters:
+      - description: request details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.RequestFundsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              allOf:
+              - type: string
+              - properties:
+                  tx_hash:
+                    type: string
+                type: object
+            type: object
+      summary: Request funds from faucet
+  /cosmonaut/arda/property/properties:
+    get:
+      description: Proxies GET /cosmonaut/arda/property/properties to the blockchain
+        REST API
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "502":
+          description: Bad Gateway
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 'Proxy: Get all properties from blockchain'
+      tags:
+      - passthrough
+  /cosmos/bank/v1beta1/balances/{address}:
+    get:
+      description: Proxies GET /cosmos/bank/v1beta1/balances/{address} to the blockchain
+        REST API
+      parameters:
+      - description: Wallet address
+        in: path
+        name: address
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "502":
+          description: Bad Gateway
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 'Proxy: Get wallet balances'
+      tags:
+      - passthrough
+  /property/edit:
+    post:
+      consumes:
+      - application/json
+      description: Updates the metadata for an existing property.
+      parameters:
+      - description: metadata
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.EditPropertyMetadataRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              allOf:
+              - type: string
+              - properties:
+                  tx_hash:
+                    type: string
+                type: object
+            type: object
+      summary: Edit property metadata
+  /property/for-sale:
+    get:
+      description: Returns all properties currently listed for sale.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.ForSaleProperty'
+            type: array
+      summary: Get properties for sale
+  /property/list-for-sale:
+    post:
+      consumes:
+      - application/json
+      description: Allows an owner to list their property (or shares) for sale.
+      parameters:
+      - description: listing info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.ListPropertyForSaleRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.ForSaleProperty'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.KYCErrorResponse'
+      summary: List property for sale
+  /property/offplan:
+    post:
+      consumes:
+      - application/json
+      description: Developer submits a new off plan property to be funded. Status
+        is set to 'for_sale'.
+      parameters:
+      - description: off plan property info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.OffPlanPropertyRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.OffPlanProperty'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.KYCErrorResponse'
+      summary: Submit off plan property
+  /property/offplan/approve:
+    post:
+      consumes:
+      - application/json
+      description: Regulator approves a fully funded off plan property, registering
+        it on-chain with the owners from the purchase requests. Status is updated
+        to 'registered'.
+      parameters:
+      - description: Off plan property ID
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.ApproveOffPlanPropertyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.OffPlanProperty'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.KYCErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/main.KYCErrorResponse'
+      summary: Approve off plan property (regulator)
+  /property/offplan/purchase-request:
+    post:
+      consumes:
+      - application/json
+      description: User submits a request to purchase shares in an off plan property.
+        When all shares are purchased, property status is set to 'pending_regulator_approval'.
+      parameters:
+      - description: purchase request info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.OffPlanPurchaseRequestPayload'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.OffPlanPurchaseRequest'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.KYCErrorResponse'
+      summary: Submit off plan property purchase request
+  /property/offplans:
+    get:
+      description: Returns a list of all off-plan properties, including their purchase
+        requests.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.OffPlanProperty'
+            type: array
+      summary: Get all off-plan properties
+  /property/register:
+    post:
+      consumes:
+      - application/json
+      description: Submits a transaction to register a new property on the blockchain.
+      parameters:
+      - description: property info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.RegisterPropertyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              allOf:
+              - type: string
+              - properties:
+                  tx_hash:
+                    type: string
+                type: object
+            type: object
+      summary: Register a property
+  /property/transfer-shares:
+    post:
+      consumes:
+      - application/json
+      description: Submits a transaction to transfer property shares between one or
+        more owners.
+      parameters:
+      - description: transfer details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.TransferSharesRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              allOf:
+              - type: string
+              - properties:
+                  tx_hash:
+                    type: string
+                type: object
+            type: object
+      summary: Transfer property shares
+  /tx/{hash}:
+    get:
+      description: Queries the blockchain for a specific transaction by its hash and
+        returns details. For certain transaction types like 'register_property', it
+        returns a richer, decoded response.
+      parameters:
+      - description: Transaction hash
+        in: path
+        name: hash
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema: {}
+      summary: Get transaction
+  /tx/list:
+    get:
+      description: Lists all transaction hashes that have been successfully processed
+        and stored by the sidecar.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.TrackedTx'
+            type: array
+      summary: List transactions
+  /user/kyc/approve:
+    post:
+      consumes:
+      - application/json
+      description: Allows a logged-in regulator to approve a pending KYC request.
+        The user's role will be updated to 'investor'.
+      parameters:
+      - description: KYC approval request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.ApproveKYCRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.KYCStatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.KYCErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/main.KYCErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/main.KYCErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.KYCErrorResponse'
+      summary: Approve KYC request (regulator)
+  /user/kyc/request:
+    post:
+      consumes:
+      - application/json
+      description: Allows a logged-in user to request KYC. This creates a pending
+        KYC request that a regulator can later approve.
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.KYCRequestEntry'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.KYCErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/main.KYCErrorResponse'
+      summary: Request KYC (user)
+  /user/kyc/requests:
+    get:
+      description: Regulators see all pending KYC requests. Regular users see only
+        their own pending KYC request(s).
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.KYCRequestEntry'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/main.KYCErrorResponse'
+      summary: Get pending KYC requests
+  /user/list:
+    get:
+      description: Lists all registered users and their key details.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.UserDetailResponse'
+            type: array
+      summary: List users
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: Handles user login, registration, and linking. If a user with the
+        given email exists, they are logged in. If the email does not exist and a
+        name is provided, a new user account and key are created. If the email does
+        not exist but a user with the given name does exist, the email is linked to
+        the existing user account.
+      parameters:
+      - description: login info
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.LoginResponse'
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.LoginResponse'
+      summary: User login, registration, and linking
+  /user/logout:
+    post:
+      description: Logs out the currently authenticated user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              allOf:
+              - type: string
+              - properties:
+                  message:
+                    type: string
+                  status:
+                    type: string
+                type: object
+            type: object
+      summary: User logout
+  /user/status:
+    get:
+      description: Returns the currently logged in user, if any.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.LoginStatusResponse'
+      summary: Get login status
+swagger: "2.0"
