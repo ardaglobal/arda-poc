@@ -8,6 +8,7 @@ package main
 // @BasePath /
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -16,6 +17,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	fiberadaptor "github.com/gofiber/adaptor/v2"
 	fiber "github.com/gofiber/fiber/v2"
@@ -402,6 +404,67 @@ func getMortgagesPassthrough(c *fiber.Ctx) error {
 	return passthroughGET("/ardaglobal/arda-poc/mortgage/mortgage", c)
 }
 
+// isBlockchainRunning checks if both the blockchain REST API and gRPC API are accessible
+func isBlockchainRunning() bool {
+	// Check REST API
+	baseURL := os.Getenv("BLOCKCHAIN_REST_API_URL")
+	if baseURL == "" {
+		baseURL = "http://localhost:1317"
+	}
+	restURL := baseURL + "/cosmos/base/tendermint/v1beta1/node_info"
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, "GET", restURL, nil)
+	if err != nil {
+		return false
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return false
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return false
+	}
+
+	// Check gRPC API
+	grpcHost := "localhost"
+	if strings.Contains(baseURL, "://") {
+		if u, err := url.Parse(baseURL); err == nil {
+			grpcHost = u.Hostname()
+		}
+	}
+	grpcAddr := fmt.Sprintf("%s:9090", grpcHost)
+
+	// Try to establish a gRPC connection
+	grpcConn, err := grpc.Dial(grpcAddr, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock(), grpc.WithTimeout(5*time.Second))
+	if err != nil {
+		return false
+	}
+	defer grpcConn.Close()
+
+	return true
+}
+
+// waitForBlockchain waits for the blockchain to be ready before proceeding
+func waitForBlockchain() {
+	zlog.Info().Msg("Waiting for blockchain to be ready...")
+
+	for {
+		if isBlockchainRunning() {
+			zlog.Info().Msg("Blockchain is ready!")
+			return
+		}
+
+		zlog.Info().Msg("Blockchain not ready yet, waiting 5 seconds...")
+		time.Sleep(5 * time.Second)
+	}
+}
+
 func main() {
 	// Load .env file if present
 	_ = godotenv.Load()
@@ -439,10 +502,28 @@ func main() {
 			investorUsers = append(investorUsers, name)
 		}
 	}
-	go server.RunAutoProperty(developerUsers, investorUsers)
+
+	// Start auto property system in a goroutine that waits for blockchain readiness
+	go func() {
+		waitForBlockchain()
+		server.RunAutoProperty(developerUsers, investorUsers)
+	}()
 
 	app := fiber.New()
-	app.Use(fibercors.New())
+
+	// Get allowed origins from environment variable, default to "*" if not set
+	allowedOrigins := os.Getenv("ALLOWED_ORIGINS")
+	if allowedOrigins == "" {
+		allowedOrigins = "*"
+	}
+
+	zlog.Info().Msgf("CORS allowed origins: %s", allowedOrigins)
+	allowCredentials := os.Getenv("ALLOW_CREDENTIALS") == "true"
+
+	app.Use(fibercors.New(fibercors.Config{
+		AllowOrigins:     allowedOrigins,
+		AllowCredentials: allowCredentials,
+	}))
 
 	app.Get("/swagger/*", fiberSwagger.HandlerDefault)
 
