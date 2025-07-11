@@ -21,6 +21,9 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	Msg_UpdateParams_FullMethodName = "/ardapoc.rent.Msg/UpdateParams"
+	Msg_CreateLease_FullMethodName  = "/ardapoc.rent.Msg/CreateLease"
+	Msg_UpdateLease_FullMethodName  = "/ardapoc.rent.Msg/UpdateLease"
+	Msg_DeleteLease_FullMethodName  = "/ardapoc.rent.Msg/DeleteLease"
 )
 
 // MsgClient is the client API for Msg service.
@@ -30,6 +33,9 @@ type MsgClient interface {
 	// UpdateParams defines a (governance) operation for updating the module
 	// parameters. The authority defaults to the x/gov module account.
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
+	CreateLease(ctx context.Context, in *MsgCreateLease, opts ...grpc.CallOption) (*MsgCreateLeaseResponse, error)
+	UpdateLease(ctx context.Context, in *MsgUpdateLease, opts ...grpc.CallOption) (*MsgUpdateLeaseResponse, error)
+	DeleteLease(ctx context.Context, in *MsgDeleteLease, opts ...grpc.CallOption) (*MsgDeleteLeaseResponse, error)
 }
 
 type msgClient struct {
@@ -49,6 +55,33 @@ func (c *msgClient) UpdateParams(ctx context.Context, in *MsgUpdateParams, opts 
 	return out, nil
 }
 
+func (c *msgClient) CreateLease(ctx context.Context, in *MsgCreateLease, opts ...grpc.CallOption) (*MsgCreateLeaseResponse, error) {
+	out := new(MsgCreateLeaseResponse)
+	err := c.cc.Invoke(ctx, Msg_CreateLease_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) UpdateLease(ctx context.Context, in *MsgUpdateLease, opts ...grpc.CallOption) (*MsgUpdateLeaseResponse, error) {
+	out := new(MsgUpdateLeaseResponse)
+	err := c.cc.Invoke(ctx, Msg_UpdateLease_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) DeleteLease(ctx context.Context, in *MsgDeleteLease, opts ...grpc.CallOption) (*MsgDeleteLeaseResponse, error) {
+	out := new(MsgDeleteLeaseResponse)
+	err := c.cc.Invoke(ctx, Msg_DeleteLease_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility
@@ -56,6 +89,9 @@ type MsgServer interface {
 	// UpdateParams defines a (governance) operation for updating the module
 	// parameters. The authority defaults to the x/gov module account.
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
+	CreateLease(context.Context, *MsgCreateLease) (*MsgCreateLeaseResponse, error)
+	UpdateLease(context.Context, *MsgUpdateLease) (*MsgUpdateLeaseResponse, error)
+	DeleteLease(context.Context, *MsgDeleteLease) (*MsgDeleteLeaseResponse, error)
 	mustEmbedUnimplementedMsgServer()
 }
 
@@ -65,6 +101,15 @@ type UnimplementedMsgServer struct {
 
 func (UnimplementedMsgServer) UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateParams not implemented")
+}
+func (UnimplementedMsgServer) CreateLease(context.Context, *MsgCreateLease) (*MsgCreateLeaseResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateLease not implemented")
+}
+func (UnimplementedMsgServer) UpdateLease(context.Context, *MsgUpdateLease) (*MsgUpdateLeaseResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateLease not implemented")
+}
+func (UnimplementedMsgServer) DeleteLease(context.Context, *MsgDeleteLease) (*MsgDeleteLeaseResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteLease not implemented")
 }
 func (UnimplementedMsgServer) mustEmbedUnimplementedMsgServer() {}
 
@@ -97,6 +142,60 @@ func _Msg_UpdateParams_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_CreateLease_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgCreateLease)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).CreateLease(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_CreateLease_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).CreateLease(ctx, req.(*MsgCreateLease))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_UpdateLease_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateLease)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).UpdateLease(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_UpdateLease_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).UpdateLease(ctx, req.(*MsgUpdateLease))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_DeleteLease_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgDeleteLease)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).DeleteLease(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_DeleteLease_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).DeleteLease(ctx, req.(*MsgDeleteLease))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Msg_ServiceDesc is the grpc.ServiceDesc for Msg service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -107,6 +206,18 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateParams",
 			Handler:    _Msg_UpdateParams_Handler,
+		},
+		{
+			MethodName: "CreateLease",
+			Handler:    _Msg_CreateLease_Handler,
+		},
+		{
+			MethodName: "UpdateLease",
+			Handler:    _Msg_UpdateLease_Handler,
+		},
+		{
+			MethodName: "DeleteLease",
+			Handler:    _Msg_DeleteLease_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

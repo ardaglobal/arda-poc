@@ -20,7 +20,9 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Query_Params_FullMethodName = "/ardapoc.rent.Query/Params"
+	Query_Params_FullMethodName   = "/ardapoc.rent.Query/Params"
+	Query_Lease_FullMethodName    = "/ardapoc.rent.Query/Lease"
+	Query_LeaseAll_FullMethodName = "/ardapoc.rent.Query/LeaseAll"
 )
 
 // QueryClient is the client API for Query service.
@@ -29,6 +31,9 @@ const (
 type QueryClient interface {
 	// Parameters queries the parameters of the module.
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
+	// Queries a list of Lease items.
+	Lease(ctx context.Context, in *QueryGetLeaseRequest, opts ...grpc.CallOption) (*QueryGetLeaseResponse, error)
+	LeaseAll(ctx context.Context, in *QueryAllLeaseRequest, opts ...grpc.CallOption) (*QueryAllLeaseResponse, error)
 }
 
 type queryClient struct {
@@ -48,12 +53,33 @@ func (c *queryClient) Params(ctx context.Context, in *QueryParamsRequest, opts .
 	return out, nil
 }
 
+func (c *queryClient) Lease(ctx context.Context, in *QueryGetLeaseRequest, opts ...grpc.CallOption) (*QueryGetLeaseResponse, error) {
+	out := new(QueryGetLeaseResponse)
+	err := c.cc.Invoke(ctx, Query_Lease_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) LeaseAll(ctx context.Context, in *QueryAllLeaseRequest, opts ...grpc.CallOption) (*QueryAllLeaseResponse, error) {
+	out := new(QueryAllLeaseResponse)
+	err := c.cc.Invoke(ctx, Query_LeaseAll_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 // All implementations must embed UnimplementedQueryServer
 // for forward compatibility
 type QueryServer interface {
 	// Parameters queries the parameters of the module.
 	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
+	// Queries a list of Lease items.
+	Lease(context.Context, *QueryGetLeaseRequest) (*QueryGetLeaseResponse, error)
+	LeaseAll(context.Context, *QueryAllLeaseRequest) (*QueryAllLeaseResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -63,6 +89,12 @@ type UnimplementedQueryServer struct {
 
 func (UnimplementedQueryServer) Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Params not implemented")
+}
+func (UnimplementedQueryServer) Lease(context.Context, *QueryGetLeaseRequest) (*QueryGetLeaseResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Lease not implemented")
+}
+func (UnimplementedQueryServer) LeaseAll(context.Context, *QueryAllLeaseRequest) (*QueryAllLeaseResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LeaseAll not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}
 
@@ -95,6 +127,42 @@ func _Query_Params_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_Lease_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryGetLeaseRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).Lease(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_Lease_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).Lease(ctx, req.(*QueryGetLeaseRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_LeaseAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryAllLeaseRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).LeaseAll(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_LeaseAll_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).LeaseAll(ctx, req.(*QueryAllLeaseRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Query_ServiceDesc is the grpc.ServiceDesc for Query service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -105,6 +173,14 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Params",
 			Handler:    _Query_Params_Handler,
+		},
+		{
+			MethodName: "Lease",
+			Handler:    _Query_Lease_Handler,
+		},
+		{
+			MethodName: "LeaseAll",
+			Handler:    _Query_LeaseAll_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

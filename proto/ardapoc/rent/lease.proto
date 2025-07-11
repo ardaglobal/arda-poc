@@ -1,0 +1,24 @@
+syntax = "proto3";
+package ardapoc.rent;
+
+option go_package = "github.com/ardaglobal/arda-poc/x/rent/types";
+
+message Lease {
+  uint64 id = 1;
+  string propertyId = 2; 
+  string tenant = 3; 
+  uint64 rentAmount = 4; 
+  string rentDueDate = 5; 
+  string status = 6; 
+  uint64 timePeriod = 7; 
+  string paymentsOutstanding = 8; 
+  string termLength = 9; 
+  bool recurringStatus = 10; 
+  bool cancellationPending = 11; 
+  string cancellationInitiator = 12; 
+  uint64 cancellationDeadline = 13; 
+  uint64 lastPaymentBlock = 14; 
+  string paymentTerms = 15; 
+  string cancellationRequirements = 16; 
+  string creator = 17;
+}

@@ -23,7 +23,19 @@ var (
 )
 
 const (
-// this line is used by starport scaffolding # simapp/module/const
+	opWeightMsgCreateLease = "op_weight_msg_lease"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgCreateLease int = 100
+
+	opWeightMsgUpdateLease = "op_weight_msg_lease"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgUpdateLease int = 100
+
+	opWeightMsgDeleteLease = "op_weight_msg_lease"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgDeleteLease int = 100
+
+	// this line is used by starport scaffolding # simapp/module/const
 )
 
 // GenerateGenesisState creates a randomized GenState of the module.
@@ -34,6 +46,17 @@ func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
 	}
 	rentGenesis := types.GenesisState{
 		Params: types.DefaultParams(),
+		LeaseList: []types.Lease{
+			{
+				Id:      0,
+				Creator: sample.AccAddress(),
+			},
+			{
+				Id:      1,
+				Creator: sample.AccAddress(),
+			},
+		},
+		LeaseCount: 2,
 		// this line is used by starport scaffolding # simapp/module/genesisState
 	}
 	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(&rentGenesis)
@@ -46,6 +69,39 @@ func (am AppModule) RegisterStoreDecoder(_ simtypes.StoreDecoderRegistry) {}
 func (am AppModule) WeightedOperations(simState module.SimulationState) []simtypes.WeightedOperation {
 	operations := make([]simtypes.WeightedOperation, 0)
 
+	var weightMsgCreateLease int
+	simState.AppParams.GetOrGenerate(opWeightMsgCreateLease, &weightMsgCreateLease, nil,
+		func(_ *rand.Rand) {
+			weightMsgCreateLease = defaultWeightMsgCreateLease
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgCreateLease,
+		rentsimulation.SimulateMsgCreateLease(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgUpdateLease int
+	simState.AppParams.GetOrGenerate(opWeightMsgUpdateLease, &weightMsgUpdateLease, nil,
+		func(_ *rand.Rand) {
+			weightMsgUpdateLease = defaultWeightMsgUpdateLease
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgUpdateLease,
+		rentsimulation.SimulateMsgUpdateLease(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
+	var weightMsgDeleteLease int
+	simState.AppParams.GetOrGenerate(opWeightMsgDeleteLease, &weightMsgDeleteLease, nil,
+		func(_ *rand.Rand) {
+			weightMsgDeleteLease = defaultWeightMsgDeleteLease
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgDeleteLease,
+		rentsimulation.SimulateMsgDeleteLease(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
 	// this line is used by starport scaffolding # simapp/module/operation
 
 	return operations
@@ -54,6 +110,30 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 // ProposalMsgs returns msgs used for governance proposals for simulations.
 func (am AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.WeightedProposalMsg {
 	return []simtypes.WeightedProposalMsg{
+		simulation.NewWeightedProposalMsg(
+			opWeightMsgCreateLease,
+			defaultWeightMsgCreateLease,
+			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+				rentsimulation.SimulateMsgCreateLease(am.accountKeeper, am.bankKeeper, am.keeper)
+				return nil
+			},
+		),
+		simulation.NewWeightedProposalMsg(
+			opWeightMsgUpdateLease,
+			defaultWeightMsgUpdateLease,
+			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+				rentsimulation.SimulateMsgUpdateLease(am.accountKeeper, am.bankKeeper, am.keeper)
+				return nil
+			},
+		),
+		simulation.NewWeightedProposalMsg(
+			opWeightMsgDeleteLease,
+			defaultWeightMsgDeleteLease,
+			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+				rentsimulation.SimulateMsgDeleteLease(am.accountKeeper, am.bankKeeper, am.keeper)
+				return nil
+			},
+		),
 		// this line is used by starport scaffolding # simapp/module/OpMsg
 	}
 }

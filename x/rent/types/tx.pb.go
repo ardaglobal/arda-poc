@@ -36,8 +36,6 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 type MsgUpdateParams struct {
 	// authority is the address that controls the module (defaults to x/gov unless overwritten).
 	Authority string `protobuf:"bytes,1,opt,name=authority,proto3" json:"authority,omitempty"`
-	// params defines the module parameters to update.
-	//
 	// NOTE: All parameters must be supplied.
 	Params Params `protobuf:"bytes,2,opt,name=params,proto3" json:"params"`
 }
@@ -127,37 +125,576 @@ func (m *MsgUpdateParamsResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateParamsResponse proto.InternalMessageInfo
 
+type MsgCreateLease struct {
+	Creator                  string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	PropertyId               string `protobuf:"bytes,2,opt,name=propertyId,proto3" json:"propertyId,omitempty"`
+	Tenant                   string `protobuf:"bytes,3,opt,name=tenant,proto3" json:"tenant,omitempty"`
+	RentAmount               uint64 `protobuf:"varint,4,opt,name=rentAmount,proto3" json:"rentAmount,omitempty"`
+	RentDueDate              string `protobuf:"bytes,5,opt,name=rentDueDate,proto3" json:"rentDueDate,omitempty"`
+	Status                   string `protobuf:"bytes,6,opt,name=status,proto3" json:"status,omitempty"`
+	TimePeriod               uint64 `protobuf:"varint,7,opt,name=timePeriod,proto3" json:"timePeriod,omitempty"`
+	PaymentsOutstanding      string `protobuf:"bytes,8,opt,name=paymentsOutstanding,proto3" json:"paymentsOutstanding,omitempty"`
+	TermLength               string `protobuf:"bytes,9,opt,name=termLength,proto3" json:"termLength,omitempty"`
+	RecurringStatus          bool   `protobuf:"varint,10,opt,name=recurringStatus,proto3" json:"recurringStatus,omitempty"`
+	CancellationPending      bool   `protobuf:"varint,11,opt,name=cancellationPending,proto3" json:"cancellationPending,omitempty"`
+	CancellationInitiator    string `protobuf:"bytes,12,opt,name=cancellationInitiator,proto3" json:"cancellationInitiator,omitempty"`
+	CancellationDeadline     uint64 `protobuf:"varint,13,opt,name=cancellationDeadline,proto3" json:"cancellationDeadline,omitempty"`
+	LastPaymentBlock         uint64 `protobuf:"varint,14,opt,name=lastPaymentBlock,proto3" json:"lastPaymentBlock,omitempty"`
+	PaymentTerms             string `protobuf:"bytes,15,opt,name=paymentTerms,proto3" json:"paymentTerms,omitempty"`
+	CancellationRequirements string `protobuf:"bytes,16,opt,name=cancellationRequirements,proto3" json:"cancellationRequirements,omitempty"`
+}
+
+func (m *MsgCreateLease) Reset()         { *m = MsgCreateLease{} }
+func (m *MsgCreateLease) String() string { return proto.CompactTextString(m) }
+func (*MsgCreateLease) ProtoMessage()    {}
+func (*MsgCreateLease) Descriptor() ([]byte, []int) {
+	return fileDescriptor_714f33a00203e81b, []int{2}
+}
+func (m *MsgCreateLease) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgCreateLease) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgCreateLease.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgCreateLease) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgCreateLease.Merge(m, src)
+}
+func (m *MsgCreateLease) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgCreateLease) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgCreateLease.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgCreateLease proto.InternalMessageInfo
+
+func (m *MsgCreateLease) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgCreateLease) GetPropertyId() string {
+	if m != nil {
+		return m.PropertyId
+	}
+	return ""
+}
+
+func (m *MsgCreateLease) GetTenant() string {
+	if m != nil {
+		return m.Tenant
+	}
+	return ""
+}
+
+func (m *MsgCreateLease) GetRentAmount() uint64 {
+	if m != nil {
+		return m.RentAmount
+	}
+	return 0
+}
+
+func (m *MsgCreateLease) GetRentDueDate() string {
+	if m != nil {
+		return m.RentDueDate
+	}
+	return ""
+}
+
+func (m *MsgCreateLease) GetStatus() string {
+	if m != nil {
+		return m.Status
+	}
+	return ""
+}
+
+func (m *MsgCreateLease) GetTimePeriod() uint64 {
+	if m != nil {
+		return m.TimePeriod
+	}
+	return 0
+}
+
+func (m *MsgCreateLease) GetPaymentsOutstanding() string {
+	if m != nil {
+		return m.PaymentsOutstanding
+	}
+	return ""
+}
+
+func (m *MsgCreateLease) GetTermLength() string {
+	if m != nil {
+		return m.TermLength
+	}
+	return ""
+}
+
+func (m *MsgCreateLease) GetRecurringStatus() bool {
+	if m != nil {
+		return m.RecurringStatus
+	}
+	return false
+}
+
+func (m *MsgCreateLease) GetCancellationPending() bool {
+	if m != nil {
+		return m.CancellationPending
+	}
+	return false
+}
+
+func (m *MsgCreateLease) GetCancellationInitiator() string {
+	if m != nil {
+		return m.CancellationInitiator
+	}
+	return ""
+}
+
+func (m *MsgCreateLease) GetCancellationDeadline() uint64 {
+	if m != nil {
+		return m.CancellationDeadline
+	}
+	return 0
+}
+
+func (m *MsgCreateLease) GetLastPaymentBlock() uint64 {
+	if m != nil {
+		return m.LastPaymentBlock
+	}
+	return 0
+}
+
+func (m *MsgCreateLease) GetPaymentTerms() string {
+	if m != nil {
+		return m.PaymentTerms
+	}
+	return ""
+}
+
+func (m *MsgCreateLease) GetCancellationRequirements() string {
+	if m != nil {
+		return m.CancellationRequirements
+	}
+	return ""
+}
+
+type MsgCreateLeaseResponse struct {
+	Id uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (m *MsgCreateLeaseResponse) Reset()         { *m = MsgCreateLeaseResponse{} }
+func (m *MsgCreateLeaseResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgCreateLeaseResponse) ProtoMessage()    {}
+func (*MsgCreateLeaseResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_714f33a00203e81b, []int{3}
+}
+func (m *MsgCreateLeaseResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgCreateLeaseResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgCreateLeaseResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgCreateLeaseResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgCreateLeaseResponse.Merge(m, src)
+}
+func (m *MsgCreateLeaseResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgCreateLeaseResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgCreateLeaseResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgCreateLeaseResponse proto.InternalMessageInfo
+
+func (m *MsgCreateLeaseResponse) GetId() uint64 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+type MsgUpdateLease struct {
+	Creator                  string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	Id                       uint64 `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`
+	PropertyId               string `protobuf:"bytes,3,opt,name=propertyId,proto3" json:"propertyId,omitempty"`
+	Tenant                   string `protobuf:"bytes,4,opt,name=tenant,proto3" json:"tenant,omitempty"`
+	RentAmount               uint64 `protobuf:"varint,5,opt,name=rentAmount,proto3" json:"rentAmount,omitempty"`
+	RentDueDate              string `protobuf:"bytes,6,opt,name=rentDueDate,proto3" json:"rentDueDate,omitempty"`
+	Status                   string `protobuf:"bytes,7,opt,name=status,proto3" json:"status,omitempty"`
+	TimePeriod               uint64 `protobuf:"varint,8,opt,name=timePeriod,proto3" json:"timePeriod,omitempty"`
+	PaymentsOutstanding      string `protobuf:"bytes,9,opt,name=paymentsOutstanding,proto3" json:"paymentsOutstanding,omitempty"`
+	TermLength               string `protobuf:"bytes,10,opt,name=termLength,proto3" json:"termLength,omitempty"`
+	RecurringStatus          bool   `protobuf:"varint,11,opt,name=recurringStatus,proto3" json:"recurringStatus,omitempty"`
+	CancellationPending      bool   `protobuf:"varint,12,opt,name=cancellationPending,proto3" json:"cancellationPending,omitempty"`
+	CancellationInitiator    string `protobuf:"bytes,13,opt,name=cancellationInitiator,proto3" json:"cancellationInitiator,omitempty"`
+	CancellationDeadline     uint64 `protobuf:"varint,14,opt,name=cancellationDeadline,proto3" json:"cancellationDeadline,omitempty"`
+	LastPaymentBlock         uint64 `protobuf:"varint,15,opt,name=lastPaymentBlock,proto3" json:"lastPaymentBlock,omitempty"`
+	PaymentTerms             string `protobuf:"bytes,16,opt,name=paymentTerms,proto3" json:"paymentTerms,omitempty"`
+	CancellationRequirements string `protobuf:"bytes,17,opt,name=cancellationRequirements,proto3" json:"cancellationRequirements,omitempty"`
+}
+
+func (m *MsgUpdateLease) Reset()         { *m = MsgUpdateLease{} }
+func (m *MsgUpdateLease) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateLease) ProtoMessage()    {}
+func (*MsgUpdateLease) Descriptor() ([]byte, []int) {
+	return fileDescriptor_714f33a00203e81b, []int{4}
+}
+func (m *MsgUpdateLease) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateLease) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateLease.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateLease) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateLease.Merge(m, src)
+}
+func (m *MsgUpdateLease) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateLease) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateLease.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateLease proto.InternalMessageInfo
+
+func (m *MsgUpdateLease) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgUpdateLease) GetId() uint64 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+func (m *MsgUpdateLease) GetPropertyId() string {
+	if m != nil {
+		return m.PropertyId
+	}
+	return ""
+}
+
+func (m *MsgUpdateLease) GetTenant() string {
+	if m != nil {
+		return m.Tenant
+	}
+	return ""
+}
+
+func (m *MsgUpdateLease) GetRentAmount() uint64 {
+	if m != nil {
+		return m.RentAmount
+	}
+	return 0
+}
+
+func (m *MsgUpdateLease) GetRentDueDate() string {
+	if m != nil {
+		return m.RentDueDate
+	}
+	return ""
+}
+
+func (m *MsgUpdateLease) GetStatus() string {
+	if m != nil {
+		return m.Status
+	}
+	return ""
+}
+
+func (m *MsgUpdateLease) GetTimePeriod() uint64 {
+	if m != nil {
+		return m.TimePeriod
+	}
+	return 0
+}
+
+func (m *MsgUpdateLease) GetPaymentsOutstanding() string {
+	if m != nil {
+		return m.PaymentsOutstanding
+	}
+	return ""
+}
+
+func (m *MsgUpdateLease) GetTermLength() string {
+	if m != nil {
+		return m.TermLength
+	}
+	return ""
+}
+
+func (m *MsgUpdateLease) GetRecurringStatus() bool {
+	if m != nil {
+		return m.RecurringStatus
+	}
+	return false
+}
+
+func (m *MsgUpdateLease) GetCancellationPending() bool {
+	if m != nil {
+		return m.CancellationPending
+	}
+	return false
+}
+
+func (m *MsgUpdateLease) GetCancellationInitiator() string {
+	if m != nil {
+		return m.CancellationInitiator
+	}
+	return ""
+}
+
+func (m *MsgUpdateLease) GetCancellationDeadline() uint64 {
+	if m != nil {
+		return m.CancellationDeadline
+	}
+	return 0
+}
+
+func (m *MsgUpdateLease) GetLastPaymentBlock() uint64 {
+	if m != nil {
+		return m.LastPaymentBlock
+	}
+	return 0
+}
+
+func (m *MsgUpdateLease) GetPaymentTerms() string {
+	if m != nil {
+		return m.PaymentTerms
+	}
+	return ""
+}
+
+func (m *MsgUpdateLease) GetCancellationRequirements() string {
+	if m != nil {
+		return m.CancellationRequirements
+	}
+	return ""
+}
+
+type MsgUpdateLeaseResponse struct {
+}
+
+func (m *MsgUpdateLeaseResponse) Reset()         { *m = MsgUpdateLeaseResponse{} }
+func (m *MsgUpdateLeaseResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateLeaseResponse) ProtoMessage()    {}
+func (*MsgUpdateLeaseResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_714f33a00203e81b, []int{5}
+}
+func (m *MsgUpdateLeaseResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateLeaseResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateLeaseResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateLeaseResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateLeaseResponse.Merge(m, src)
+}
+func (m *MsgUpdateLeaseResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateLeaseResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateLeaseResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateLeaseResponse proto.InternalMessageInfo
+
+type MsgDeleteLease struct {
+	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	Id      uint64 `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (m *MsgDeleteLease) Reset()         { *m = MsgDeleteLease{} }
+func (m *MsgDeleteLease) String() string { return proto.CompactTextString(m) }
+func (*MsgDeleteLease) ProtoMessage()    {}
+func (*MsgDeleteLease) Descriptor() ([]byte, []int) {
+	return fileDescriptor_714f33a00203e81b, []int{6}
+}
+func (m *MsgDeleteLease) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgDeleteLease) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgDeleteLease.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgDeleteLease) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgDeleteLease.Merge(m, src)
+}
+func (m *MsgDeleteLease) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgDeleteLease) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgDeleteLease.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgDeleteLease proto.InternalMessageInfo
+
+func (m *MsgDeleteLease) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgDeleteLease) GetId() uint64 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+type MsgDeleteLeaseResponse struct {
+}
+
+func (m *MsgDeleteLeaseResponse) Reset()         { *m = MsgDeleteLeaseResponse{} }
+func (m *MsgDeleteLeaseResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgDeleteLeaseResponse) ProtoMessage()    {}
+func (*MsgDeleteLeaseResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_714f33a00203e81b, []int{7}
+}
+func (m *MsgDeleteLeaseResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgDeleteLeaseResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgDeleteLeaseResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgDeleteLeaseResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgDeleteLeaseResponse.Merge(m, src)
+}
+func (m *MsgDeleteLeaseResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgDeleteLeaseResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgDeleteLeaseResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgDeleteLeaseResponse proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*MsgUpdateParams)(nil), "ardapoc.rent.MsgUpdateParams")
 	proto.RegisterType((*MsgUpdateParamsResponse)(nil), "ardapoc.rent.MsgUpdateParamsResponse")
+	proto.RegisterType((*MsgCreateLease)(nil), "ardapoc.rent.MsgCreateLease")
+	proto.RegisterType((*MsgCreateLeaseResponse)(nil), "ardapoc.rent.MsgCreateLeaseResponse")
+	proto.RegisterType((*MsgUpdateLease)(nil), "ardapoc.rent.MsgUpdateLease")
+	proto.RegisterType((*MsgUpdateLeaseResponse)(nil), "ardapoc.rent.MsgUpdateLeaseResponse")
+	proto.RegisterType((*MsgDeleteLease)(nil), "ardapoc.rent.MsgDeleteLease")
+	proto.RegisterType((*MsgDeleteLeaseResponse)(nil), "ardapoc.rent.MsgDeleteLeaseResponse")
 }
 
 func init() { proto.RegisterFile("ardapoc/rent/tx.proto", fileDescriptor_714f33a00203e81b) }
 
 var fileDescriptor_714f33a00203e81b = []byte{
-	// 340 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x4d, 0x2c, 0x4a, 0x49,
-	0x2c, 0xc8, 0x4f, 0xd6, 0x2f, 0x4a, 0xcd, 0x2b, 0xd1, 0x2f, 0xa9, 0xd0, 0x2b, 0x28, 0xca, 0x2f,
-	0xc9, 0x17, 0xe2, 0x81, 0x0a, 0xeb, 0x81, 0x84, 0xa5, 0x04, 0x13, 0x73, 0x33, 0xf3, 0xf2, 0xf5,
-	0xc1, 0x24, 0x44, 0x81, 0x94, 0x78, 0x72, 0x7e, 0x71, 0x6e, 0x7e, 0xb1, 0x7e, 0x6e, 0x71, 0xba,
-	0x7e, 0x99, 0x21, 0x88, 0x82, 0x4a, 0x48, 0x42, 0x24, 0xe2, 0xc1, 0x3c, 0x7d, 0x08, 0x07, 0x2a,
-	0x25, 0x92, 0x9e, 0x9f, 0x9e, 0x0f, 0x11, 0x07, 0xb1, 0x60, 0x1a, 0x50, 0x5c, 0x50, 0x90, 0x58,
-	0x94, 0x98, 0x0b, 0xd5, 0xa0, 0xb4, 0x95, 0x91, 0x8b, 0xdf, 0xb7, 0x38, 0x3d, 0xb4, 0x20, 0x25,
-	0xb1, 0x24, 0x35, 0x00, 0x2c, 0x23, 0x64, 0xc6, 0xc5, 0x99, 0x58, 0x5a, 0x92, 0x91, 0x5f, 0x94,
-	0x59, 0x52, 0x29, 0xc1, 0xa8, 0xc0, 0xa8, 0xc1, 0xe9, 0x24, 0x71, 0x69, 0x8b, 0xae, 0x08, 0xd4,
-	0x26, 0xc7, 0x94, 0x94, 0xa2, 0xd4, 0xe2, 0xe2, 0xe0, 0x92, 0xa2, 0xcc, 0xbc, 0xf4, 0x20, 0x84,
-	0x52, 0x21, 0x73, 0x2e, 0x36, 0x88, 0xd9, 0x12, 0x4c, 0x0a, 0x8c, 0x1a, 0xdc, 0x46, 0x22, 0x7a,
-	0xc8, 0x5e, 0xd4, 0x83, 0x98, 0xee, 0xc4, 0x79, 0xe2, 0x9e, 0x3c, 0xc3, 0x8a, 0xe7, 0x1b, 0xb4,
-	0x18, 0x83, 0xa0, 0xca, 0xad, 0x0c, 0x9b, 0x9e, 0x6f, 0xd0, 0x42, 0x18, 0xd4, 0xf5, 0x7c, 0x83,
-	0x96, 0x1c, 0xcc, 0xc9, 0x15, 0x10, 0x47, 0xa3, 0xb9, 0x51, 0x49, 0x92, 0x4b, 0x1c, 0x4d, 0x28,
-	0x28, 0xb5, 0xb8, 0x20, 0x3f, 0xaf, 0x38, 0xd5, 0x28, 0x89, 0x8b, 0xd9, 0xb7, 0x38, 0x5d, 0x28,
-	0x84, 0x8b, 0x07, 0xc5, 0x57, 0xb2, 0xa8, 0xae, 0x41, 0xd3, 0x2d, 0xa5, 0x8a, 0x57, 0x1a, 0x66,
-	0xb8, 0x14, 0x6b, 0x03, 0xc8, 0xe5, 0x4e, 0xae, 0x27, 0x1e, 0xc9, 0x31, 0x5e, 0x78, 0x24, 0xc7,
-	0xf8, 0xe0, 0x91, 0x1c, 0xe3, 0x84, 0xc7, 0x72, 0x0c, 0x17, 0x1e, 0xcb, 0x31, 0xdc, 0x78, 0x2c,
-	0xc7, 0x10, 0xa5, 0x9d, 0x9e, 0x59, 0x92, 0x51, 0x9a, 0xa4, 0x97, 0x9c, 0x9f, 0xab, 0x0f, 0x32,
-	0x31, 0x3d, 0x27, 0x3f, 0x29, 0x31, 0x07, 0xcc, 0xd4, 0x45, 0xf2, 0x4f, 0x49, 0x65, 0x41, 0x6a,
-	0x71, 0x12, 0x1b, 0x38, 0x12, 0x8c, 0x01, 0x01, 0x00, 0x00, 0xff, 0xff, 0x2d, 0x1f, 0xbb, 0x0b,
-	0x23, 0x02, 0x00, 0x00,
+	// 806 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x96, 0x41, 0x6f, 0xe3, 0x44,
+	0x14, 0xc7, 0xe3, 0x34, 0x49, 0x9b, 0x49, 0x36, 0xe9, 0x0e, 0xd9, 0xdd, 0xd9, 0x68, 0x31, 0x51,
+	0x04, 0x52, 0x14, 0xb4, 0x09, 0x5b, 0x10, 0x48, 0xbd, 0x6d, 0x08, 0x12, 0x2b, 0x6d, 0x45, 0xf0,
+	0x96, 0x0b, 0x17, 0x34, 0xb5, 0x47, 0xae, 0x85, 0xed, 0x31, 0x33, 0x63, 0xd4, 0xdc, 0x10, 0x47,
+	0x0e, 0x88, 0x4f, 0xc0, 0x99, 0x63, 0x0f, 0xf0, 0x1d, 0x7a, 0xac, 0x38, 0x21, 0x21, 0x21, 0xd4,
+	0x1e, 0xfa, 0x35, 0x56, 0x33, 0x13, 0x37, 0x93, 0xd4, 0x4d, 0x93, 0x5e, 0x5a, 0xbf, 0xf7, 0x9f,
+	0xf7, 0x9f, 0x37, 0xcf, 0x3f, 0x77, 0x0a, 0x1e, 0x61, 0xe6, 0xe1, 0x84, 0xba, 0x43, 0x46, 0x62,
+	0x31, 0x14, 0x27, 0x83, 0x84, 0x51, 0x41, 0x61, 0x7d, 0x96, 0x1e, 0xc8, 0x74, 0xfb, 0x21, 0x8e,
+	0x82, 0x98, 0x0e, 0xd5, 0x4f, 0xbd, 0xa0, 0xfd, 0xc4, 0xa5, 0x3c, 0xa2, 0x7c, 0x18, 0x71, 0x7f,
+	0xf8, 0xe3, 0x0b, 0xf9, 0x6b, 0x26, 0x3c, 0xd5, 0xc2, 0x77, 0x2a, 0x1a, 0xea, 0x60, 0x26, 0xb5,
+	0x7c, 0xea, 0x53, 0x9d, 0x97, 0x4f, 0x59, 0xc1, 0x42, 0x07, 0x09, 0x66, 0x38, 0xca, 0x0a, 0xd0,
+	0x82, 0x14, 0x12, 0xcc, 0x89, 0x56, 0xba, 0x7f, 0x59, 0xa0, 0x79, 0xc0, 0xfd, 0x6f, 0x12, 0x0f,
+	0x0b, 0x32, 0x51, 0x35, 0xf0, 0x53, 0x50, 0xc5, 0xa9, 0x38, 0xa6, 0x2c, 0x10, 0x53, 0x64, 0x75,
+	0xac, 0x5e, 0x75, 0x84, 0xfe, 0xfe, 0xf3, 0x79, 0x6b, 0xd6, 0xc3, 0x4b, 0xcf, 0x63, 0x84, 0xf3,
+	0x37, 0x82, 0x05, 0xb1, 0xef, 0xcc, 0x97, 0xc2, 0xcf, 0x40, 0x45, 0xef, 0x8a, 0x8a, 0x1d, 0xab,
+	0x57, 0xdb, 0x6b, 0x0d, 0xcc, 0xc3, 0x0f, 0xb4, 0xfb, 0xa8, 0x7a, 0xf6, 0xdf, 0x7b, 0x85, 0x3f,
+	0xae, 0x4e, 0xfb, 0x96, 0x33, 0x5b, 0xbe, 0xff, 0xe2, 0xe7, 0xab, 0xd3, 0xfe, 0xdc, 0xe8, 0x97,
+	0xab, 0xd3, 0xbe, 0x9d, 0x75, 0x7c, 0xa2, 0x7b, 0x5e, 0xea, 0xb1, 0xfb, 0x14, 0x3c, 0x59, 0x4a,
+	0x39, 0x84, 0x27, 0x34, 0xe6, 0xa4, 0xfb, 0x6b, 0x19, 0x34, 0x0e, 0xb8, 0xff, 0x39, 0x23, 0x58,
+	0x90, 0xd7, 0xf2, 0xac, 0x10, 0x81, 0x6d, 0x57, 0x86, 0x94, 0xe9, 0xf3, 0x38, 0x59, 0x08, 0x6d,
+	0x00, 0x12, 0x46, 0x13, 0xc2, 0xc4, 0xf4, 0x95, 0xa7, 0xfa, 0xae, 0x3a, 0x46, 0x06, 0x3e, 0x06,
+	0x15, 0x41, 0x62, 0x1c, 0x0b, 0xb4, 0xa5, 0xb4, 0x59, 0x24, 0xeb, 0x64, 0x5f, 0x2f, 0x23, 0x9a,
+	0xc6, 0x02, 0x95, 0x3a, 0x56, 0xaf, 0xe4, 0x18, 0x19, 0xd8, 0x01, 0x35, 0x19, 0x8d, 0x53, 0x32,
+	0xc6, 0x82, 0xa0, 0xb2, 0x2a, 0x36, 0x53, 0xd2, 0x99, 0x0b, 0x2c, 0x52, 0x8e, 0x2a, 0xda, 0x59,
+	0x47, 0xd2, 0x59, 0x04, 0x11, 0x99, 0x10, 0x16, 0x50, 0x0f, 0x6d, 0x6b, 0xe7, 0x79, 0x06, 0x7e,
+	0x04, 0xde, 0x49, 0xf0, 0x34, 0x22, 0xb1, 0xe0, 0x5f, 0xa5, 0x82, 0x0b, 0x1c, 0x7b, 0x41, 0xec,
+	0xa3, 0x1d, 0x65, 0x92, 0x27, 0x29, 0x47, 0xc2, 0xa2, 0xd7, 0x24, 0xf6, 0xc5, 0x31, 0xaa, 0xea,
+	0x33, 0xce, 0x33, 0xb0, 0x07, 0x9a, 0x8c, 0xb8, 0x29, 0x93, 0xef, 0xf3, 0x8d, 0x6e, 0x09, 0x74,
+	0xac, 0xde, 0x8e, 0xb3, 0x9c, 0x96, 0x7b, 0xbb, 0x38, 0x76, 0x49, 0x18, 0x62, 0x11, 0xd0, 0x78,
+	0x42, 0xf4, 0xde, 0x35, 0xb5, 0x3a, 0x4f, 0x82, 0x9f, 0x80, 0x47, 0x66, 0xfa, 0x55, 0x1c, 0x88,
+	0x40, 0xbd, 0x87, 0xba, 0x6a, 0x23, 0x5f, 0x84, 0x7b, 0xa0, 0x65, 0x0a, 0x63, 0x82, 0xbd, 0x30,
+	0x88, 0x09, 0x7a, 0xa0, 0xa6, 0x91, 0xab, 0xc1, 0x3e, 0xd8, 0x0d, 0x31, 0x17, 0x13, 0x3d, 0x80,
+	0x51, 0x48, 0xdd, 0xef, 0x51, 0x43, 0xad, 0xbf, 0x91, 0x87, 0x5d, 0x50, 0x9f, 0x0d, 0xea, 0x90,
+	0xb0, 0x88, 0xa3, 0xa6, 0x6a, 0x66, 0x21, 0x07, 0xf7, 0x01, 0x32, 0xf7, 0x71, 0xc8, 0x0f, 0x69,
+	0xc0, 0x88, 0x1a, 0x2e, 0xda, 0x55, 0xeb, 0x6f, 0xd5, 0xf7, 0xeb, 0x12, 0xe8, 0x8c, 0xb1, 0x6e,
+	0x0f, 0x3c, 0x5e, 0xe4, 0x31, 0x43, 0x15, 0x36, 0x40, 0x31, 0xf0, 0x14, 0x92, 0x25, 0xa7, 0x18,
+	0x78, 0xdd, 0xdf, 0x35, 0xba, 0x1a, 0xeb, 0xbb, 0xd0, 0xd5, 0xc5, 0xc5, 0xac, 0x78, 0x09, 0xe5,
+	0xad, 0x15, 0x28, 0x97, 0x56, 0xa0, 0x5c, 0xbe, 0x0b, 0xe5, 0xca, 0x2a, 0x94, 0xb7, 0x57, 0xa0,
+	0xbc, 0xb3, 0x2e, 0xca, 0xd5, 0x75, 0x51, 0x06, 0xeb, 0xa0, 0x5c, 0xdb, 0x08, 0xe5, 0xfa, 0x3d,
+	0x50, 0x7e, 0x70, 0x1f, 0x94, 0x1b, 0x1b, 0xa2, 0xdc, 0x5c, 0x13, 0xe5, 0xdd, 0x0d, 0x51, 0x7e,
+	0xb8, 0x11, 0xca, 0x48, 0xa1, 0x6c, 0xf0, 0x79, 0xfd, 0x57, 0xf7, 0x4b, 0x45, 0xee, 0x98, 0x84,
+	0x64, 0x63, 0x72, 0x73, 0xf7, 0x30, 0x9c, 0xb2, 0x3d, 0xf6, 0xfe, 0x2d, 0x82, 0xad, 0x03, 0xee,
+	0xc3, 0x43, 0x50, 0x5f, 0xb8, 0xb0, 0xde, 0x5d, 0xbc, 0x68, 0x96, 0x2e, 0x86, 0xf6, 0x07, 0x2b,
+	0xe5, 0xeb, 0x8f, 0xf1, 0x6b, 0x50, 0x33, 0xef, 0x8c, 0x67, 0x37, 0xaa, 0x0c, 0xb5, 0xfd, 0xfe,
+	0x2a, 0xd5, 0xb4, 0x34, 0xbf, 0xe5, 0x67, 0xb7, 0x34, 0x72, 0x9b, 0x65, 0xce, 0x9c, 0xa5, 0xa5,
+	0x39, 0xe4, 0x9b, 0x96, 0x86, 0x9a, 0x63, 0x99, 0x33, 0xd6, 0x76, 0xf9, 0x27, 0x79, 0x1b, 0x8f,
+	0xbe, 0x38, 0xbb, 0xb0, 0xad, 0xf3, 0x0b, 0xdb, 0xfa, 0xff, 0xc2, 0xb6, 0x7e, 0xbb, 0xb4, 0x0b,
+	0xe7, 0x97, 0x76, 0xe1, 0x9f, 0x4b, 0xbb, 0xf0, 0xed, 0x87, 0x7e, 0x20, 0x8e, 0xd3, 0xa3, 0x81,
+	0x4b, 0xa3, 0xa1, 0x34, 0xf4, 0x43, 0x7a, 0x84, 0x43, 0xf5, 0xf8, 0xdc, 0xb8, 0xa3, 0xc5, 0x34,
+	0x21, 0xfc, 0xa8, 0xa2, 0xfe, 0xb1, 0xf8, 0xf8, 0x6d, 0x00, 0x00, 0x00, 0xff, 0xff, 0xac, 0x36,
+	0xeb, 0x02, 0x11, 0x09, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -175,6 +712,9 @@ type MsgClient interface {
 	// UpdateParams defines a (governance) operation for updating the module
 	// parameters. The authority defaults to the x/gov module account.
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
+	CreateLease(ctx context.Context, in *MsgCreateLease, opts ...grpc.CallOption) (*MsgCreateLeaseResponse, error)
+	UpdateLease(ctx context.Context, in *MsgUpdateLease, opts ...grpc.CallOption) (*MsgUpdateLeaseResponse, error)
+	DeleteLease(ctx context.Context, in *MsgDeleteLease, opts ...grpc.CallOption) (*MsgDeleteLeaseResponse, error)
 }
 
 type msgClient struct {
@@ -194,11 +734,41 @@ func (c *msgClient) UpdateParams(ctx context.Context, in *MsgUpdateParams, opts 
 	return out, nil
 }
 
+func (c *msgClient) CreateLease(ctx context.Context, in *MsgCreateLease, opts ...grpc.CallOption) (*MsgCreateLeaseResponse, error) {
+	out := new(MsgCreateLeaseResponse)
+	err := c.cc.Invoke(ctx, "/ardapoc.rent.Msg/CreateLease", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) UpdateLease(ctx context.Context, in *MsgUpdateLease, opts ...grpc.CallOption) (*MsgUpdateLeaseResponse, error) {
+	out := new(MsgUpdateLeaseResponse)
+	err := c.cc.Invoke(ctx, "/ardapoc.rent.Msg/UpdateLease", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) DeleteLease(ctx context.Context, in *MsgDeleteLease, opts ...grpc.CallOption) (*MsgDeleteLeaseResponse, error) {
+	out := new(MsgDeleteLeaseResponse)
+	err := c.cc.Invoke(ctx, "/ardapoc.rent.Msg/DeleteLease", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	// UpdateParams defines a (governance) operation for updating the module
 	// parameters. The authority defaults to the x/gov module account.
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
+	CreateLease(context.Context, *MsgCreateLease) (*MsgCreateLeaseResponse, error)
+	UpdateLease(context.Context, *MsgUpdateLease) (*MsgUpdateLeaseResponse, error)
+	DeleteLease(context.Context, *MsgDeleteLease) (*MsgDeleteLeaseResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -207,6 +777,15 @@ type UnimplementedMsgServer struct {
 
 func (*UnimplementedMsgServer) UpdateParams(ctx context.Context, req *MsgUpdateParams) (*MsgUpdateParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateParams not implemented")
+}
+func (*UnimplementedMsgServer) CreateLease(ctx context.Context, req *MsgCreateLease) (*MsgCreateLeaseResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateLease not implemented")
+}
+func (*UnimplementedMsgServer) UpdateLease(ctx context.Context, req *MsgUpdateLease) (*MsgUpdateLeaseResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateLease not implemented")
+}
+func (*UnimplementedMsgServer) DeleteLease(ctx context.Context, req *MsgDeleteLease) (*MsgDeleteLeaseResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteLease not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -231,6 +810,60 @@ func _Msg_UpdateParams_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_CreateLease_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgCreateLease)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).CreateLease(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ardapoc.rent.Msg/CreateLease",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).CreateLease(ctx, req.(*MsgCreateLease))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_UpdateLease_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateLease)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).UpdateLease(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ardapoc.rent.Msg/UpdateLease",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).UpdateLease(ctx, req.(*MsgUpdateLease))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_DeleteLease_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgDeleteLease)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).DeleteLease(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ardapoc.rent.Msg/DeleteLease",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).DeleteLease(ctx, req.(*MsgDeleteLease))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var Msg_serviceDesc = _Msg_serviceDesc
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "ardapoc.rent.Msg",
@@ -239,6 +872,18 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateParams",
 			Handler:    _Msg_UpdateParams_Handler,
+		},
+		{
+			MethodName: "CreateLease",
+			Handler:    _Msg_CreateLease_Handler,
+		},
+		{
+			MethodName: "UpdateLease",
+			Handler:    _Msg_UpdateLease_Handler,
+		},
+		{
+			MethodName: "DeleteLease",
+			Handler:    _Msg_DeleteLease_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -308,6 +953,392 @@ func (m *MsgUpdateParamsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgCreateLease) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgCreateLease) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgCreateLease) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.CancellationRequirements) > 0 {
+		i -= len(m.CancellationRequirements)
+		copy(dAtA[i:], m.CancellationRequirements)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.CancellationRequirements)))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x82
+	}
+	if len(m.PaymentTerms) > 0 {
+		i -= len(m.PaymentTerms)
+		copy(dAtA[i:], m.PaymentTerms)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.PaymentTerms)))
+		i--
+		dAtA[i] = 0x7a
+	}
+	if m.LastPaymentBlock != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.LastPaymentBlock))
+		i--
+		dAtA[i] = 0x70
+	}
+	if m.CancellationDeadline != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.CancellationDeadline))
+		i--
+		dAtA[i] = 0x68
+	}
+	if len(m.CancellationInitiator) > 0 {
+		i -= len(m.CancellationInitiator)
+		copy(dAtA[i:], m.CancellationInitiator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.CancellationInitiator)))
+		i--
+		dAtA[i] = 0x62
+	}
+	if m.CancellationPending {
+		i--
+		if m.CancellationPending {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x58
+	}
+	if m.RecurringStatus {
+		i--
+		if m.RecurringStatus {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x50
+	}
+	if len(m.TermLength) > 0 {
+		i -= len(m.TermLength)
+		copy(dAtA[i:], m.TermLength)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.TermLength)))
+		i--
+		dAtA[i] = 0x4a
+	}
+	if len(m.PaymentsOutstanding) > 0 {
+		i -= len(m.PaymentsOutstanding)
+		copy(dAtA[i:], m.PaymentsOutstanding)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.PaymentsOutstanding)))
+		i--
+		dAtA[i] = 0x42
+	}
+	if m.TimePeriod != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.TimePeriod))
+		i--
+		dAtA[i] = 0x38
+	}
+	if len(m.Status) > 0 {
+		i -= len(m.Status)
+		copy(dAtA[i:], m.Status)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Status)))
+		i--
+		dAtA[i] = 0x32
+	}
+	if len(m.RentDueDate) > 0 {
+		i -= len(m.RentDueDate)
+		copy(dAtA[i:], m.RentDueDate)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.RentDueDate)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if m.RentAmount != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.RentAmount))
+		i--
+		dAtA[i] = 0x20
+	}
+	if len(m.Tenant) > 0 {
+		i -= len(m.Tenant)
+		copy(dAtA[i:], m.Tenant)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Tenant)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.PropertyId) > 0 {
+		i -= len(m.PropertyId)
+		copy(dAtA[i:], m.PropertyId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.PropertyId)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgCreateLeaseResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgCreateLeaseResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgCreateLeaseResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Id != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.Id))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUpdateLease) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpdateLease) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateLease) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.CancellationRequirements) > 0 {
+		i -= len(m.CancellationRequirements)
+		copy(dAtA[i:], m.CancellationRequirements)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.CancellationRequirements)))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x8a
+	}
+	if len(m.PaymentTerms) > 0 {
+		i -= len(m.PaymentTerms)
+		copy(dAtA[i:], m.PaymentTerms)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.PaymentTerms)))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x82
+	}
+	if m.LastPaymentBlock != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.LastPaymentBlock))
+		i--
+		dAtA[i] = 0x78
+	}
+	if m.CancellationDeadline != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.CancellationDeadline))
+		i--
+		dAtA[i] = 0x70
+	}
+	if len(m.CancellationInitiator) > 0 {
+		i -= len(m.CancellationInitiator)
+		copy(dAtA[i:], m.CancellationInitiator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.CancellationInitiator)))
+		i--
+		dAtA[i] = 0x6a
+	}
+	if m.CancellationPending {
+		i--
+		if m.CancellationPending {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x60
+	}
+	if m.RecurringStatus {
+		i--
+		if m.RecurringStatus {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x58
+	}
+	if len(m.TermLength) > 0 {
+		i -= len(m.TermLength)
+		copy(dAtA[i:], m.TermLength)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.TermLength)))
+		i--
+		dAtA[i] = 0x52
+	}
+	if len(m.PaymentsOutstanding) > 0 {
+		i -= len(m.PaymentsOutstanding)
+		copy(dAtA[i:], m.PaymentsOutstanding)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.PaymentsOutstanding)))
+		i--
+		dAtA[i] = 0x4a
+	}
+	if m.TimePeriod != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.TimePeriod))
+		i--
+		dAtA[i] = 0x40
+	}
+	if len(m.Status) > 0 {
+		i -= len(m.Status)
+		copy(dAtA[i:], m.Status)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Status)))
+		i--
+		dAtA[i] = 0x3a
+	}
+	if len(m.RentDueDate) > 0 {
+		i -= len(m.RentDueDate)
+		copy(dAtA[i:], m.RentDueDate)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.RentDueDate)))
+		i--
+		dAtA[i] = 0x32
+	}
+	if m.RentAmount != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.RentAmount))
+		i--
+		dAtA[i] = 0x28
+	}
+	if len(m.Tenant) > 0 {
+		i -= len(m.Tenant)
+		copy(dAtA[i:], m.Tenant)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Tenant)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.PropertyId) > 0 {
+		i -= len(m.PropertyId)
+		copy(dAtA[i:], m.PropertyId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.PropertyId)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.Id != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.Id))
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUpdateLeaseResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpdateLeaseResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateLeaseResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgDeleteLease) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgDeleteLease) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgDeleteLease) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Id != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.Id))
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgDeleteLeaseResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgDeleteLeaseResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgDeleteLeaseResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTx(v)
 	base := offset
@@ -335,6 +1366,189 @@ func (m *MsgUpdateParams) Size() (n int) {
 }
 
 func (m *MsgUpdateParamsResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgCreateLease) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.PropertyId)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Tenant)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.RentAmount != 0 {
+		n += 1 + sovTx(uint64(m.RentAmount))
+	}
+	l = len(m.RentDueDate)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Status)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.TimePeriod != 0 {
+		n += 1 + sovTx(uint64(m.TimePeriod))
+	}
+	l = len(m.PaymentsOutstanding)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.TermLength)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.RecurringStatus {
+		n += 2
+	}
+	if m.CancellationPending {
+		n += 2
+	}
+	l = len(m.CancellationInitiator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.CancellationDeadline != 0 {
+		n += 1 + sovTx(uint64(m.CancellationDeadline))
+	}
+	if m.LastPaymentBlock != 0 {
+		n += 1 + sovTx(uint64(m.LastPaymentBlock))
+	}
+	l = len(m.PaymentTerms)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.CancellationRequirements)
+	if l > 0 {
+		n += 2 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgCreateLeaseResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Id != 0 {
+		n += 1 + sovTx(uint64(m.Id))
+	}
+	return n
+}
+
+func (m *MsgUpdateLease) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.Id != 0 {
+		n += 1 + sovTx(uint64(m.Id))
+	}
+	l = len(m.PropertyId)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Tenant)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.RentAmount != 0 {
+		n += 1 + sovTx(uint64(m.RentAmount))
+	}
+	l = len(m.RentDueDate)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Status)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.TimePeriod != 0 {
+		n += 1 + sovTx(uint64(m.TimePeriod))
+	}
+	l = len(m.PaymentsOutstanding)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.TermLength)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.RecurringStatus {
+		n += 2
+	}
+	if m.CancellationPending {
+		n += 2
+	}
+	l = len(m.CancellationInitiator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.CancellationDeadline != 0 {
+		n += 1 + sovTx(uint64(m.CancellationDeadline))
+	}
+	if m.LastPaymentBlock != 0 {
+		n += 1 + sovTx(uint64(m.LastPaymentBlock))
+	}
+	l = len(m.PaymentTerms)
+	if l > 0 {
+		n += 2 + l + sovTx(uint64(l))
+	}
+	l = len(m.CancellationRequirements)
+	if l > 0 {
+		n += 2 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgUpdateLeaseResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgDeleteLease) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.Id != 0 {
+		n += 1 + sovTx(uint64(m.Id))
+	}
+	return n
+}
+
+func (m *MsgDeleteLeaseResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -491,6 +1705,1267 @@ func (m *MsgUpdateParamsResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: MsgUpdateParamsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgCreateLease) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgCreateLease: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgCreateLease: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PropertyId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PropertyId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Tenant", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Tenant = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RentAmount", wireType)
+			}
+			m.RentAmount = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.RentAmount |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RentDueDate", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RentDueDate = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Status = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 7:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TimePeriod", wireType)
+			}
+			m.TimePeriod = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.TimePeriod |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PaymentsOutstanding", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PaymentsOutstanding = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 9:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TermLength", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TermLength = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 10:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RecurringStatus", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.RecurringStatus = bool(v != 0)
+		case 11:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CancellationPending", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.CancellationPending = bool(v != 0)
+		case 12:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CancellationInitiator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CancellationInitiator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 13:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CancellationDeadline", wireType)
+			}
+			m.CancellationDeadline = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.CancellationDeadline |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 14:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LastPaymentBlock", wireType)
+			}
+			m.LastPaymentBlock = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.LastPaymentBlock |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 15:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PaymentTerms", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PaymentTerms = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 16:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CancellationRequirements", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CancellationRequirements = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgCreateLeaseResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgCreateLeaseResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgCreateLeaseResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			m.Id = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Id |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateLease) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateLease: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateLease: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			m.Id = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Id |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PropertyId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PropertyId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Tenant", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Tenant = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RentAmount", wireType)
+			}
+			m.RentAmount = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.RentAmount |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RentDueDate", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RentDueDate = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Status = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 8:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TimePeriod", wireType)
+			}
+			m.TimePeriod = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.TimePeriod |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 9:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PaymentsOutstanding", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PaymentsOutstanding = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 10:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TermLength", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TermLength = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 11:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RecurringStatus", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.RecurringStatus = bool(v != 0)
+		case 12:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CancellationPending", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.CancellationPending = bool(v != 0)
+		case 13:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CancellationInitiator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CancellationInitiator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 14:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CancellationDeadline", wireType)
+			}
+			m.CancellationDeadline = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.CancellationDeadline |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 15:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LastPaymentBlock", wireType)
+			}
+			m.LastPaymentBlock = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.LastPaymentBlock |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 16:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PaymentTerms", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PaymentTerms = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 17:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CancellationRequirements", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CancellationRequirements = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateLeaseResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateLeaseResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateLeaseResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgDeleteLease) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgDeleteLease: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgDeleteLease: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			m.Id = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Id |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgDeleteLeaseResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgDeleteLeaseResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgDeleteLeaseResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
