@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"math/rand"
 	"strings"
+	"time"
 
 	propertytypes "github.com/ardaglobal/arda-poc/x/property/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/google/uuid"
 	zlog "github.com/rs/zerolog/log"
 )
 
@@ -47,6 +49,51 @@ func intToUint64Slice(v []int) []uint64 {
 	return u
 }
 
+// createOffPlanProperty generates an off plan property for a random developer.
+func (s *Server) createOffPlanProperty(developerUsers []string) error {
+	if len(developerUsers) == 0 {
+		return fmt.Errorf("no developers available")
+	}
+	dev := developerUsers[rand.Intn(len(developerUsers))]
+	addr := fmt.Sprintf("%d Future Rd", rand.Intn(9000)+100)
+	value := uint64(rand.Intn(900000) + 1000000)
+	prop := OffPlanProperty{
+		ID:          uuid.New().String(),
+		Address:     addr,
+		Region:      "dubai",
+		Value:       value,
+		TotalShares: 100,
+		Status:      "for_sale",
+		Developer:   dev,
+	}
+	s.offPlanProperties = append(s.offPlanProperties, prop)
+	return s.saveOffPlanPropertiesToFile()
+}
+
+// listPropertyForSale creates a local for-sale listing for a property.
+func (s *Server) listPropertyForSale(p *Property) error {
+	if len(p.Owners) == 0 {
+		return fmt.Errorf("property has no owners")
+	}
+	idx := rand.Intn(len(p.Owners))
+	owner := p.Owners[idx]
+	owned := p.Shares[idx]
+	if owned == 0 {
+		return nil
+	}
+	shareAmt := rand.Intn(owned) + 1
+	listing := ForSaleProperty{
+		ID:         uuid.New().String(),
+		PropertyID: strings.ToLower(p.Address),
+		Owner:      owner,
+		Shares:     []uint64{uint64(shareAmt)},
+		Price:      uint64(p.Value),
+		Status:     "listed",
+	}
+	s.forSaleProperties = append(s.forSaleProperties, listing)
+	return s.saveForSalePropertiesToFile()
+}
+
 // registerProperty creates a new property with random data and sends the CLI command.
 func (s *Server) registerProperty(ctx context.Context, users []string) (Property, error) {
 	address := fmt.Sprintf("%d Main St", rand.Intn(9000)+100)
@@ -83,7 +130,7 @@ func (s *Server) registerProperty(ctx context.Context, users []string) (Property
 		)
 	}
 
-	_, err := s.buildSignAndBroadcastInternal(ctx, fromName, "auto", "register_property", msgBuilder)
+	_, err := s.buildSignAndBroadcastInternal(ctx, fromName, "register_property", msgBuilder)
 	if err != nil {
 		return Property{}, fmt.Errorf("autoproperty failed to register property: %w", err)
 	}
@@ -182,7 +229,7 @@ func (s *Server) transferShares(ctx context.Context, p *Property, investorUsers 
 		)
 	}
 
-	_, err := s.buildSignAndBroadcastInternal(ctx, fromName, "auto", "transfer_shares", msgBuilder)
+	_, err := s.buildSignAndBroadcastInternal(ctx, fromName, "transfer_shares", msgBuilder)
 	if err != nil {
 		return fmt.Errorf("autoproperty failed to transfer shares: %w", err)
 	}
@@ -254,7 +301,7 @@ func (s *Server) autoEditPropertyMetadata(ctx context.Context, p *Property) erro
 		)
 	}
 
-	_, err := s.buildSignAndBroadcastInternal(ctx, fromName, "auto", "edit_property_metadata", msgBuilder)
+	_, err := s.buildSignAndBroadcastInternal(ctx, fromName, "edit_property_metadata", msgBuilder)
 	if err != nil {
 		return fmt.Errorf("autoproperty failed to edit property metadata: %w", err)
 	}
@@ -274,32 +321,45 @@ func (s *Server) RunAutoProperty(developerUsers, investorUsers []string) {
 		return
 	}
 
-	var properties []Property
 	ctx := context.Background()
 
-	for i := 0; i < 10; i++ {
-		zlog.Info().Msg("AutoProperty: Registering property...")
+	// Initial setup: create two off plan properties
+	for i := 0; i < 2; i++ {
+		if err := s.createOffPlanProperty(developerUsers); err != nil {
+			zlog.Error().Err(err).Msg("autoproperty create off plan")
+		}
+	}
+
+	// Continuous property creation loop
+	for {
+		zlog.Info().Msg("AutoProperty: Adding a new property...")
+
+		// Register a new property
 		p, err := s.registerProperty(ctx, developerUsers)
 		if err != nil {
 			zlog.Error().Err(err).Msg("autoproperty register property")
-		} else {
-			properties = append(properties, p)
-
-			// Also edit the property's metadata with placeholder info.
-			zlog.Info().Msg("AutoProperty: Editing property metadata...")
-			if err := s.autoEditPropertyMetadata(ctx, &properties[len(properties)-1]); err != nil {
-				zlog.Error().Err(err).Msg("autoproperty edit metadata")
-			}
+			time.Sleep(10 * time.Second)
+			continue
 		}
 
-		if len(properties) > 0 {
-			zlog.Info().Msg("AutoProperty: Creating transfer...")
-			randIdx := rand.Intn(len(properties))
-			err := s.transferShares(ctx, &properties[randIdx], investorUsers)
-			if err != nil {
+		// Edit property metadata
+		zlog.Info().Msg("AutoProperty: Editing property metadata...")
+		if err := s.autoEditPropertyMetadata(ctx, &p); err != nil {
+			zlog.Error().Err(err).Msg("autoproperty edit metadata")
+		}
+
+		// Randomly decide to list for sale or transfer shares
+		if rand.Intn(2) == 0 {
+			if err := s.listPropertyForSale(&p); err != nil {
+				zlog.Error().Err(err).Msg("autoproperty list for sale")
+			}
+		} else {
+			if err := s.transferShares(ctx, &p, investorUsers); err != nil {
 				zlog.Error().Err(err).Msg("autoproperty transfer")
 			}
 		}
+
+		zlog.Info().Msg("AutoProperty: Done with this property. Waiting 10 seconds before next one...")
+		time.Sleep(10 * time.Second)
 	}
-	zlog.Info().Msg("AutoProperty: Done")
 }

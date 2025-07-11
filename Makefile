@@ -1,6 +1,6 @@
 			BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 COMMIT := $(shell git log -1 --format='%H')
-APPNAME := arda
+APPNAME := arda-poc
 
 # don't override user values
 ifeq (,$(VERSION))
@@ -128,6 +128,7 @@ setup-dev: setup-script proto-deps
 	@go install golang.org/x/vuln/cmd/govulncheck@latest
 	@go install golang.org/x/tools/cmd/goimports@latest
 	@go install github.com/swaggo/swag/cmd/swag@latest
+	@go install github.com/air-verse/air@latest
 .PHONY: setup-dev
 
 ###################
@@ -139,9 +140,9 @@ dev:
 	@ignite chain serve 
 .PHONY: dev
 
-dev-sidecar: sidecar-docs
-	@echo "--> Running dev-sidecar"
-	@go run ./cmd/tx-sidecar
+dev-sidecar:
+	@echo "--> Running dev-sidecar with Air hot reload"
+	@air -c .air.toml
 .PHONY: dev-sidecar
 
 sidecar-docs:
@@ -160,8 +161,12 @@ govulncheck:
 .PHONY: govet govulncheck
 
 clean:
-	rm -rf ~/.arda-poc
-	rm users.json
-	rm logins.json
-	rm tx.json
+	rm -rf ~/.$(APPNAME)
+	rm -rf cmd/tx-sidecar/local_data
 .PHONY: clean
+
+# prod assumes the chain binary has been built and initialized. For example you might run `make dev` first while testing a feature, and then make prod to do integration testing with the sidecar.
+prod:
+	cp config.toml ~/.$(APPNAME)/config/config.toml
+	$(APPNAME)d start
+.PHONY: prod

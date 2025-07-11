@@ -48,7 +48,6 @@ type MortgageRequestPayload struct {
 	Amount       uint64 `json:"amount"`
 	InterestRate string `json:"interest_rate"`
 	Term         string `json:"term"`
-	Gas          string `json:"gas,omitempty"`
 
 	// Property purchase details
 	PropertyID string   `json:"property_id"`
@@ -64,15 +63,19 @@ type MortgageRequestPayload struct {
 type RepayMortgageRequest struct {
 	MortgageID string `json:"mortgage_id"`
 	Amount     uint64 `json:"amount"`
-	Gas        string `json:"gas,omitempty"`
+}
+
+// CreateMortgageByIDRequest defines the request body for creating a mortgage by ID.
+type CreateMortgageByIDRequest struct {
+	ID string `json:"id"`
 }
 
 // createMortgageHandler handles the creation of a mortgage, approving a pending request.
 // @Summary Create a mortgage (lender)
-// @Description Submits a transaction to create a new mortgage, effectively approving a pending request. This must be called by the **lender**, who must be logged in. The sidecar will use the logged-in user's account to sign the transaction, funding the mortgage from their account. The details in the request body should match the details from a pending mortgage request.
+// @Description Submits a transaction to create a new mortgage, effectively approving a pending request. This must be called by the **lender**, who must be logged in. The sidecar will use the logged-in user's account to sign the transaction, funding the mortgage from their account. The request body should only contain the ID of a pending mortgage request.
 // @Accept json
 // @Produce json
-// @Param request body MortgageRequestPayload true "mortgage details (with property purchase details)"
+// @Param request body CreateMortgageByIDRequest true "mortgage request ID"
 // @Success 200 {object} map[string]string{tx_hash=string}
 // @Router /bank/mortgage/create [post]
 func (s *Server) createMortgageHandler(w http.ResponseWriter, r *http.Request) {
@@ -86,58 +89,76 @@ func (s *Server) createMortgageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req MortgageRequestPayload
+	var req CreateMortgageByIDRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		zlog.Error().Err(err).Msg("failed to decode request body")
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
 	zlog.Info().Str("handler", "createMortgageHandler").Interface("request", req).Msg("received request")
 
+	// Find the mortgage request by ID
+	var mr *MortgageRequest
+	for i := range s.mortgageRequests {
+		if s.mortgageRequests[i].ID == req.ID {
+			mr = &s.mortgageRequests[i]
+			break
+		}
+	}
+	if mr == nil {
+		http.Error(w, "Mortgage request not found", http.StatusNotFound)
+		return
+	}
+	if mr.Status != "pending" {
+		http.Error(w, "Mortgage request is not pending", http.StatusBadRequest)
+		return
+	}
+	if mr.Lender != s.loggedInUser {
+		http.Error(w, "Only the lender assigned to this request can approve it", http.StatusUnauthorized)
+		return
+	}
+
 	fromName := s.loggedInUser
 	msgBuilder := func(fromAddr string) sdk.Msg {
 		return mortgagetypes.NewMsgCreateMortgage(
 			fromAddr, // creator
-			req.Index,
+			mr.Index,
 			fromAddr, // lender is the creator
-			req.Lendee,
-			req.Collateral,
-			req.Amount,
-			req.InterestRate,
-			req.Term,
+			mr.LendeeAddr,
+			mr.Collateral,
+			mr.Amount,
+			mr.InterestRate,
+			mr.Term,
 		)
 	}
 
-	txHash, err := s.buildSignAndBroadcastInternal(r.Context(), fromName, req.Gas, "create_mortgage", msgBuilder)
+	txHash, err := s.buildSignAndBroadcastInternal(r.Context(), fromName, "create_mortgage", msgBuilder)
 	if err != nil {
+		zlog.Error().Err(err).Msg("failed to build sign and broadcast")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	// After successfully broadcasting, update the original request's status
-	for i, mr := range s.mortgageRequests {
-		if mr.Index == req.Index && mr.Lender == fromName && mr.Status == "pending" {
-			s.mortgageRequests[i].Status = "completed"
-			// After mortgage approval, immediately send transfer shares request if property purchase details are present
-			if req.Index != "equity" {
-				if req.PropertyID != "" && len(req.FromOwners) > 0 && len(req.FromShares) > 0 && len(req.ToOwners) > 0 && len(req.ToShares) > 0 {
-					transferReq := TransferSharesRequest{
-						PropertyID: req.PropertyID,
-						FromOwners: req.FromOwners,
-						FromShares: req.FromShares,
-						ToOwners:   req.ToOwners,
-						ToShares:   req.ToShares,
-					}
-					transferReqBody, _ := json.Marshal(transferReq)
-					r2 := &http.Request{Body: io.NopCloser(strings.NewReader(string(transferReqBody))), Method: http.MethodPost}
-					s.transferSharesHandler(w, r2)
-				}
+	mr.Status = "completed"
+	// After mortgage approval, immediately send transfer shares request if property purchase details are present
+	if mr.Index != "equity" {
+		if mr.PropertyID != "" && len(mr.FromOwners) > 0 && len(mr.FromShares) > 0 && len(mr.ToOwners) > 0 && len(mr.ToShares) > 0 {
+			transferReq := TransferSharesRequest{
+				PropertyID: mr.PropertyID,
+				FromOwners: mr.FromOwners,
+				FromShares: mr.FromShares,
+				ToOwners:   mr.ToOwners,
+				ToShares:   mr.ToShares,
 			}
-			if err := s.saveMortgageRequestsToFile(); err != nil {
-				zlog.Error().Err(err).Msgf("failed to update status for mortgage request index %s", req.Index)
-			}
-			break // Assume index is unique per lender
+			transferReqBody, _ := json.Marshal(transferReq)
+			r2 := &http.Request{Body: io.NopCloser(strings.NewReader(string(transferReqBody))), Method: http.MethodPost}
+			s.transferSharesHandler(w, r2)
 		}
+	}
+	if err := s.saveMortgageRequestsToFile(); err != nil {
+		zlog.Error().Err(err).Msgf("failed to update status for mortgage request id %s", mr.ID)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -180,7 +201,7 @@ func (s *Server) repayMortgageHandler(w http.ResponseWriter, r *http.Request) {
 		)
 	}
 
-	s.buildSignAndBroadcast(w, r, fromName, req.Gas, "repay_mortgage", msgBuilder)
+	s.buildSignAndBroadcast(w, r, fromName, "repay_mortgage", msgBuilder)
 }
 
 // RequestFundsRequest defines the request body for requesting funds from the bank.
@@ -188,7 +209,6 @@ type RequestFundsRequest struct {
 	Address string `json:"address"`
 	Amount  uint64 `json:"amount"`
 	Denom   string `json:"denom"`
-	Gas     string `json:"gas,omitempty"`
 }
 
 // requestFundsHandler requests funds from the built-in faucet.
@@ -232,7 +252,7 @@ func (s *Server) requestFundsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	s.buildSignAndBroadcast(w, r, fromName, req.Gas, "request_funds", msgBuilder)
+	s.buildSignAndBroadcast(w, r, fromName, "request_funds", msgBuilder)
 }
 
 // requestMortgageHandler allows a user to request a mortgage from a lender.
@@ -256,6 +276,7 @@ func (s *Server) requestMortgageHandler(w http.ResponseWriter, r *http.Request) 
 
 	var req MortgageRequestPayload
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		zlog.Error().Err(err).Msg("failed to decode request body")
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
@@ -264,6 +285,7 @@ func (s *Server) requestMortgageHandler(w http.ResponseWriter, r *http.Request) 
 
 	// Validate that the lender exists
 	if _, ok := s.users[req.Lender]; !ok {
+		zlog.Error().Str("lender", req.Lender).Msg("lender not found")
 		http.Error(w, fmt.Sprintf("Lender '%s' not found.", req.Lender), http.StatusBadRequest)
 		return
 	}
@@ -346,33 +368,26 @@ func (s *Server) getMortgageRequestsHandler(w http.ResponseWriter, r *http.Reque
 // @Router /bank/mortgage/request-equity [post]
 func (s *Server) requestEquityMortgageHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
+		zlog.Error().Msg("invalid request method")
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
 	if s.loggedInUser == "" {
+		zlog.Error().Msg("no user is logged in")
 		http.Error(w, "No user is logged in. Please log in to request a home equity mortgage.", http.StatusUnauthorized)
 		return
 	}
 	var req MortgageRequestPayload
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		zlog.Error().Err(err).Msg("failed to decode request body")
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
+	zlog.Info().Str("handler", "requestEquityMortgageHandler").Interface("request", req).Msg("received request")
 	// Validate that the lender exists
 	if _, ok := s.users[req.Lender]; !ok {
+		zlog.Error().Str("lender", req.Lender).Msg("lender not found")
 		http.Error(w, "Lender not found.", http.StatusBadRequest)
-		return
-	}
-	// Validate that the requester owns the property (simple check: must be in ToOwners)
-	ownsProperty := false
-	for _, owner := range req.ToOwners {
-		if owner == s.loggedInUser {
-			ownsProperty = true
-			break
-		}
-	}
-	if !ownsProperty {
-		http.Error(w, "You must be an owner of the property to request a home equity mortgage.", http.StatusBadRequest)
 		return
 	}
 	requesterData := s.users[s.loggedInUser]

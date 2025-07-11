@@ -1,0 +1,23 @@
+# Configuration for Air live reloading
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  cmd = "go build -o ./tmp/tx-sidecar ./cmd/tx-sidecar"
+  bin = "tmp/tx-sidecar"
+  include_ext = ["go", "tpl", "tmpl", "html"]
+  include_dir = ["cmd/tx-sidecar"]
+  exclude_dir = ["tmp", "vendor", "cmd/tx-sidecar/docs", "cmd/tx-sidecar/local_data"]
+  exclude_regex = ["_test.go"]
+
+[log]
+  time = true
+
+[color]
+  main = "magenta"
+  watcher = "cyan"
+  build = "yellow"
+  runner = "green"
+
+[misc]
+  clean_on_exit = true

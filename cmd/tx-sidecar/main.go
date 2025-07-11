@@ -8,13 +8,16 @@ package main
 // @BasePath /
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strings"
+	"time"
 
 	fiberadaptor "github.com/gofiber/adaptor/v2"
 	fiber "github.com/gofiber/fiber/v2"
@@ -94,7 +97,12 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		return nil, fmt.Errorf("failed to connect to gRPC server at %s: %w", grpcAddr, err)
 	}
 
-	usersFile := "users.json"
+	dataDir := "cmd/tx-sidecar/local_data"
+	if err := os.MkdirAll(dataDir, 0755); err != nil {
+		return nil, fmt.Errorf("failed to create data directory: %w", err)
+	}
+
+	usersFile := filepath.Join(dataDir, "users.json")
 	users := make(map[string]UserData)
 
 	file, err := os.ReadFile(usersFile)
@@ -142,7 +150,7 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		}
 	}
 
-	loginsFile := "logins.json"
+	loginsFile := filepath.Join(dataDir, "logins.json")
 	logins := make(map[string]string)
 
 	loginData, err := os.ReadFile(loginsFile)
@@ -154,7 +162,7 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		return nil, fmt.Errorf("failed to read logins file: %w", err)
 	}
 
-	transactionsFile := "tx.json"
+	transactionsFile := filepath.Join(dataDir, "tx.json")
 	transactions := make([]TrackedTx, 0)
 	txData, err := os.ReadFile(transactionsFile)
 	if err == nil {
@@ -165,7 +173,7 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		return nil, fmt.Errorf("failed to read transactions file: %w", err)
 	}
 
-	mortgageRequestsFile := "mortgage_requests.json"
+	mortgageRequestsFile := filepath.Join(dataDir, "mortgage_requests.json")
 	mortgageRequests := make([]MortgageRequest, 0)
 	mrData, err := os.ReadFile(mortgageRequestsFile)
 	if err == nil {
@@ -192,7 +200,7 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		return nil, fmt.Errorf("faucet name is not defined in config.yml")
 	}
 
-	kycRequestsFile := "kyc_requests.json"
+	kycRequestsFile := filepath.Join(dataDir, "kyc_requests.json")
 	kycRequests := make([]KYCRequestEntry, 0)
 	krData, err := os.ReadFile(kycRequestsFile)
 	if err == nil {
@@ -203,7 +211,7 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		return nil, fmt.Errorf("failed to read kyc requests file: %w", err)
 	}
 
-	forSalePropertiesFile := "for_sale_properties.json"
+	forSalePropertiesFile := filepath.Join(dataDir, "for_sale_properties.json")
 	forSaleProperties := make([]ForSaleProperty, 0)
 	fspData, err := os.ReadFile(forSalePropertiesFile)
 	if err == nil {
@@ -214,7 +222,7 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		return nil, fmt.Errorf("failed to read for sale properties file: %w", err)
 	}
 
-	offPlanPropertiesFile := "offplan_properties.json"
+	offPlanPropertiesFile := filepath.Join(dataDir, "offplan_properties.json")
 	offPlanProperties := make([]OffPlanProperty, 0)
 	oppData, err := os.ReadFile(offPlanPropertiesFile)
 	if err == nil {
@@ -225,43 +233,30 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 		return nil, fmt.Errorf("failed to read off plan properties file: %w", err)
 	}
 
-	offPlanPurchaseRequestsFile := "offplan_purchase_requests.json"
-	offPlanPurchaseRequests := make([]OffPlanPurchaseRequest, 0)
-	opprData, err := os.ReadFile(offPlanPurchaseRequestsFile)
-	if err == nil {
-		if err := json.Unmarshal(opprData, &offPlanPurchaseRequests); err != nil {
-			zlog.Warn().Msgf("failed to unmarshal off plan purchase requests file, starting with empty list: %v", err)
-		}
-	} else if !os.IsNotExist(err) {
-		return nil, fmt.Errorf("failed to read off plan purchase requests file: %w", err)
-	}
-
 	s := &Server{
-		clientCtx:                   clientCtx,
-		authClient:                  authtypes.NewQueryClient(grpcConn),
-		txClient:                    txtypes.NewServiceClient(grpcConn),
-		users:                       users,
-		usersFile:                   usersFile,
-		logins:                      logins,
-		loginsFile:                  loginsFile,
-		faucetName:                  appConfig.Faucet.Name,
-		transactions:                transactions,
-		transactionsFile:            transactionsFile,
-		mortgageRequests:            mortgageRequests,
-		mortgageRequestsFile:        mortgageRequestsFile,
-		kycRequests:                 kycRequests,
-		kycRequestsFile:             kycRequestsFile,
-		forSaleProperties:           forSaleProperties,
-		forSalePropertiesFile:       forSalePropertiesFile,
-		offPlanProperties:           offPlanProperties,
-		offPlanPropertiesFile:       offPlanPropertiesFile,
-		offPlanPurchaseRequests:     offPlanPurchaseRequests,
-		offPlanPurchaseRequestsFile: offPlanPurchaseRequestsFile,
+		clientCtx:             clientCtx,
+		authClient:            authtypes.NewQueryClient(grpcConn),
+		txClient:              txtypes.NewServiceClient(grpcConn),
+		users:                 users,
+		usersFile:             usersFile,
+		logins:                logins,
+		loginsFile:            loginsFile,
+		faucetName:            appConfig.Faucet.Name,
+		transactions:          transactions,
+		transactionsFile:      transactionsFile,
+		mortgageRequests:      mortgageRequests,
+		mortgageRequestsFile:  mortgageRequestsFile,
+		kycRequests:           kycRequests,
+		kycRequestsFile:       kycRequestsFile,
+		forSaleProperties:     forSaleProperties,
+		forSalePropertiesFile: forSalePropertiesFile,
+		offPlanProperties:     offPlanProperties,
+		offPlanPropertiesFile: offPlanPropertiesFile,
 	}
 
 	// Ensure that the faucet account from config exists in the keyring.
 	if _, err := s.clientCtx.Keyring.Key(s.faucetName); err != nil {
-		return nil, fmt.Errorf("faucet user '%s' from config.yml not found in keyring: %w", s.faucetName, err)
+		zlog.Warn().Msgf("faucet user '%s' from config.yml not found in keyring: %v", s.faucetName, err)
 	}
 	zlog.Info().Msgf("Using '%s' as the faucet account.", s.faucetName)
 
@@ -393,6 +388,67 @@ func getMortgagesPassthrough(c *fiber.Ctx) error {
 	return passthroughGET("/ardaglobal/arda-poc/mortgage/mortgage", c)
 }
 
+// isBlockchainRunning checks if both the blockchain REST API and gRPC API are accessible
+func isBlockchainRunning() bool {
+	// Check REST API
+	baseURL := os.Getenv("BLOCKCHAIN_REST_API_URL")
+	if baseURL == "" {
+		baseURL = "http://localhost:1317"
+	}
+	restURL := baseURL + "/cosmos/base/tendermint/v1beta1/node_info"
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, "GET", restURL, nil)
+	if err != nil {
+		return false
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return false
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return false
+	}
+
+	// Check gRPC API
+	grpcHost := "localhost"
+	if strings.Contains(baseURL, "://") {
+		if u, err := url.Parse(baseURL); err == nil {
+			grpcHost = u.Hostname()
+		}
+	}
+	grpcAddr := fmt.Sprintf("%s:9090", grpcHost)
+
+	// Try to establish a gRPC connection
+	grpcConn, err := grpc.Dial(grpcAddr, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock(), grpc.WithTimeout(5*time.Second))
+	if err != nil {
+		return false
+	}
+	defer grpcConn.Close()
+
+	return true
+}
+
+// waitForBlockchain waits for the blockchain to be ready before proceeding
+func waitForBlockchain() {
+	zlog.Info().Msg("Waiting for blockchain to be ready...")
+
+	for {
+		if isBlockchainRunning() {
+			zlog.Info().Msg("Blockchain is ready!")
+			return
+		}
+
+		zlog.Info().Msg("Blockchain not ready yet, waiting 5 seconds...")
+		time.Sleep(5 * time.Second)
+	}
+}
+
 func main() {
 	// Load .env file if present
 	_ = godotenv.Load()
@@ -426,10 +482,28 @@ func main() {
 			investorUsers = append(investorUsers, name)
 		}
 	}
-	go server.RunAutoProperty(developerUsers, investorUsers)
+
+	// Start auto property system in a goroutine that waits for blockchain readiness
+	go func() {
+		waitForBlockchain()
+		server.RunAutoProperty(developerUsers, investorUsers)
+	}()
 
 	app := fiber.New()
-	app.Use(fibercors.New())
+
+	// Get allowed origins from environment variable, default to "*" if not set
+	allowedOrigins := os.Getenv("ALLOWED_ORIGINS")
+	if allowedOrigins == "" {
+		allowedOrigins = "*"
+	}
+
+	zlog.Info().Msgf("CORS allowed origins: %s", allowedOrigins)
+	allowCredentials := os.Getenv("ALLOW_CREDENTIALS") == "true"
+
+	app.Use(fibercors.New(fibercors.Config{
+		AllowOrigins:     allowedOrigins,
+		AllowCredentials: allowCredentials,
+	}))
 
 	app.Get("/swagger/*", fiberSwagger.HandlerDefault)
 
@@ -437,6 +511,7 @@ func main() {
 	app.Get("/user/list", fiberadaptor.HTTPHandlerFunc(server.listUsersHandler))
 	app.Post("/user/login", fiberadaptor.HTTPHandlerFunc(server.loginHandler))
 	app.Post("/user/logout", fiberadaptor.HTTPHandlerFunc(server.logoutHandler))
+	app.Get("/user/status", fiberadaptor.HTTPHandlerFunc(server.loginStatusHandler))
 
 	// Property routes
 	app.Post("/property/register", fiberadaptor.HTTPHandlerFunc(server.registerPropertyHandler))
@@ -446,9 +521,9 @@ func main() {
 	app.Get("/property/for-sale", fiberadaptor.HTTPHandlerFunc(server.getPropertiesForSaleHandler))
 
 	// Off plan property routes
+	app.Get("/property/offplans", fiberadaptor.HTTPHandlerFunc(server.getOffPlanPropertiesHandler))
 	app.Post("/property/offplan", fiberadaptor.HTTPHandlerFunc(server.postOffPlanPropertyHandler))
 	app.Post("/property/offplan/purchase-request", fiberadaptor.HTTPHandlerFunc(server.postOffPlanPurchaseRequestHandler))
-	app.Get("/property/offplan/purchase-requests", fiberadaptor.HTTPHandlerFunc(server.getOffPlanPurchaseRequestsHandler))
 	app.Post("/property/offplan/approve", fiberadaptor.HTTPHandlerFunc(server.approveOffPlanPropertyHandler))
 
 	// Bank/mortgage routes

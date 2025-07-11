@@ -96,7 +96,7 @@ const docTemplate = `{
         },
         "/bank/mortgage/create": {
             "post": {
-                "description": "Submits a transaction to create a new mortgage, effectively approving a pending request. This must be called by the **lender**, who must be logged in. The sidecar will use the logged-in user's account to sign the transaction, funding the mortgage from their account. The details in the request body should match the details from a pending mortgage request.",
+                "description": "Submits a transaction to create a new mortgage, effectively approving a pending request. This must be called by the **lender**, who must be logged in. The sidecar will use the logged-in user's account to sign the transaction, funding the mortgage from their account. The request body should only contain the ID of a pending mortgage request.",
                 "consumes": [
                     "application/json"
                 ],
@@ -106,12 +106,12 @@ const docTemplate = `{
                 "summary": "Create a mortgage (lender)",
                 "parameters": [
                     {
-                        "description": "mortgage details (with property purchase details)",
+                        "description": "mortgage request ID",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.MortgageRequestPayload"
+                            "$ref": "#/definitions/main.CreateMortgageByIDRequest"
                         }
                     }
                 ],
@@ -580,7 +580,7 @@ const docTemplate = `{
         },
         "/property/offplan/purchase-request": {
             "post": {
-                "description": "User submits a request to purchase shares in an off plan property. Auto-accepted if not fully funded. Rejected if \u003e100% funded. If 100% funded, property status is set to 'pending_regulator_approval'.",
+                "description": "User submits a request to purchase shares in an off plan property. When all shares are purchased, property status is set to 'pending_regulator_approval'.",
                 "consumes": [
                     "application/json"
                 ],
@@ -615,29 +615,20 @@ const docTemplate = `{
                 }
             }
         },
-        "/property/offplan/purchase-requests": {
+        "/property/offplans": {
             "get": {
-                "description": "Returns all purchase requests for a given off plan property.",
+                "description": "Returns a list of all off-plan properties, including their purchase requests.",
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Get off plan property purchase requests",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Off plan property ID",
-                        "name": "property_id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
+                "summary": "Get all off-plan properties",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/main.OffPlanPurchaseRequest"
+                                "$ref": "#/definitions/main.OffPlanProperty"
                             }
                         }
                     }
@@ -984,6 +975,23 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/user/status": {
+            "get": {
+                "description": "Returns the currently logged in user, if any.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get login status",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.LoginStatusResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -1030,13 +1038,18 @@ const docTemplate = `{
                 }
             }
         },
+        "main.CreateMortgageByIDRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
         "main.EditPropertyMetadataRequest": {
             "type": "object",
             "properties": {
                 "construction_information": {
-                    "type": "string"
-                },
-                "gas": {
                     "type": "string"
                 },
                 "owner_information": {
@@ -1182,6 +1195,20 @@ const docTemplate = `{
                 }
             }
         },
+        "main.LoginStatusResponse": {
+            "type": "object",
+            "properties": {
+                "logged_in": {
+                    "type": "boolean"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "user": {
+                    "type": "string"
+                }
+            }
+        },
         "main.MortgageRequest": {
             "type": "object",
             "properties": {
@@ -1276,9 +1303,6 @@ const docTemplate = `{
                         "type": "integer"
                     }
                 },
-                "gas": {
-                    "type": "string"
-                },
                 "index": {
                     "type": "string"
                 },
@@ -1328,6 +1352,12 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "purchase_requests": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/main.OffPlanPurchaseRequest"
+                    }
+                },
                 "region": {
                     "type": "string"
                 },
@@ -1363,17 +1393,14 @@ const docTemplate = `{
         "main.OffPlanPurchaseRequest": {
             "type": "object",
             "properties": {
-                "amount_usd": {
-                    "type": "integer"
-                },
                 "id": {
                     "type": "string"
                 },
-                "percent": {
-                    "type": "number"
-                },
                 "property_id": {
                     "type": "string"
+                },
+                "shares": {
+                    "type": "integer"
                 },
                 "status": {
                     "description": "\"accepted\"",
@@ -1387,11 +1414,11 @@ const docTemplate = `{
         "main.OffPlanPurchaseRequestPayload": {
             "type": "object",
             "properties": {
-                "amount_usd": {
-                    "type": "integer"
-                },
                 "property_id": {
                     "type": "string"
+                },
+                "shares": {
+                    "type": "integer"
                 }
             }
         },
@@ -1399,9 +1426,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "address": {
-                    "type": "string"
-                },
-                "gas": {
                     "type": "string"
                 },
                 "owners": {
@@ -1430,9 +1454,6 @@ const docTemplate = `{
                 "amount": {
                     "type": "integer"
                 },
-                "gas": {
-                    "type": "string"
-                },
                 "mortgage_id": {
                     "type": "string"
                 }
@@ -1448,9 +1469,6 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "denom": {
-                    "type": "string"
-                },
-                "gas": {
                     "type": "string"
                 }
             }
@@ -1483,9 +1501,6 @@ const docTemplate = `{
                     "items": {
                         "type": "integer"
                     }
-                },
-                "gas": {
-                    "type": "string"
                 },
                 "property_id": {
                     "type": "string"
