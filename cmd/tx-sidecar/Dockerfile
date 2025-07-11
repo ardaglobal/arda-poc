@@ -16,7 +16,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o /app/tx-sidecar ./cmd/tx-sidecar
 
 # Stage 2: Create the final image
-FROM alpine:latest
+FROM alpine:3.19
 
 WORKDIR /app
 
@@ -27,9 +27,7 @@ COPY --from=builder /app/tx-sidecar .
 COPY ./cmd/tx-sidecar/docs ./docs
 COPY config.yml .
 
-# The application uses a local sqlite database, so we create the directory for it.
-# This directory can be mounted as a volume in production.
-RUN mkdir -p /app/local_data
+VOLUME /app/local_data
 
 # Expose the port the application runs on
 EXPOSE 8080
