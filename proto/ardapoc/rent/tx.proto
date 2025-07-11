@@ -17,11 +17,12 @@ service Msg {
   
   // UpdateParams defines a (governance) operation for updating the module
   // parameters. The authority defaults to the x/gov module account.
-  rpc UpdateParams (MsgUpdateParams) returns (MsgUpdateParamsResponse);
-  rpc CreateLease  (MsgCreateLease ) returns (MsgCreateLeaseResponse );
-  rpc UpdateLease  (MsgUpdateLease ) returns (MsgUpdateLeaseResponse );
-  rpc DeleteLease  (MsgDeleteLease ) returns (MsgDeleteLeaseResponse );
-  rpc PayRent      (MsgPayRent     ) returns (MsgPayRentResponse     );
+  rpc UpdateParams         (MsgUpdateParams        ) returns (MsgUpdateParamsResponse        );
+  rpc CreateLease          (MsgCreateLease         ) returns (MsgCreateLeaseResponse         );
+  rpc UpdateLease          (MsgUpdateLease         ) returns (MsgUpdateLeaseResponse         );
+  rpc DeleteLease          (MsgDeleteLease         ) returns (MsgDeleteLeaseResponse         );
+  rpc PayRent              (MsgPayRent             ) returns (MsgPayRentResponse             );
+  rpc InitiateCancellation (MsgInitiateCancellation) returns (MsgInitiateCancellationResponse);
 }
 // MsgUpdateParams is the Msg/UpdateParams request type.
 message MsgUpdateParams {
@@ -103,4 +104,12 @@ message MsgPayRent {
 }
 
 message MsgPayRentResponse {}
+
+message MsgInitiateCancellation {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string leaseId = 2;
+}
+
+message MsgInitiateCancellationResponse {}
 

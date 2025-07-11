@@ -39,6 +39,10 @@ const (
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgPayRent int = 100
 
+	opWeightMsgInitiateCancellation = "op_weight_msg_initiate_cancellation"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgInitiateCancellation int = 100
+
 	// this line is used by starport scaffolding # simapp/module/const
 )
 
@@ -117,6 +121,17 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 		rentsimulation.SimulateMsgPayRent(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
+	var weightMsgInitiateCancellation int
+	simState.AppParams.GetOrGenerate(opWeightMsgInitiateCancellation, &weightMsgInitiateCancellation, nil,
+		func(_ *rand.Rand) {
+			weightMsgInitiateCancellation = defaultWeightMsgInitiateCancellation
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgInitiateCancellation,
+		rentsimulation.SimulateMsgInitiateCancellation(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
 	// this line is used by starport scaffolding # simapp/module/operation
 
 	return operations
@@ -154,6 +169,14 @@ func (am AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.Wei
 			defaultWeightMsgPayRent,
 			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
 				rentsimulation.SimulateMsgPayRent(am.accountKeeper, am.bankKeeper, am.keeper)
+				return nil
+			},
+		),
+		simulation.NewWeightedProposalMsg(
+			opWeightMsgInitiateCancellation,
+			defaultWeightMsgInitiateCancellation,
+			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+				rentsimulation.SimulateMsgInitiateCancellation(am.accountKeeper, am.bankKeeper, am.keeper)
 				return nil
 			},
 		),

@@ -20,11 +20,12 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Msg_UpdateParams_FullMethodName = "/ardapoc.rent.Msg/UpdateParams"
-	Msg_CreateLease_FullMethodName  = "/ardapoc.rent.Msg/CreateLease"
-	Msg_UpdateLease_FullMethodName  = "/ardapoc.rent.Msg/UpdateLease"
-	Msg_DeleteLease_FullMethodName  = "/ardapoc.rent.Msg/DeleteLease"
-	Msg_PayRent_FullMethodName      = "/ardapoc.rent.Msg/PayRent"
+	Msg_UpdateParams_FullMethodName         = "/ardapoc.rent.Msg/UpdateParams"
+	Msg_CreateLease_FullMethodName          = "/ardapoc.rent.Msg/CreateLease"
+	Msg_UpdateLease_FullMethodName          = "/ardapoc.rent.Msg/UpdateLease"
+	Msg_DeleteLease_FullMethodName          = "/ardapoc.rent.Msg/DeleteLease"
+	Msg_PayRent_FullMethodName              = "/ardapoc.rent.Msg/PayRent"
+	Msg_InitiateCancellation_FullMethodName = "/ardapoc.rent.Msg/InitiateCancellation"
 )
 
 // MsgClient is the client API for Msg service.
@@ -38,6 +39,7 @@ type MsgClient interface {
 	UpdateLease(ctx context.Context, in *MsgUpdateLease, opts ...grpc.CallOption) (*MsgUpdateLeaseResponse, error)
 	DeleteLease(ctx context.Context, in *MsgDeleteLease, opts ...grpc.CallOption) (*MsgDeleteLeaseResponse, error)
 	PayRent(ctx context.Context, in *MsgPayRent, opts ...grpc.CallOption) (*MsgPayRentResponse, error)
+	InitiateCancellation(ctx context.Context, in *MsgInitiateCancellation, opts ...grpc.CallOption) (*MsgInitiateCancellationResponse, error)
 }
 
 type msgClient struct {
@@ -93,6 +95,15 @@ func (c *msgClient) PayRent(ctx context.Context, in *MsgPayRent, opts ...grpc.Ca
 	return out, nil
 }
 
+func (c *msgClient) InitiateCancellation(ctx context.Context, in *MsgInitiateCancellation, opts ...grpc.CallOption) (*MsgInitiateCancellationResponse, error) {
+	out := new(MsgInitiateCancellationResponse)
+	err := c.cc.Invoke(ctx, Msg_InitiateCancellation_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility
@@ -104,6 +115,7 @@ type MsgServer interface {
 	UpdateLease(context.Context, *MsgUpdateLease) (*MsgUpdateLeaseResponse, error)
 	DeleteLease(context.Context, *MsgDeleteLease) (*MsgDeleteLeaseResponse, error)
 	PayRent(context.Context, *MsgPayRent) (*MsgPayRentResponse, error)
+	InitiateCancellation(context.Context, *MsgInitiateCancellation) (*MsgInitiateCancellationResponse, error)
 	mustEmbedUnimplementedMsgServer()
 }
 
@@ -125,6 +137,9 @@ func (UnimplementedMsgServer) DeleteLease(context.Context, *MsgDeleteLease) (*Ms
 }
 func (UnimplementedMsgServer) PayRent(context.Context, *MsgPayRent) (*MsgPayRentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PayRent not implemented")
+}
+func (UnimplementedMsgServer) InitiateCancellation(context.Context, *MsgInitiateCancellation) (*MsgInitiateCancellationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InitiateCancellation not implemented")
 }
 func (UnimplementedMsgServer) mustEmbedUnimplementedMsgServer() {}
 
@@ -229,6 +244,24 @@ func _Msg_PayRent_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_InitiateCancellation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgInitiateCancellation)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).InitiateCancellation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_InitiateCancellation_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).InitiateCancellation(ctx, req.(*MsgInitiateCancellation))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Msg_ServiceDesc is the grpc.ServiceDesc for Msg service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -255,6 +288,10 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PayRent",
 			Handler:    _Msg_PayRent_Handler,
+		},
+		{
+			MethodName: "InitiateCancellation",
+			Handler:    _Msg_InitiateCancellation_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
