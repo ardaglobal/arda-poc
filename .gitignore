@@ -14,7 +14,6 @@ logins.json
 tx.json
 mortgage_requests.json
 for_sale_properties.json
-test.*
 cmd/tx-sidecar/local_data/
 
 tmp/
