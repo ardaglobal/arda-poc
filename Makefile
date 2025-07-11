@@ -170,3 +170,34 @@ prod:
 	cp config.toml ~/.$(APPNAME)/config/config.toml
 	$(APPNAME)d start
 .PHONY: prod
+
+################
+###  Docker  ###
+################
+
+# Individual build commands
+docker-build-main:
+	@echo "--> Building arda-pocd docker image"
+	@docker build -t arda-pocd-ignite -f Dockerfile .
+.PHONY: docker-build-main
+
+docker-build-tx-sidecar:
+	@echo "--> Building tx-sidecar docker image"
+	@docker build -t tx-sidecar-compose -f cmd/tx-sidecar/Dockerfile .
+.PHONY: docker-build-tx-sidecar
+
+# Docker Compose commands
+dc-up:
+	@echo "--> Starting docker-compose services"
+	@docker-compose up -d --build
+.PHONY: dc-up
+
+dc-down:
+	@echo "--> Stopping docker-compose services"
+	@docker-compose down
+.PHONY: dc-down
+
+dc-logs:
+	@echo "--> Tailing logs for all services"
+	@docker-compose logs -f
+.PHONY: dc-logs

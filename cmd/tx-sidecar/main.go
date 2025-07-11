@@ -39,6 +39,21 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// getEnv is a helper function to read an environment variable or return a fallback value.
+func getEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return fallback
+}
+
+var (
+	blockchainRestAPIURL = getEnv("BLOCKCHAIN_REST_API_URL", "http://localhost:1317")
+	grpcAddr             = getEnv("GRPC_ADDR", "localhost:9090")
+	nodeRPCURL           = getEnv("NODE_RPC_URL", "http://localhost:26657")
+	faucetURL            = getEnv("FAUCET_URL", "http://localhost:4500")
+)
+
 func init() {
 	zlog.Logger = zlog.Output(zerolog.ConsoleWriter{Out: os.Stdout})
 }
@@ -257,8 +272,9 @@ func NewServer(clientCtx client.Context, grpcAddr string) (*Server, error) {
 	// Ensure that the faucet account from config exists in the keyring.
 	if _, err := s.clientCtx.Keyring.Key(s.faucetName); err != nil {
 		zlog.Warn().Msgf("faucet user '%s' from config.yml not found in keyring: %v", s.faucetName, err)
+	} else {
+		zlog.Info().Msgf("Faucet user '%s' found in keyring.", s.faucetName)
 	}
-	zlog.Info().Msgf("Using '%s' as the faucet account.", s.faucetName)
 
 	// Ensure faucet user has the 'bank' role.
 	if faucetUserData, ok := s.users[s.faucetName]; ok {
@@ -329,7 +345,7 @@ func (s *Server) adminLoginHandler(c *fiber.Ctx) error {
 
 // passthroughGET proxies a GET request to the blockchain REST API and returns the response as-is.
 func passthroughGET(path string, c *fiber.Ctx) error {
-	baseURL := "http://localhost:1317"
+	baseURL := blockchainRestAPIURL
 	// Compose the full URL
 	url := baseURL + path
 	resp, err := http.Get(url)
@@ -391,45 +407,40 @@ func getMortgagesPassthrough(c *fiber.Ctx) error {
 // isBlockchainRunning checks if both the blockchain REST API and gRPC API are accessible
 func isBlockchainRunning() bool {
 	// Check REST API
-	baseURL := os.Getenv("BLOCKCHAIN_REST_API_URL")
-	if baseURL == "" {
-		baseURL = "http://localhost:1317"
-	}
+	baseURL := blockchainRestAPIURL
 	restURL := baseURL + "/cosmos/base/tendermint/v1beta1/node_info"
+	zlog.Info().Msgf("Checking blockchain REST API at %s", restURL)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
+	restCtx, restCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer restCancel()
 
-	req, err := http.NewRequestWithContext(ctx, "GET", restURL, nil)
+	req, err := http.NewRequestWithContext(restCtx, "GET", restURL, nil)
 	if err != nil {
+		zlog.Error().Msgf("Blockchain not ready: failed to create request for REST API: %v", err)
 		return false
 	}
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
+		zlog.Error().Msgf("Blockchain not ready: failed to make request to REST API: %v", err)
 		return false
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != http.StatusOK {
+		zlog.Error().Msgf("Blockchain not ready: REST API returned status %d", resp.StatusCode)
 		return false
 	}
 
 	// Check gRPC API
-	grpcHost := "localhost"
-	if strings.Contains(baseURL, "://") {
-		if u, err := url.Parse(baseURL); err == nil {
-			grpcHost = u.Hostname()
-		}
-	}
-	grpcAddr := fmt.Sprintf("%s:9090", grpcHost)
+	zlog.Info().Msgf("Checking blockchain gRPC API at %s", grpcAddr)
 
-	// Try to establish a gRPC connection
-	grpcConn, err := grpc.Dial(grpcAddr, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock(), grpc.WithTimeout(5*time.Second))
+	conn, err := grpc.NewClient(grpcAddr, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
 	if err != nil {
+		zlog.Error().Msgf("Blockchain not ready: NewClient failed for gRPC: %v", err)
 		return false
 	}
-	defer grpcConn.Close()
+	defer conn.Close()
 
 	return true
 }
@@ -464,8 +475,12 @@ func main() {
 		zlog.Fatal().Msgf("Failed to parse node URI: %v", err)
 	}
 	host := strings.Split(parsedURL.Host, ":")[0]
-	grpcAddr := fmt.Sprintf("%s:9090", host)
+	clientCtxGrpcAddr := fmt.Sprintf("%s:9090", host)
 
+	if clientCtxGrpcAddr != grpcAddr {
+		zlog.Warn().Msgf("Using grpc addresses don't match: %s != %s", clientCtxGrpcAddr, grpcAddr)
+	}
+	// Use the client context's grpc address if it's set, otherwise use the default.
 	server, err := NewServer(clientCtx, grpcAddr)
 	if err != nil {
 		zlog.Fatal().Msgf("Failed to create server: %v", err)
@@ -557,3 +572,4 @@ func main() {
 		zlog.Fatal().Msgf("Failed to start server: %v", err)
 	}
 }
+

@@ -1,0 +1,38 @@
+services:
+  arda:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: arda-pocd
+    ports:
+      - "26657:26657"   # Tendermint RPC
+      - "1317:1317"     # REST API
+      - "9090:9090"     # gRPC
+      - "4500:4500"     # Faucet
+    volumes:
+      - arda_state:/data            # <-- named volume, not host bind
+    environment:
+      - ARDA_HOME=/data/.arda-poc
+
+  sidecar:
+    build:
+      context: .
+      dockerfile: cmd/tx-sidecar/Dockerfile
+    image: tx-sidecar-compose
+    volumes:
+      - arda_state:/data            # share chain state
+      - sidecar_data:/app/local_data         # own DB
+    ports:
+      - "8080:8080"
+    environment:
+      - BLOCKCHAIN_REST_API_URL=http://arda:1317
+      - GRPC_ADDR=arda:9090
+      - NODE_RPC_URL=http://arda:26657
+      - FAUCET_URL=http://arda:4500
+      - ARDA_HOME=/data/.arda-poc               # <-- tell sidecar where to find the keyring
+    depends_on:
+      - arda
+
+volumes:
+  arda_state:
+  sidecar_data:
