@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   arda:
     build:
@@ -12,32 +10,17 @@ services:
       - "9090:9090"     # gRPC
       - "4500:4500"     # Faucet
     volumes:
-      - arda_state:/app/.arda-poc            # <-- named volume, not host bind
+      - arda_state:/data            # <-- named volume, not host bind
     environment:
-      - ARDA_HOME=/data/.arda-poc       # entrypoint.sh uses this
-    # Healthy only after height > 1
-    # healthcheck:
-    #   test: >
-    #     CMD sh -c "
-    #       h=$(curl -sf http://localhost:26657/status |
-    #            grep -o '\"latest_block_height\":\"[0-9]*\"' |
-    #            grep -o '[0-9]*') &&
-    #       [ \"$h\" -gt 1 ]
-    #     "
-    #   interval: 10s
-    #   timeout: 5s
-    #   retries: 12      # ~2 min max wait
+      - ARDA_HOME=/data/.arda-poc
 
   sidecar:
     build:
       context: .
       dockerfile: cmd/tx-sidecar/Dockerfile
     image: tx-sidecar-compose
-    # depends_on:
-      # arda:
-        # condition: service_healthy
     volumes:
-      - arda_state:/app/.arda-poc            # share chain state
+      - arda_state:/data            # share chain state
       - sidecar_data:/app/local_data         # own DB
     ports:
       - "8080:8080"
@@ -46,7 +29,9 @@ services:
       - GRPC_ADDR=arda:9090
       - NODE_RPC_URL=http://arda:26657
       - FAUCET_URL=http://arda:4500
-    command: ["./tx-sidecar"]
+      - ARDA_HOME=/data/.arda-poc               # <-- tell sidecar where to find the keyring
+    depends_on:
+      - arda
 
 volumes:
   arda_state:

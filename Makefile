@@ -189,6 +189,8 @@ docker-build-tx-sidecar:
 # Docker Compose commands
 dc-up:
 	@echo "--> Starting docker-compose services"
+	# Currently doing this to debug, remove later to allow for persistentance 
+	@docker system prune -f
 	@docker-compose up -d --build
 .PHONY: dc-up
 
