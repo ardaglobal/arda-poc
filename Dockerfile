@@ -1,47 +1,40 @@
-# Stage 1: Build environment
+###############  Stage 1 – build  ###############
 FROM golang:1.24-alpine AS builder
-
-# Set ignite version, can be overridden at build time
 ARG IGNITE_VERSION=v28.10.0
 
-# Install build-base, git, curl and bash for ignite installation
 RUN apk add --no-cache build-base git curl bash
+RUN curl -L "https://get.ignite.com/cli@${IGNITE_VERSION}!" | bash
 
-# Install ignite
-RUN curl -L https://get.ignite.com/cli@${IGNITE_VERSION}! | bash
-
-# Copy all the source code
 WORKDIR /src
 COPY . .
 
-# Build the app with ignite to cache dependencies and verify it works.
-RUN ignite chain build
-RUN ignite chain init
+# put ./build on the PATH so `which` can see the binary
+ENV PATH="/src/build:${PATH}"
 
-# Move the initialized data to a template location
-RUN mv /src/.arda-poc /src/arda-poc-template
+RUN ignite chain build && ignite chain init --home .arda-poc
 
-# Stage 2: Final image for development
-# We use a golang image because ignite needs go to build and run the app.
-FROM golang:1.24-alpine
+# figure out where the node binary is *at runtime* and copy it out
+RUN BIN=$(which arda-pocd 2>/dev/null || true)  \
+ && if [ -z "$BIN" ]; then echo "arda-pocd not found on PATH"; exit 1; fi \
+ && install -Dm755 "$BIN" /out/arda-pocd \
+ && cp -r .arda-poc /out/.arda-poc-template
 
-# Install curl for healthcheck and git, bash (needed by ignite)
-RUN apk add --no-cache curl git bash
+###############  Stage 2 – runtime ###############
+FROM alpine:3.19
+RUN apk add --no-cache bash curl
 
-# Copy ignite and the full project source from the builder stage
-COPY --from=builder /usr/local/bin/ignite /usr/local/bin/ignite
-COPY --from=builder /src /app
+# binary + template only
+COPY --from=builder /out/arda-pocd          /usr/local/bin/arda-pocd
+COPY --from=builder /out/.arda-poc-template /template/.arda-poc
 
-WORKDIR /app
+# copy in entrypoint script
+COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Expose ports used by ignite serve
-# 26657: Tendermint RPC
-# 1317: API Server
-# 9090: gRPC
-# 4500: Faucet
+# declare persistent state location
+VOLUME ["/data"]
+ENV ARDA_HOME=/data/.arda-poc
+WORKDIR /data
+
 EXPOSE 26657 1317 9090 4500
-
-# The command will be provided by docker-compose. By default, it will
-# initialize the chain from config.yml and start it.
-ENTRYPOINT ["arda-pocd"]
-CMD ["start"] 
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
