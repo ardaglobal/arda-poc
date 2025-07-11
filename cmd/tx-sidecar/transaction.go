@@ -163,16 +163,74 @@ func (s *Server) saveTransactionsToFile() {
 	}
 }
 
-// listTransactionsHandler returns the list of tracked transactions
+// PaginatedTransactionsResponse represents the paginated response for transactions
+type PaginatedTransactionsResponse struct {
+	Transactions []TrackedTx `json:"transactions"`
+	Total        int         `json:"total"`
+	Page         int         `json:"page"`
+	PageSize     int         `json:"page_size"`
+	HasNext      bool        `json:"has_next"`
+	HasPrev      bool        `json:"has_prev"`
+}
+
+// listTransactionsHandler returns the list of tracked transactions with pagination
 // @Summary List transactions
-// @Description Lists all transaction hashes that have been successfully processed and stored by the sidecar.
+// @Description Lists all transaction hashes that have been successfully processed and stored by the sidecar with pagination support.
 // @Produce json
-// @Success 200 {array} TrackedTx
+// @Param page query int false "Page number (default: 1)"
+// @Param page_size query int false "Number of transactions per page (default: 50, max: 1000)"
+// @Success 200 {object} PaginatedTransactionsResponse
 // @Router /tx/list [get]
 func (s *Server) listTransactionsHandler(w http.ResponseWriter, r *http.Request) {
 	zlog.Info().Str("handler", "listTransactionsHandler").Msg("received request")
+	
+	// Parse pagination parameters
+	page := 1
+	pageSize := 50
+	
+	if pageStr := r.URL.Query().Get("page"); pageStr != "" {
+		if p, err := strconv.Atoi(pageStr); err == nil && p > 0 {
+			page = p
+		}
+	}
+	
+	if pageSizeStr := r.URL.Query().Get("page_size"); pageSizeStr != "" {
+		if ps, err := strconv.Atoi(pageSizeStr); err == nil && ps > 0 {
+			pageSize = ps
+			if pageSize > 1000 {
+				pageSize = 1000 // Cap at 1000
+			}
+		}
+	}
+	
+	total := len(s.transactions)
+	totalPages := (total + pageSize - 1) / pageSize
+	
+	// Calculate start and end indices
+	start := (page - 1) * pageSize
+	end := start + pageSize
+	
+	var paginatedTransactions []TrackedTx
+	if start < total {
+		if end > total {
+			end = total
+		}
+		paginatedTransactions = s.transactions[start:end]
+	} else {
+		paginatedTransactions = []TrackedTx{}
+	}
+	
+	response := PaginatedTransactionsResponse{
+		Transactions: paginatedTransactions,
+		Total:        total,
+		Page:         page,
+		PageSize:     pageSize,
+		HasNext:      page < totalPages,
+		HasPrev:      page > 1,
+	}
+	
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(s.transactions)
+	json.NewEncoder(w).Encode(response)
 }
 
 // getTransactionHandler returns a specific transaction by its hash

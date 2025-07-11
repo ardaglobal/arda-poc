@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
@@ -32,32 +33,63 @@ func (k Keeper) PropertyAll(goCtx context.Context, req *propertyTypes.QueryAllPr
 	}
 
 	// Apply pagination if provided
-	start, end := 0, len(propertyPtrs)
+	var paginatedProperties []*propertyTypes.Property
+	var pageRes *query.PageResponse
+	
 	if req.Pagination != nil {
-		start = int(req.Pagination.Offset)
-		if start > len(propertyPtrs) {
-			start = len(propertyPtrs)
+		// Use proper pagination with default limit
+		limit := req.Pagination.Limit
+		if limit == 0 {
+			limit = 100 // Default limit
 		}
-
-		if req.Pagination.Limit > 0 && start+int(req.Pagination.Limit) < len(propertyPtrs) {
-			end = start + int(req.Pagination.Limit)
+		if limit > 1000 {
+			limit = 1000 // Max limit
 		}
-	}
-
-	// Slice the submissions based on pagination
-	paginatedProperties := propertyPtrs
-	if start < end {
-		paginatedProperties = propertyPtrs[start:end]
+		
+		offset := req.Pagination.Offset
+		if offset > uint64(len(propertyPtrs)) {
+			offset = uint64(len(propertyPtrs))
+		}
+		
+		start := int(offset)
+		end := start + int(limit)
+		if end > len(propertyPtrs) {
+			end = len(propertyPtrs)
+		}
+		
+		if start < end {
+			paginatedProperties = propertyPtrs[start:end]
+		} else {
+			paginatedProperties = []*propertyTypes.Property{}
+		}
+		
+		// Create pagination response with next key for cursor-based pagination
+		pageRes = &query.PageResponse{
+			Total: uint64(len(propertyPtrs)),
+		}
+		
+		if req.Pagination.CountTotal {
+			pageRes.Total = uint64(len(propertyPtrs))
+		}
+		
+		// Set next key if there are more results
+		if end < len(propertyPtrs) {
+			pageRes.NextKey = []byte(fmt.Sprintf("%d", end))
+		}
 	} else {
-		paginatedProperties = []*propertyTypes.Property{}
-	}
-
-	// Create pagination response
-	pageRes := &query.PageResponse{
-		Total: uint64(len(propertyPtrs)),
-	}
-	if req.Pagination != nil && req.Pagination.CountTotal {
-		pageRes.Total = uint64(len(propertyPtrs))
+		// No pagination requested, return all (with reasonable limit)
+		if len(propertyPtrs) > 100 {
+			paginatedProperties = propertyPtrs[:100]
+			pageRes = &query.PageResponse{
+				Total:   uint64(len(propertyPtrs)),
+				NextKey: []byte("100"),
+			}
+		} else {
+			paginatedProperties = propertyPtrs
+			pageRes = &query.PageResponse{
+				Total: uint64(len(propertyPtrs)),
+			}
+		}
 	}
 
 	return &propertyTypes.QueryAllPropertyResponse{
