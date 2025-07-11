@@ -10,6 +10,7 @@ import (
 	"github.com/ardaglobal/arda-poc/testutil/network"
 	propertytypes "github.com/ardaglobal/arda-poc/x/property/types"
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	"github.com/cosmos/cosmos-sdk/types"
 	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
@@ -36,7 +37,7 @@ func (s *E2ETestSuite) TestRegisterProperty() {
 	clientCtx := val.ClientCtx
 
 	// Define the property to register
-	propertyAddress := "123 Main St, Anytown, USA"
+	propertyAddress := "123 Main Street"
 	propertyRegion := "e2e-test-region"
 	propertyValue := uint64(1000000)
 	ownerAddress := val.Address.String()
@@ -55,19 +56,24 @@ func (s *E2ETestSuite) TestRegisterProperty() {
 	// --- This block replicates the core logic of the sidecar's handler ---
 
 	// Create a new TxFactory
-	txf, err := tx.NewFactoryCLI(clientCtx, nil)
-	s.Require().NoError(err)
-	txf = txf.
+	txf := tx.Factory{}.
 		WithChainID(s.network.Config.ChainID).
 		WithKeybase(val.ClientCtx.Keyring).
-		WithGas(200000)
+		WithTxConfig(clientCtx.TxConfig).
+		WithGas(200000).
+		WithFees("2uarda")
 
 	// Get account number and sequence
 	authClient := authtypes.NewQueryClient(clientCtx)
 	acc, err := authClient.Account(context.Background(), &authtypes.QueryAccountRequest{Address: val.Address.String()})
 	s.Require().NoError(err)
-	var baseAcc authtypes.BaseAccount
-	s.Require().NoError(clientCtx.Codec.UnpackAny(acc.Account, &baseAcc))
+	
+	var accI types.AccountI
+	s.Require().NoError(clientCtx.InterfaceRegistry.UnpackAny(acc.Account, &accI))
+	
+	baseAcc, ok := accI.(*authtypes.BaseAccount)
+	s.Require().True(ok, "account is not a BaseAccount")
+	
 	txf = txf.WithAccountNumber(baseAcc.AccountNumber).WithSequence(baseAcc.Sequence)
 
 	// Build and sign the transaction
@@ -87,25 +93,32 @@ func (s *E2ETestSuite) TestRegisterProperty() {
 		},
 	)
 	s.Require().NoError(err)
-	s.Require().Equal(uint32(0), res.TxResponse.Code, "transaction failed with code: %d", res.TxResponse.Code)
+	s.Require().Equal(uint32(0), res.TxResponse.Code, "transaction failed with code: %d, raw_log: %s", res.TxResponse.Code, res.TxResponse.RawLog)
 	// --- End of sidecar logic replication ---
 
 	// Wait for the next block to ensure the transaction is committed
 	s.Require().NoError(s.network.WaitForNextBlock())
 
+	// Get the transaction details to verify it was successful
+	txResp, err := txClient.GetTx(context.Background(), &txtypes.GetTxRequest{Hash: res.TxResponse.TxHash})
+	s.Require().NoError(err)
+	s.T().Logf("Transaction committed in block %d with code %d", txResp.TxResponse.Height, txResp.TxResponse.Code)
+	s.Require().Equal(uint32(0), txResp.TxResponse.Code, "transaction failed in block with code: %d, raw_log: %s", txResp.TxResponse.Code, txResp.TxResponse.RawLog)
+
 	// Verify the property was created
 	queryClient := propertytypes.NewQueryClient(clientCtx)
+	expectedIndex := strings.ToLower(strings.TrimSpace(propertyAddress))
+	s.T().Logf("Querying for property with index: %s", expectedIndex)
+	
 	queryResp, err := queryClient.Property(context.Background(), &propertytypes.QueryGetPropertyRequest{
-		Index: strings.ToLower(strings.TrimSpace(propertyAddress)),
+		Index: expectedIndex,
 	})
 	s.Require().NoError(err)
 	s.Require().Equal(propertyAddress, queryResp.Property.Address)
 	s.Require().Equal(propertyRegion, queryResp.Property.Region)
 	s.Require().Equal(propertyValue, queryResp.Property.Value)
 
-	// Skip the remainder of the test to avoid the fatal cleanup error.
-	// This is a workaround for a race condition in the test network's teardown process.
-	s.T().Skip("Skipping teardown to avoid race condition")
+	s.T().Log("Property registration test completed successfully")
 }
 
 func TestE2ETestSuite(t *testing.T) {
