@@ -38,7 +38,9 @@ func RentKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 		runtime.NewKVStoreService(storeKey),
 		log.NewNopLogger(),
 		authority.String(),
-		nil,
+		nil, // PropertyKeeper - using nil for testing
+		nil, // BankKeeper - using nil for testing
+		nil, // AccountKeeper - using nil for testing
 	)
 
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())

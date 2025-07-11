@@ -8,7 +8,6 @@ package rent
 
 import (
 	context "context"
-
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -27,6 +26,7 @@ const (
 	Msg_PayRent_FullMethodName              = "/ardapoc.rent.Msg/PayRent"
 	Msg_InitiateCancellation_FullMethodName = "/ardapoc.rent.Msg/InitiateCancellation"
 	Msg_ApproveCancellation_FullMethodName  = "/ardapoc.rent.Msg/ApproveCancellation"
+	Msg_CancelCancellation_FullMethodName   = "/ardapoc.rent.Msg/CancelCancellation"
 )
 
 // MsgClient is the client API for Msg service.
@@ -42,6 +42,7 @@ type MsgClient interface {
 	PayRent(ctx context.Context, in *MsgPayRent, opts ...grpc.CallOption) (*MsgPayRentResponse, error)
 	InitiateCancellation(ctx context.Context, in *MsgInitiateCancellation, opts ...grpc.CallOption) (*MsgInitiateCancellationResponse, error)
 	ApproveCancellation(ctx context.Context, in *MsgApproveCancellation, opts ...grpc.CallOption) (*MsgApproveCancellationResponse, error)
+	CancelCancellation(ctx context.Context, in *MsgCancelCancellation, opts ...grpc.CallOption) (*MsgCancelCancellationResponse, error)
 }
 
 type msgClient struct {
@@ -115,6 +116,15 @@ func (c *msgClient) ApproveCancellation(ctx context.Context, in *MsgApproveCance
 	return out, nil
 }
 
+func (c *msgClient) CancelCancellation(ctx context.Context, in *MsgCancelCancellation, opts ...grpc.CallOption) (*MsgCancelCancellationResponse, error) {
+	out := new(MsgCancelCancellationResponse)
+	err := c.cc.Invoke(ctx, Msg_CancelCancellation_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility
@@ -128,6 +138,7 @@ type MsgServer interface {
 	PayRent(context.Context, *MsgPayRent) (*MsgPayRentResponse, error)
 	InitiateCancellation(context.Context, *MsgInitiateCancellation) (*MsgInitiateCancellationResponse, error)
 	ApproveCancellation(context.Context, *MsgApproveCancellation) (*MsgApproveCancellationResponse, error)
+	CancelCancellation(context.Context, *MsgCancelCancellation) (*MsgCancelCancellationResponse, error)
 	mustEmbedUnimplementedMsgServer()
 }
 
@@ -155,6 +166,9 @@ func (UnimplementedMsgServer) InitiateCancellation(context.Context, *MsgInitiate
 }
 func (UnimplementedMsgServer) ApproveCancellation(context.Context, *MsgApproveCancellation) (*MsgApproveCancellationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ApproveCancellation not implemented")
+}
+func (UnimplementedMsgServer) CancelCancellation(context.Context, *MsgCancelCancellation) (*MsgCancelCancellationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CancelCancellation not implemented")
 }
 func (UnimplementedMsgServer) mustEmbedUnimplementedMsgServer() {}
 
@@ -295,6 +309,24 @@ func _Msg_ApproveCancellation_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_CancelCancellation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgCancelCancellation)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).CancelCancellation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_CancelCancellation_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).CancelCancellation(ctx, req.(*MsgCancelCancellation))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Msg_ServiceDesc is the grpc.ServiceDesc for Msg service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -329,6 +361,10 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ApproveCancellation",
 			Handler:    _Msg_ApproveCancellation_Handler,
+		},
+		{
+			MethodName: "CancelCancellation",
+			Handler:    _Msg_CancelCancellation_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
