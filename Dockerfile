@@ -21,7 +21,7 @@ RUN BIN=$(which arda-pocd 2>/dev/null || true)  \
 
 ###############  Stage 2 – runtime ###############
 FROM alpine:3.19
-RUN apk add --no-cache bash curl
+RUN apk update && apk add --no-cache bash curl
 
 # binary + template only
 COPY --from=builder /out/arda-pocd          /usr/local/bin/arda-pocd

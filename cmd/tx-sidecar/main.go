@@ -37,6 +37,21 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// getEnv is a helper function to read an environment variable or return a fallback value.
+func getEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return fallback
+}
+
+var (
+	blockchainRestAPIURL = getEnv("BLOCKCHAIN_REST_API_URL", "http://localhost:1317")
+	grpcAddr             = getEnv("GRPC_ADDR", "localhost:9090")
+	nodeRPCURL           = getEnv("NODE_RPC_URL", "http://localhost:26657")
+	faucetURL            = getEnv("FAUCET_URL", "http://localhost:4500")
+)
+
 func init() {
 	zlog.Logger = zlog.Output(zerolog.ConsoleWriter{Out: os.Stdout})
 }
@@ -328,7 +343,7 @@ func (s *Server) adminLoginHandler(c *fiber.Ctx) error {
 
 // passthroughGET proxies a GET request to the blockchain REST API and returns the response as-is.
 func passthroughGET(path string, c *fiber.Ctx) error {
-	baseURL := "http://localhost:1317"
+	baseURL := blockchainRestAPIURL
 	// Compose the full URL
 	url := baseURL + path
 	resp, err := http.Get(url)
@@ -402,8 +417,12 @@ func main() {
 		zlog.Fatal().Msgf("Failed to parse node URI: %v", err)
 	}
 	host := strings.Split(parsedURL.Host, ":")[0]
-	grpcAddr := fmt.Sprintf("%s:9090", host)
+	clientCtxGrpcAddr := fmt.Sprintf("%s:9090", host)
 
+	if clientCtxGrpcAddr != grpcAddr {
+		zlog.Warn().Msgf("Using grpc addresses don't match: %s != %s", clientCtxGrpcAddr, grpcAddr)
+	}
+	// Use the client context's grpc address if it's set, otherwise use the default.
 	server, err := NewServer(clientCtx, grpcAddr)
 	if err != nil {
 		zlog.Fatal().Msgf("Failed to create server: %v", err)

@@ -41,6 +41,11 @@ services:
       - sidecar_data:/app/local_data         # own DB
     ports:
       - "8080:8080"
+    environment:
+      - BLOCKCHAIN_REST_API_URL=http://arda:1317
+      - GRPC_ADDR=arda:9090
+      - NODE_RPC_URL=http://arda:26657
+      - FAUCET_URL=http://arda:4500
     command: ["./tx-sidecar"]
 
 volumes:
