@@ -1,0 +1,17 @@
+syntax = "proto3";
+package ardapoc.rent;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+import "ardapoc/rent/params.proto";
+
+option go_package = "github.com/ardaglobal/arda-poc/x/rent/types";
+
+// GenesisState defines the rent module's genesis state.
+message GenesisState {
+  // params defines all the parameters of the module.
+  Params params = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}
