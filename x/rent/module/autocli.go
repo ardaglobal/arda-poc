@@ -57,6 +57,12 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Short:          "Delete Lease",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "id"}},
 				},
+				{
+					RpcMethod:      "PayRent",
+					Use:            "pay-rent [lease-id]",
+					Short:          "Send a PayRent tx",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "leaseId"}},
+				},
 				// this line is used by ignite scaffolding # autocli/tx
 			},
 		},

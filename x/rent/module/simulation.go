@@ -35,6 +35,10 @@ const (
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgDeleteLease int = 100
 
+	opWeightMsgPayRent = "op_weight_msg_pay_rent"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgPayRent int = 100
+
 	// this line is used by starport scaffolding # simapp/module/const
 )
 
@@ -102,6 +106,17 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 		rentsimulation.SimulateMsgDeleteLease(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
+	var weightMsgPayRent int
+	simState.AppParams.GetOrGenerate(opWeightMsgPayRent, &weightMsgPayRent, nil,
+		func(_ *rand.Rand) {
+			weightMsgPayRent = defaultWeightMsgPayRent
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgPayRent,
+		rentsimulation.SimulateMsgPayRent(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
 	// this line is used by starport scaffolding # simapp/module/operation
 
 	return operations
@@ -131,6 +146,14 @@ func (am AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.Wei
 			defaultWeightMsgDeleteLease,
 			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
 				rentsimulation.SimulateMsgDeleteLease(am.accountKeeper, am.bankKeeper, am.keeper)
+				return nil
+			},
+		),
+		simulation.NewWeightedProposalMsg(
+			opWeightMsgPayRent,
+			defaultWeightMsgPayRent,
+			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+				rentsimulation.SimulateMsgPayRent(am.accountKeeper, am.bankKeeper, am.keeper)
 				return nil
 			},
 		),

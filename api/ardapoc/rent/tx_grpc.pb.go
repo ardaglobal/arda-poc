@@ -24,6 +24,7 @@ const (
 	Msg_CreateLease_FullMethodName  = "/ardapoc.rent.Msg/CreateLease"
 	Msg_UpdateLease_FullMethodName  = "/ardapoc.rent.Msg/UpdateLease"
 	Msg_DeleteLease_FullMethodName  = "/ardapoc.rent.Msg/DeleteLease"
+	Msg_PayRent_FullMethodName      = "/ardapoc.rent.Msg/PayRent"
 )
 
 // MsgClient is the client API for Msg service.
@@ -36,6 +37,7 @@ type MsgClient interface {
 	CreateLease(ctx context.Context, in *MsgCreateLease, opts ...grpc.CallOption) (*MsgCreateLeaseResponse, error)
 	UpdateLease(ctx context.Context, in *MsgUpdateLease, opts ...grpc.CallOption) (*MsgUpdateLeaseResponse, error)
 	DeleteLease(ctx context.Context, in *MsgDeleteLease, opts ...grpc.CallOption) (*MsgDeleteLeaseResponse, error)
+	PayRent(ctx context.Context, in *MsgPayRent, opts ...grpc.CallOption) (*MsgPayRentResponse, error)
 }
 
 type msgClient struct {
@@ -82,6 +84,15 @@ func (c *msgClient) DeleteLease(ctx context.Context, in *MsgDeleteLease, opts ..
 	return out, nil
 }
 
+func (c *msgClient) PayRent(ctx context.Context, in *MsgPayRent, opts ...grpc.CallOption) (*MsgPayRentResponse, error) {
+	out := new(MsgPayRentResponse)
+	err := c.cc.Invoke(ctx, Msg_PayRent_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility
@@ -92,6 +103,7 @@ type MsgServer interface {
 	CreateLease(context.Context, *MsgCreateLease) (*MsgCreateLeaseResponse, error)
 	UpdateLease(context.Context, *MsgUpdateLease) (*MsgUpdateLeaseResponse, error)
 	DeleteLease(context.Context, *MsgDeleteLease) (*MsgDeleteLeaseResponse, error)
+	PayRent(context.Context, *MsgPayRent) (*MsgPayRentResponse, error)
 	mustEmbedUnimplementedMsgServer()
 }
 
@@ -110,6 +122,9 @@ func (UnimplementedMsgServer) UpdateLease(context.Context, *MsgUpdateLease) (*Ms
 }
 func (UnimplementedMsgServer) DeleteLease(context.Context, *MsgDeleteLease) (*MsgDeleteLeaseResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteLease not implemented")
+}
+func (UnimplementedMsgServer) PayRent(context.Context, *MsgPayRent) (*MsgPayRentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PayRent not implemented")
 }
 func (UnimplementedMsgServer) mustEmbedUnimplementedMsgServer() {}
 
@@ -196,6 +211,24 @@ func _Msg_DeleteLease_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_PayRent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgPayRent)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).PayRent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_PayRent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).PayRent(ctx, req.(*MsgPayRent))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Msg_ServiceDesc is the grpc.ServiceDesc for Msg service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -218,6 +251,10 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteLease",
 			Handler:    _Msg_DeleteLease_Handler,
+		},
+		{
+			MethodName: "PayRent",
+			Handler:    _Msg_PayRent_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
