@@ -17,11 +17,23 @@ import (
 	zlog "github.com/rs/zerolog/log"
 )
 
+// TransactionEvent represents a single event in the transaction lifecycle
+type TransactionEvent struct {
+	Status    string                 `json:"status"`
+	Timestamp time.Time              `json:"timestamp"`
+	Height    int64                  `json:"height,omitempty"`
+	Code      uint32                 `json:"code,omitempty"`
+	RawLog    string                 `json:"raw_log,omitempty"`
+	Events    []map[string]interface{} `json:"events,omitempty"`
+}
+
 // TrackedTx stores information about a transaction that has been broadcast.
 type TrackedTx struct {
-	Timestamp time.Time `json:"timestamp"`
-	Type      string    `json:"type"`
-	TxHash    string    `json:"tx_hash"`
+	Timestamp time.Time           `json:"timestamp"`
+	Type      string              `json:"type"`
+	TxHash    string              `json:"tx_hash"`
+	Status    string              `json:"status"`
+	Events    []TransactionEvent  `json:"events"`
 }
 
 // buildSignAndBroadcast handles the common logic for creating, signing, and broadcasting a transaction.
@@ -104,17 +116,22 @@ func (s *Server) buildSignAndBroadcastInternal(ctx context.Context, fromName, tx
 		},
 	)
 	if err != nil {
+		s.trackTransactionEvent(txType, "", "failed", 0, err.Error(), nil)
 		return "", fmt.Errorf("failed to broadcast tx: %w", err)
 	}
 
 	// In sync mode, a non-zero code means the transaction failed validation (CheckTx).
 	if res.TxResponse.Code != 0 {
+		s.trackTransactionEvent(txType, res.TxResponse.TxHash, "failed", res.TxResponse.Code, res.TxResponse.RawLog, nil)
 		return "", fmt.Errorf("transaction failed with code %d: %s", res.TxResponse.Code, res.TxResponse.RawLog)
 	}
 
 	// Poll for the transaction to be included in a block.
 	txHash := res.TxResponse.TxHash
 	zlog.Info().Msgf("Transaction broadcasted with hash: %s. Polling for confirmation...", txHash)
+
+	// Track the submitted state
+	s.trackTransactionEvent(txType, txHash, "submitted", 0, "", nil)
 
 	// This is a simplified polling mechanism. In a production system, you might want
 	// a more robust solution, possibly involving a message queue or a dedicated transaction tracker.
@@ -129,26 +146,83 @@ func (s *Server) buildSignAndBroadcastInternal(ctx context.Context, fromName, tx
 				time.Sleep(2 * time.Second)
 				continue
 			}
+			s.trackTransactionEvent(txType, txHash, "failed", 0, fmt.Sprintf("failed to poll for tx confirmation: %v", err), nil)
 			return "", fmt.Errorf("failed to poll for tx confirmation: %w", err)
 		}
 
 		// Transaction is confirmed.
 		zlog.Info().Msgf("Transaction %s confirmed in block %d.", txHash, txRes.TxResponse.Height)
-		s.trackTransaction(txType, txHash)
+		
+		// Extract events from the transaction response
+		events := make([]map[string]interface{}, 0)
+		for _, event := range txRes.TxResponse.Events {
+			eventMap := make(map[string]interface{})
+			eventMap["type"] = event.Type
+			attributes := make([]map[string]string, 0)
+			for _, attr := range event.Attributes {
+				attributes = append(attributes, map[string]string{
+					"key":   attr.Key,
+					"value": attr.Value,
+				})
+			}
+			eventMap["attributes"] = attributes
+			events = append(events, eventMap)
+		}
+
+		if txRes.TxResponse.Code == 0 {
+			s.trackTransactionEvent(txType, txHash, "confirmed", 0, "", events)
+		} else {
+			s.trackTransactionEvent(txType, txHash, "failed", txRes.TxResponse.Code, txRes.TxResponse.RawLog, events)
+		}
+		
 		return txHash, nil
 	}
 }
 
-// trackTransaction adds a new transaction to the server's list and saves it to a file.
-func (s *Server) trackTransaction(txType, txHash string) {
-	newTx := TrackedTx{
-		Timestamp: time.Now(),
-		Type:      txType,
-		TxHash:    txHash,
+// trackTransactionEvent adds a new transaction event to the server's list and saves it to a file.
+func (s *Server) trackTransactionEvent(txType, txHash, status string, code uint32, rawLog string, events []map[string]interface{}) {
+	now := time.Now()
+	
+	// Find existing transaction or create new one
+	var existingTx *TrackedTx
+	for i := range s.transactions {
+		if s.transactions[i].TxHash == txHash {
+			existingTx = &s.transactions[i]
+			break
+		}
 	}
-
-	s.transactions = append(s.transactions, newTx)
+	
+	if existingTx == nil {
+		// Create new transaction
+		newTx := TrackedTx{
+			Timestamp: now,
+			Type:      txType,
+			TxHash:    txHash,
+			Status:    status,
+			Events:    make([]TransactionEvent, 0),
+		}
+		s.transactions = append(s.transactions, newTx)
+		existingTx = &s.transactions[len(s.transactions)-1]
+	}
+	
+	// Update transaction status and add event
+	existingTx.Status = status
+	event := TransactionEvent{
+		Status:    status,
+		Timestamp: now,
+		Code:      code,
+		RawLog:    rawLog,
+		Events:    events,
+	}
+	existingTx.Events = append(existingTx.Events, event)
+	
 	s.saveTransactionsToFile()
+}
+
+// trackTransaction adds a new transaction to the server's list and saves it to a file.
+// This method is kept for backward compatibility
+func (s *Server) trackTransaction(txType, txHash string) {
+	s.trackTransactionEvent(txType, txHash, "legacy", 0, "", nil)
 }
 
 // saveTransactionsToFile saves the current list of transactions to tx.json.
@@ -278,4 +352,44 @@ func (s *Server) getTransactionHandler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(getTxRes.TxResponse)
 	}
+}
+
+// getTransactionEventsHandler returns the lifecycle events for a specific transaction
+// @Summary Get transaction events
+// @Description Returns the complete lifecycle events for a transaction including submitted, confirmed, and failed states. This endpoint provides real-time updates on transaction status for frontend UI updates.
+// @Produce json
+// @Param hash path string true "Transaction hash"
+// @Success 200 {object} TrackedTx
+// @Failure 404 {object} map[string]string
+// @Router /tx/events/{hash} [get]
+func (s *Server) getTransactionEventsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	txHash := strings.TrimPrefix(r.URL.Path, "/tx/events/")
+	zlog.Info().Str("handler", "getTransactionEventsHandler").Str("tx_hash", txHash).Msg("received request")
+	
+	if txHash == "" {
+		http.Error(w, "Transaction hash must be provided in the path", http.StatusBadRequest)
+		return
+	}
+
+	// Find the transaction in our local cache
+	var trackedTx *TrackedTx
+	for i := range s.transactions {
+		if s.transactions[i].TxHash == txHash {
+			trackedTx = &s.transactions[i]
+			break
+		}
+	}
+
+	if trackedTx == nil {
+		http.Error(w, "Transaction not found in local cache", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(trackedTx)
 }

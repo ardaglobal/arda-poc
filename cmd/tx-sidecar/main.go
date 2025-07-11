@@ -542,6 +542,7 @@ func main() {
 	// Transaction routes
 	app.Get("/tx/list", fiberadaptor.HTTPHandlerFunc(server.listTransactionsHandler))
 	app.Get("/tx/:hash", fiberadaptor.HTTPHandlerFunc(server.getTransactionHandler))
+	app.Get("/tx/events/:hash", fiberadaptor.HTTPHandlerFunc(server.getTransactionEventsHandler))
 
 	// Admin
 	app.Post("/admin/login", server.adminLoginHandler)
