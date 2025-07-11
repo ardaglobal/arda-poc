@@ -323,12 +323,47 @@ func (s *Server) RunAutoProperty(developerUsers, investorUsers []string) {
 
 	ctx := context.Background()
 
-	// Initial setup: create two off plan properties
-	for i := 0; i < 2; i++ {
+	// Initial setup: create ten off plan properties for more test data
+	for i := 0; i < 10; i++ {
 		if err := s.createOffPlanProperty(developerUsers); err != nil {
 			zlog.Error().Err(err).Msg("autoproperty create off plan")
 		}
 	}
+
+	// Initial batch creation: create 20 properties quickly for testing pagination
+	zlog.Info().Msg("AutoProperty: Creating initial batch of properties for testing...")
+	for i := 0; i < 20; i++ {
+		zlog.Info().Msgf("AutoProperty: Creating initial property %d/20...", i+1)
+		
+		p, err := s.registerProperty(ctx, developerUsers)
+		if err != nil {
+			zlog.Error().Err(err).Msgf("autoproperty batch register property %d", i+1)
+			continue
+		}
+
+		// Edit metadata for the property
+		if err := s.autoEditPropertyMetadata(ctx, &p); err != nil {
+			zlog.Error().Err(err).Msgf("autoproperty batch edit metadata %d", i+1)
+		}
+
+		// Add some variety by randomly listing for sale or transferring shares
+		if rand.Intn(3) == 0 { // 33% chance to list for sale
+			if err := s.listPropertyForSale(&p); err != nil {
+				zlog.Error().Err(err).Msgf("autoproperty batch list for sale %d", i+1)
+			}
+		}
+		
+		if rand.Intn(2) == 0 { // 50% chance to transfer shares
+			if err := s.transferShares(ctx, &p, investorUsers); err != nil {
+				zlog.Error().Err(err).Msgf("autoproperty batch transfer %d", i+1)
+			}
+		}
+
+		// Short delay to avoid overwhelming the system
+		time.Sleep(1 * time.Second)
+	}
+	
+	zlog.Info().Msg("AutoProperty: Initial batch creation complete. Starting continuous mode...")
 
 	// Continuous property creation loop
 	for {
@@ -359,7 +394,7 @@ func (s *Server) RunAutoProperty(developerUsers, investorUsers []string) {
 			}
 		}
 
-		zlog.Info().Msg("AutoProperty: Done with this property. Waiting 10 seconds before next one...")
-		time.Sleep(10 * time.Second)
+		zlog.Info().Msg("AutoProperty: Done with this property. Waiting 3 seconds before next one...")
+		time.Sleep(3 * time.Second)
 	}
 }
