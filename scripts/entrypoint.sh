@@ -8,4 +8,8 @@ if [ ! -d "$ARDA_HOME" ]; then
   cp -r /template/.arda-poc "$ARDA_HOME"
 fi
 
+# Update gRPC address to listen on all interfaces
+# TODO: should create app.toml and config.toml in repo for consistency and then copy them to data dir
+sed -i -e 's/grpc.address = "localhost:9090"/grpc.address = "0.0.0.0:9090"/' "$ARDA_HOME/config/app.toml"
+
 exec arda-pocd start --home "$ARDA_HOME" "$@"

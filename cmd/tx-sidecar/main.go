@@ -407,45 +407,40 @@ func getMortgagesPassthrough(c *fiber.Ctx) error {
 // isBlockchainRunning checks if both the blockchain REST API and gRPC API are accessible
 func isBlockchainRunning() bool {
 	// Check REST API
-	baseURL := os.Getenv("BLOCKCHAIN_REST_API_URL")
-	if baseURL == "" {
-		baseURL = "http://localhost:1317"
-	}
+	baseURL := blockchainRestAPIURL
 	restURL := baseURL + "/cosmos/base/tendermint/v1beta1/node_info"
+	zlog.Info().Msgf("Checking blockchain REST API at %s", restURL)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
+	restCtx, restCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer restCancel()
 
-	req, err := http.NewRequestWithContext(ctx, "GET", restURL, nil)
+	req, err := http.NewRequestWithContext(restCtx, "GET", restURL, nil)
 	if err != nil {
+		zlog.Error().Msgf("Blockchain not ready: failed to create request for REST API: %v", err)
 		return false
 	}
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
+		zlog.Error().Msgf("Blockchain not ready: failed to make request to REST API: %v", err)
 		return false
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != http.StatusOK {
+		zlog.Error().Msgf("Blockchain not ready: REST API returned status %d", resp.StatusCode)
 		return false
 	}
 
 	// Check gRPC API
-	grpcHost := "localhost"
-	if strings.Contains(baseURL, "://") {
-		if u, err := url.Parse(baseURL); err == nil {
-			grpcHost = u.Hostname()
-		}
-	}
-	grpcAddr := fmt.Sprintf("%s:9090", grpcHost)
+	zlog.Info().Msgf("Checking blockchain gRPC API at %s", grpcAddr)
 
-	// Try to establish a gRPC connection
-	grpcConn, err := grpc.Dial(grpcAddr, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock(), grpc.WithTimeout(5*time.Second))
+	conn, err := grpc.NewClient(grpcAddr, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
 	if err != nil {
+		zlog.Error().Msgf("Blockchain not ready: NewClient failed for gRPC: %v", err)
 		return false
 	}
-	defer grpcConn.Close()
+	defer conn.Close()
 
 	return true
 }
@@ -576,3 +571,4 @@ func main() {
 		zlog.Fatal().Msgf("Failed to start server: %v", err)
 	}
 }
+
