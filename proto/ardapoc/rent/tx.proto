@@ -23,6 +23,7 @@ service Msg {
   rpc DeleteLease          (MsgDeleteLease         ) returns (MsgDeleteLeaseResponse         );
   rpc PayRent              (MsgPayRent             ) returns (MsgPayRentResponse             );
   rpc InitiateCancellation (MsgInitiateCancellation) returns (MsgInitiateCancellationResponse);
+  rpc ApproveCancellation  (MsgApproveCancellation ) returns (MsgApproveCancellationResponse );
 }
 // MsgUpdateParams is the Msg/UpdateParams request type.
 message MsgUpdateParams {
@@ -112,4 +113,12 @@ message MsgInitiateCancellation {
 }
 
 message MsgInitiateCancellationResponse {}
+
+message MsgApproveCancellation {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string leaseId = 2;
+}
+
+message MsgApproveCancellationResponse {}
 

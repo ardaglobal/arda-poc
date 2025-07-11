@@ -26,6 +26,7 @@ const (
 	Msg_DeleteLease_FullMethodName          = "/ardapoc.rent.Msg/DeleteLease"
 	Msg_PayRent_FullMethodName              = "/ardapoc.rent.Msg/PayRent"
 	Msg_InitiateCancellation_FullMethodName = "/ardapoc.rent.Msg/InitiateCancellation"
+	Msg_ApproveCancellation_FullMethodName  = "/ardapoc.rent.Msg/ApproveCancellation"
 )
 
 // MsgClient is the client API for Msg service.
@@ -40,6 +41,7 @@ type MsgClient interface {
 	DeleteLease(ctx context.Context, in *MsgDeleteLease, opts ...grpc.CallOption) (*MsgDeleteLeaseResponse, error)
 	PayRent(ctx context.Context, in *MsgPayRent, opts ...grpc.CallOption) (*MsgPayRentResponse, error)
 	InitiateCancellation(ctx context.Context, in *MsgInitiateCancellation, opts ...grpc.CallOption) (*MsgInitiateCancellationResponse, error)
+	ApproveCancellation(ctx context.Context, in *MsgApproveCancellation, opts ...grpc.CallOption) (*MsgApproveCancellationResponse, error)
 }
 
 type msgClient struct {
@@ -104,6 +106,15 @@ func (c *msgClient) InitiateCancellation(ctx context.Context, in *MsgInitiateCan
 	return out, nil
 }
 
+func (c *msgClient) ApproveCancellation(ctx context.Context, in *MsgApproveCancellation, opts ...grpc.CallOption) (*MsgApproveCancellationResponse, error) {
+	out := new(MsgApproveCancellationResponse)
+	err := c.cc.Invoke(ctx, Msg_ApproveCancellation_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility
@@ -116,6 +127,7 @@ type MsgServer interface {
 	DeleteLease(context.Context, *MsgDeleteLease) (*MsgDeleteLeaseResponse, error)
 	PayRent(context.Context, *MsgPayRent) (*MsgPayRentResponse, error)
 	InitiateCancellation(context.Context, *MsgInitiateCancellation) (*MsgInitiateCancellationResponse, error)
+	ApproveCancellation(context.Context, *MsgApproveCancellation) (*MsgApproveCancellationResponse, error)
 	mustEmbedUnimplementedMsgServer()
 }
 
@@ -140,6 +152,9 @@ func (UnimplementedMsgServer) PayRent(context.Context, *MsgPayRent) (*MsgPayRent
 }
 func (UnimplementedMsgServer) InitiateCancellation(context.Context, *MsgInitiateCancellation) (*MsgInitiateCancellationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method InitiateCancellation not implemented")
+}
+func (UnimplementedMsgServer) ApproveCancellation(context.Context, *MsgApproveCancellation) (*MsgApproveCancellationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ApproveCancellation not implemented")
 }
 func (UnimplementedMsgServer) mustEmbedUnimplementedMsgServer() {}
 
@@ -262,6 +277,24 @@ func _Msg_InitiateCancellation_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_ApproveCancellation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgApproveCancellation)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).ApproveCancellation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_ApproveCancellation_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).ApproveCancellation(ctx, req.(*MsgApproveCancellation))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Msg_ServiceDesc is the grpc.ServiceDesc for Msg service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -292,6 +325,10 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "InitiateCancellation",
 			Handler:    _Msg_InitiateCancellation_Handler,
+		},
+		{
+			MethodName: "ApproveCancellation",
+			Handler:    _Msg_ApproveCancellation_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

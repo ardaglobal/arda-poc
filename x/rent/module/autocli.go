@@ -69,6 +69,12 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Short:          "Send a InitiateCancellation tx",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "leaseId"}},
 				},
+				{
+					RpcMethod:      "ApproveCancellation",
+					Use:            "approve-cancellation [lease-id]",
+					Short:          "Send a ApproveCancellation tx",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "leaseId"}},
+				},
 				// this line is used by ignite scaffolding # autocli/tx
 			},
 		},
