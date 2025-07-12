@@ -1,24 +1,21 @@
+# This is the base compose file and is configured to run published images.
+# For local development (building from source), use the override file:
+# docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 services:
   arda:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: arda-pocd
+    image: ghcr.io/ardaglobal/arda-poc:${IMAGE_TAG:-latest}
     ports:
       - "26657:26657"   # Tendermint RPC
       - "1317:1317"     # REST API
       - "9090:9090"     # gRPC
       - "4500:4500"     # Faucet
     volumes:
-      - arda_state:/data            # <-- named volume, not host bind
+      - arda_state:/data
     environment:
       - ARDA_HOME=/data/.arda-poc
 
   sidecar:
-    build:
-      context: .
-      dockerfile: cmd/tx-sidecar/Dockerfile
-    image: tx-sidecar-compose
+    image: ghcr.io/ardaglobal/arda-poc-tx-sidecar:${IMAGE_TAG:-latest}
     volumes:
       - arda_state:/data            # share chain state
       - sidecar_data:/app/local_data         # own DB
@@ -29,7 +26,7 @@ services:
       - GRPC_ADDR=arda:9090
       - NODE_RPC_URL=http://arda:26657
       - FAUCET_URL=http://arda:4500
-      - ARDA_HOME=/data/.arda-poc               # <-- tell sidecar where to find the keyring
+      - ARDA_HOME=/data/.arda-poc
     depends_on:
       - arda
 

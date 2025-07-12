@@ -1,0 +1,18 @@
+# This is an override file for local development.
+# It tells docker-compose to build the images from source instead of pulling from a registry.
+#
+# Usage:
+# docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+
+services:
+  arda:
+    image: arda-poc-local
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+  sidecar:
+    image: arda-poc-tx-sidecar-local
+    build:
+      context: .
+      dockerfile: cmd/tx-sidecar/Dockerfile 

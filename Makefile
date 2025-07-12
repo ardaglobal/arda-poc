@@ -209,10 +209,10 @@ docker-push-tx-sidecar: docker-build-tx-sidecar
 	@docker push ghcr.io/$(GHCR_NAMESPACE)/$(SIDECAR_IMAGE_NAME):latest
 .PHONY: docker-push-tx-sidecar
 
-# Docker Compose commands
+# Docker Compose commands (for published images by default)
 dc-up:
-	@echo "--> Starting docker-compose services"
-	@docker-compose up -d --build
+	@echo "--> Starting docker-compose services with published images"
+	@docker-compose up -d
 .PHONY: dc-up
 
 dc-down:
@@ -224,3 +224,26 @@ dc-logs:
 	@echo "--> Tailing logs for all services"
 	@docker-compose logs -f
 .PHONY: dc-logs
+
+# Docker Compose commands for local development (building from source)
+COMPOSE_DEV_FILES := -f docker-compose.yml -f docker-compose.dev.yml
+
+dc-build-dev:
+	@echo "--> Building local docker images for development"
+	@docker-compose $(COMPOSE_DEV_FILES) build
+.PHONY: dc-build-dev
+
+dc-up-dev:
+	@echo "--> Starting docker-compose services for local development"
+	@docker-compose $(COMPOSE_DEV_FILES) up -d
+.PHONY: dc-up-dev
+
+dc-down-dev:
+	@echo "--> Stopping docker-compose services for local development"
+	@docker-compose $(COMPOSE_DEV_FILES) down
+.PHONY: dc-down-dev
+
+dc-logs-dev:
+	@echo "--> Tailing logs for local development services"
+	@docker-compose $(COMPOSE_DEV_FILES) logs -f
+.PHONY: dc-logs-dev
