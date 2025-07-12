@@ -8,7 +8,7 @@ RUN curl -L "https://get.ignite.com/cli@${IGNITE_VERSION}!" | bash
 WORKDIR /src
 COPY . .
 
-RUN ignite chain build && ignite chain init --home .arda-poc
+RUN /usr/local/bin/ignite chain build && /usr/local/bin/ignite chain init --home .arda-poc
 
 # put ./build on the PATH so `which` can see the binary
 ENV PATH="/src/build:${PATH}"

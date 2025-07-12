@@ -192,6 +192,7 @@ docker-build-tx-sidecar:
 .PHONY: docker-build-tx-sidecar
 
 # Push to ghcr.io
+# Can use the following to login: $ echo $CR_PAT | docker login ghcr.io -u USERNAME --password-stdin
 docker-push-main: docker-build-main
 	@echo "--> Pushing $(MAIN_IMAGE_NAME):$(IMAGE_TAG) to ghcr.io"
 	@docker tag $(MAIN_IMAGE_NAME) ghcr.io/$(GHCR_NAMESPACE)/$(MAIN_IMAGE_NAME):$(IMAGE_TAG)
