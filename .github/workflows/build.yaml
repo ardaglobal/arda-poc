@@ -1,0 +1,105 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  GO_VERSION: "1.23.0"
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Verify dependencies
+        run: go mod verify
+
+      - name: Check go mod tidy
+        run: |
+          go mod tidy
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "go.mod or go.sum is not tidy. Please run 'go mod tidy' and commit changes."
+            exit 1
+          fi
+
+      - name: Run go vet
+        run: go vet ./...
+
+      - name: Run govulncheck
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          govulncheck ./...
+
+      - name: Run linting
+        run: |
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.61.0
+          golangci-lint run --timeout=10m
+
+      - name: Run unit tests
+        run: go test -v -timeout 20m ./...
+
+      - name: Run tests with race detection
+        run: go test -v -race -timeout 20m ./...
+
+      - name: Run benchmarks
+        run: go test -v -timeout 20m -bench=. ./...
+
+      - name: Build main daemon
+        run: |
+          BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          COMMIT=$(git log -1 --format='%H')
+          VERSION=$(git describe --exact-match 2>/dev/null || echo "${BRANCH}-${COMMIT}")
+
+          ldflags="-X github.com/cosmos/cosmos-sdk/version.Name=arda-poc \
+                   -X github.com/cosmos/cosmos-sdk/version.AppName=arda-pocd \
+                   -X github.com/cosmos/cosmos-sdk/version.Version=${VERSION} \
+                   -X github.com/cosmos/cosmos-sdk/version.Commit=${COMMIT}"
+
+          go build -ldflags "${ldflags}" -o arda-pocd ./cmd/arda-pocd
+
+      - name: Build transaction sidecar
+        run: |
+          cd cmd/tx-sidecar
+          go build -o tx-sidecar .
+
+      - name: Build all modules
+        run: |
+          go build ./x/arda/...
+          go build ./x/mortgage/...
+          go build ./x/property/...
+          go build ./x/usdarda/...
+          go build ./app/...
+          go build ./pkg/...
+          go build ./testutil/...
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: binaries
+          path: |
+            arda-pocd
+            cmd/tx-sidecar/tx-sidecar
