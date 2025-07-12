@@ -8,10 +8,10 @@ RUN curl -L "https://get.ignite.com/cli@${IGNITE_VERSION}!" | bash
 WORKDIR /src
 COPY . .
 
+RUN /usr/local/bin/ignite chain build && /usr/local/bin/ignite chain init --home .arda-poc
+
 # put ./build on the PATH so `which` can see the binary
 ENV PATH="/src/build:${PATH}"
-
-RUN ignite chain build && ignite chain init --home .arda-poc
 
 # figure out where the node binary is *at runtime* and copy it out
 RUN BIN=$(which arda-pocd 2>/dev/null || true)  \

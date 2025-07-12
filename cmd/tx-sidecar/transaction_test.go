@@ -494,7 +494,8 @@ func BenchmarkGetTransactionEventsHandler(b *testing.B) {
 		req := httptest.NewRequest(http.MethodGet, "/tx/events/"+txHash, nil)
 		w := httptest.NewRecorder()
 		server.getTransactionEventsHandler(w, req)
-
+	}
+}
 
 func TestListTransactionsPagination(t *testing.T) {
 	// Create a server with some test transactions

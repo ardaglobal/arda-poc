@@ -1,4 +1,4 @@
-			BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
 COMMIT := $(shell git log -1 --format='%H')
 APPNAME := arda-poc
 
@@ -175,21 +175,44 @@ prod:
 ###  Docker  ###
 ################
 
+GHCR_NAMESPACE ?= ardaglobal
+IMAGE_TAG ?= $(VERSION)
+MAIN_IMAGE_NAME ?= arda-poc
+SIDECAR_IMAGE_NAME ?= arda-poc-tx-sidecar
+
 # Individual build commands
 docker-build-main:
-	@echo "--> Building arda-pocd docker image"
-	@docker build -t arda-pocd-ignite -f Dockerfile .
+	@echo "--> Building $(MAIN_IMAGE_NAME) docker image"
+	@docker build -t $(MAIN_IMAGE_NAME) -f Dockerfile .
 .PHONY: docker-build-main
 
 docker-build-tx-sidecar:
-	@echo "--> Building tx-sidecar docker image"
-	@docker build -t tx-sidecar-compose -f cmd/tx-sidecar/Dockerfile .
+	@echo "--> Building $(SIDECAR_IMAGE_NAME) docker image"
+	@docker build -t $(SIDECAR_IMAGE_NAME) -f cmd/tx-sidecar/Dockerfile .
 .PHONY: docker-build-tx-sidecar
 
-# Docker Compose commands
+# Push to ghcr.io
+# Can use the following to login: $ echo $CR_PAT | docker login ghcr.io -u USERNAME --password-stdin
+docker-push-main: docker-build-main
+	@echo "--> Pushing $(MAIN_IMAGE_NAME):$(IMAGE_TAG) to ghcr.io"
+	@docker tag $(MAIN_IMAGE_NAME) ghcr.io/$(GHCR_NAMESPACE)/$(MAIN_IMAGE_NAME):$(IMAGE_TAG)
+	@docker tag $(MAIN_IMAGE_NAME) ghcr.io/$(GHCR_NAMESPACE)/$(MAIN_IMAGE_NAME):latest
+	@docker push ghcr.io/$(GHCR_NAMESPACE)/$(MAIN_IMAGE_NAME):$(IMAGE_TAG)
+	@docker push ghcr.io/$(GHCR_NAMESPACE)/$(MAIN_IMAGE_NAME):latest
+.PHONY: docker-push-main
+
+docker-push-tx-sidecar: docker-build-tx-sidecar
+	@echo "--> Pushing $(SIDECAR_IMAGE_NAME):$(IMAGE_TAG) to ghcr.io"
+	@docker tag $(SIDECAR_IMAGE_NAME) ghcr.io/$(GHCR_NAMESPACE)/$(SIDECAR_IMAGE_NAME):$(IMAGE_TAG)
+	@docker tag $(SIDECAR_IMAGE_NAME) ghcr.io/$(GHCR_NAMESPACE)/$(SIDECAR_IMAGE_NAME):latest
+	@docker push ghcr.io/$(GHCR_NAMESPACE)/$(SIDECAR_IMAGE_NAME):$(IMAGE_TAG)
+	@docker push ghcr.io/$(GHCR_NAMESPACE)/$(SIDECAR_IMAGE_NAME):latest
+.PHONY: docker-push-tx-sidecar
+
+# Docker Compose commands (for published images by default)
 dc-up:
-	@echo "--> Starting docker-compose services"
-	@docker-compose up -d --build
+	@echo "--> Starting docker-compose services with published images"
+	@docker-compose up -d
 .PHONY: dc-up
 
 dc-down:
@@ -201,3 +224,26 @@ dc-logs:
 	@echo "--> Tailing logs for all services"
 	@docker-compose logs -f
 .PHONY: dc-logs
+
+# Docker Compose commands for local development (building from source)
+COMPOSE_DEV_FILES := -f docker-compose.yml -f docker-compose.dev.yml
+
+dc-build-dev:
+	@echo "--> Building local docker images for development"
+	@docker-compose $(COMPOSE_DEV_FILES) build
+.PHONY: dc-build-dev
+
+dc-up-dev:
+	@echo "--> Starting docker-compose services for local development"
+	@docker-compose $(COMPOSE_DEV_FILES) up -d
+.PHONY: dc-up-dev
+
+dc-down-dev:
+	@echo "--> Stopping docker-compose services for local development"
+	@docker-compose $(COMPOSE_DEV_FILES) down
+.PHONY: dc-down-dev
+
+dc-logs-dev:
+	@echo "--> Tailing logs for local development services"
+	@docker-compose $(COMPOSE_DEV_FILES) logs -f
+.PHONY: dc-logs-dev
