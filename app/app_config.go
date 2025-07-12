@@ -40,9 +40,12 @@ import (
 	"cosmossdk.io/x/nft"
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	mortgagemodulev1 "github.com/ardaglobal/arda-poc/api/ardapoc/mortgage/module"
+	rentmodulev1 "github.com/ardaglobal/arda-poc/api/ardapoc/rent/module"
 	usdardamodulev1 "github.com/ardaglobal/arda-poc/api/ardapoc/usdarda/module"
 	_ "github.com/ardaglobal/arda-poc/x/mortgage/module" // import for side-effects
 	mortgagemoduletypes "github.com/ardaglobal/arda-poc/x/mortgage/types"
+	_ "github.com/ardaglobal/arda-poc/x/rent/module" // import for side-effects
+	rentmoduletypes "github.com/ardaglobal/arda-poc/x/rent/types"
 	_ "github.com/ardaglobal/arda-poc/x/usdarda/module" // import for side-effects
 	usdardamoduletypes "github.com/ardaglobal/arda-poc/x/usdarda/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
@@ -107,6 +110,7 @@ var (
 		propertymoduletypes.ModuleName,
 		usdardamoduletypes.ModuleName,
 		mortgagemoduletypes.ModuleName,
+		rentmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 
@@ -135,6 +139,7 @@ var (
 		propertymoduletypes.ModuleName,
 		usdardamoduletypes.ModuleName,
 		mortgagemoduletypes.ModuleName,
+		rentmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	}
 
@@ -157,6 +162,7 @@ var (
 		propertymoduletypes.ModuleName,
 		usdardamoduletypes.ModuleName,
 		mortgagemoduletypes.ModuleName,
+		rentmoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	}
 
@@ -330,6 +336,10 @@ var (
 			{
 				Name:   mortgagemoduletypes.ModuleName,
 				Config: appconfig.WrapAny(&mortgagemodulev1.Module{}),
+			},
+			{
+				Name:   rentmoduletypes.ModuleName,
+				Config: appconfig.WrapAny(&rentmodulev1.Module{}),
 			},
 			// this line is used by starport scaffolding # stargate/app/moduleConfig
 		},

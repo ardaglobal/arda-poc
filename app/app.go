@@ -80,6 +80,7 @@ import (
 	propertymodulekeeper "github.com/ardaglobal/arda-poc/x/property/keeper"
 	usdardamodulekeeper "github.com/ardaglobal/arda-poc/x/usdarda/keeper"
 
+	rentmodulekeeper "github.com/ardaglobal/arda-poc/x/rent/keeper"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	"github.com/ardaglobal/arda-poc/docs"
@@ -155,6 +156,7 @@ type App struct {
 	PropertyKeeper propertymodulekeeper.Keeper
 	UsdardaKeeper  usdardamodulekeeper.Keeper
 	MortgageKeeper mortgagemodulekeeper.Keeper
+	RentKeeper     rentmodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// simulation manager
@@ -265,6 +267,7 @@ func New(
 		&app.PropertyKeeper,
 		&app.UsdardaKeeper,
 		&app.MortgageKeeper,
+		&app.RentKeeper,
 		// this line is used by starport scaffolding # stargate/app/keeperDefinition
 	); err != nil {
 		panic(err)
