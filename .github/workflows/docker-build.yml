@@ -18,9 +18,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: arda-pocd
+          - name: arda-poc
             dockerfile: ./Dockerfile
-          - name: tx-sidecar
+          - name: arda-poc-tx-sidecar
             dockerfile: ./cmd/tx-sidecar/Dockerfile
 
     steps:
@@ -38,7 +38,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@v5
       with:
-        images: ${{ env.REGISTRY }}/${{ github.repository }}/${{ matrix.name }}
+        images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ matrix.name }}
         tags: |
           type=ref,event=branch
           type=ref,event=pr
