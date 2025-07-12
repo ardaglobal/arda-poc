@@ -1,9 +1,24 @@
 ###############  Stage 1 – build  ###############
 FROM golang:1.24-alpine AS builder
 ARG IGNITE_VERSION=v28.10.0
+ARG TARGETARCH
+ARG TARGETOS
 
 RUN apk add --no-cache build-base git curl bash
-RUN curl -L "https://get.ignite.com/cli@${IGNITE_VERSION}!" | bash
+
+# Set up architecture-specific variables
+RUN case ${TARGETARCH} in \
+    "amd64") IGNITE_ARCH=amd64 ;; \
+    "arm64") IGNITE_ARCH=arm64 ;; \
+    *) echo "Unsupported architecture: ${TARGETARCH}" && exit 1 ;; \
+    esac && \
+    echo "Building for ${TARGETOS}/${TARGETARCH}, downloading ignite-${IGNITE_ARCH}" && \
+    curl -L "https://github.com/ignite/cli/releases/download/${IGNITE_VERSION}/ignite-${IGNITE_ARCH}" -o /tmp/ignite && \
+    chmod +x /tmp/ignite && \
+    mv /tmp/ignite /usr/local/bin/ignite
+
+# Verify the binary works
+RUN /usr/local/bin/ignite version || (echo "Ignite binary verification failed" && exit 1)
 
 WORKDIR /src
 COPY . .

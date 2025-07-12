@@ -257,3 +257,42 @@ curl https://your-domain.com/user/list
 ```
 
 Remember to replace `your-domain.com` and `your-secure-admin-key-here` with your actual domain and a secure admin key throughout this guide.
+
+# Docker Build Cross-Platform Compatibility
+
+## Issue
+The original Dockerfile used the Ignite CLI installation script (`curl -L "https://get.ignite.com/cli@${IGNITE_VERSION}!" | bash`) which had architecture detection issues in Docker multi-platform builds. This caused builds to fail on Linux servers (Ubuntu) while working on Mac with Apple Silicon.
+
+## Solution
+The Dockerfile has been updated to:
+
+1. **Explicit Architecture Handling**: Uses Docker's built-in `TARGETARCH` and `TARGETOS` build arguments to detect the target platform
+2. **Direct Binary Download**: Downloads the correct architecture-specific binary directly from GitHub releases instead of relying on the auto-detection script
+3. **Binary Verification**: Verifies the downloaded binary works before proceeding with the build
+4. **Multi-platform Support**: Properly handles both `linux/amd64` and `linux/arm64` architectures
+
+## Testing
+To test the cross-platform Docker build:
+
+```bash
+# Build for both architectures
+docker buildx build --platform linux/amd64,linux/arm64 -t test-build .
+
+# Test locally on your current architecture
+docker build -t test-build .
+docker run --rm test-build arda-pocd version
+```
+
+## Original Architecture Detection Issues
+The original installation script (`get.ignite.com/cli`) has these limitations in Docker Buildx:
+- May not correctly detect the target architecture during multi-platform builds
+- Could install binaries in unexpected locations
+- Doesn't handle cross-compilation scenarios well
+
+## New Architecture Detection
+The updated Dockerfile uses:
+- `TARGETARCH`: Provided by Docker Buildx (amd64, arm64, etc.)
+- `TARGETOS`: Provided by Docker Buildx (linux, windows, etc.)
+- Direct GitHub release downloads with explicit architecture matching
+
+This ensures reliable builds across different development environments and CI/CD systems.
